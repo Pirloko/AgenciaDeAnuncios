@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { listarSlugs } from "@/lib/sitios";
+import { ANUNCIOS_SITIOS } from "@/lib/anuncios-seo";
 import { SITE_URL } from "@/lib/seo";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -13,6 +14,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: now,
       changeFrequency: "weekly" as const,
       priority: 0.9,
+    })),
+    ...ANUNCIOS_SITIOS.filter((s) => slugs.includes(s)).map((slug) => ({
+      url: `${SITE_URL}/anuncios-${slug}`,
+      lastModified: now,
+      changeFrequency: "monthly" as const,
+      priority: 0.75,
     })),
   ];
 }

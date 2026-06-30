@@ -47,6 +47,13 @@ export const KEYWORDS: Record<string, string[]> = {
     "precios simpleescorts por horario",
     "subidas simpleescorts",
   ],
+  escorcitas: [
+    "publicar en escorcitas",
+    "anuncio escort escorcitas chile",
+    "precios escorcitas top premium gold",
+    "publicacion escort mujer trans masculino",
+    "avisos destacados escorcitas",
+  ],
 };
 
 // Título/description por sitio (opcional; si no, se generan automáticamente)
@@ -73,6 +80,11 @@ export const SEO_OVERRIDES: Record<
     title: "Super Turbo en SimpleEscorts — precios por horario",
     description:
       "Cotiza Super Turbo en SimpleEscorts: foto 2,5× más grande, etiqueta y color distintivo. 5 subidas por horario. Hasta 20× más contactos según franjas y días.",
+  },
+  escorcitas: {
+    title: "Precios de publicación en Escorcitas (TOP, PREMIUM, GOLD)",
+    description:
+      "Cotiza tu publicación en Escorcitas: escort mujer, trans o masculino. Planes TOP, PREMIUM y GOLD por 1, 3 o 7 días. Rotación dentro de cada categoría.",
   },
 };
 

@@ -67,6 +67,12 @@ a { color: inherit; }
 .chimbis-note--result { text-align: left; margin-top: 14px; }
 .locanto-note { background: #fff8ef; border: 1px solid #f5dcc0; border-radius: 14px; padding: 12px 14px; font-size: 13px; color: var(--muted); line-height: 1.45; margin: 4px 0 14px; }
 .locanto-note--result { text-align: left; margin-top: 14px; }
+.escorcitas-note { background: #fdf5f8; border: 1px solid #e8c4d4; border-radius: 14px; padding: 12px 14px; font-size: 13px; color: var(--muted); line-height: 1.45; margin: 4px 0 14px; }
+.escorcitas-note--result { text-align: left; margin-top: 14px; }
+.ptag--top { background: #b8e6b8; color: #1a5c1a; }
+.ptag--prem { background: #b8d4f5; color: #1a3d6b; }
+.ptag--gold { background: #f5e6a8; color: #6b5200; }
+.opt .ds--detail { font-size: 12px; margin-top: 4px; color: #888; }
 .aviso-ejemplo { margin: 0 0 8px; }
 .aviso-ejemplo__frame { width: 100%; border-radius: 12px; overflow: hidden; border: 1px solid var(--line); background: #f7f8fc; line-height: 0; }
 .aviso-ejemplo img { width: 100%; height: auto; display: block; vertical-align: top; }
@@ -151,7 +157,77 @@ a { color: inherit; }
 .seo .note { color: var(--muted); font-size: 12px; margin: 10px 0 0; }
 .faq dt { font-weight: 600; margin-top: 14px; font-size: 15px; line-height: 1.35; }
 .faq dt:first-child { margin-top: 0; }
+.faq dt a { color: inherit; text-decoration: none; }
+.faq dt a:hover { color: var(--brand); text-decoration: underline; }
+.faq-teaser { margin: 0 0 14px; font-size: 13px; }
+.faq-teaser a { color: var(--brand); font-weight: 600; text-decoration: none; }
+.faq-teaser a:hover { text-decoration: underline; }
+.guia-completa { margin: 0 0 12px; font-size: 14px; }
+.guia-completa a { color: var(--brand); font-weight: 600; text-decoration: none; }
+.guia-completa a:hover { text-decoration: underline; }
+.faq--acordeon { padding: 0; overflow: hidden; }
+.faq-acordeon__hdr {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 18px;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+.faq-acordeon__title { font-size: 15px; font-weight: 700; }
+.faq-acordeon__icon {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1;
+}
+.faq-acordeon__panel { padding: 0 18px 16px; }
+.faq--solo-preguntas dt a { color: var(--brand); font-weight: 600; }
 .faq dd { margin: 4px 0 0; color: #444; font-size: 14px; line-height: 1.5; }
+
+/* Guías SEO /anuncios-{sitio} */
+.page-anuncios { padding-bottom: max(24px, env(safe-area-inset-bottom)); }
+.anuncios-hdr { display: flex; align-items: center; justify-content: space-between; padding: 18px 2px 12px; }
+.anuncios-hdr .logo { font-weight: 800; font-size: 24px; color: var(--brand); letter-spacing: -.5px; }
+.anuncios-hdr .dom { font-size: 11px; color: var(--muted); font-weight: 500; }
+.anuncios-article { padding: 0 2px 8px; }
+.anuncios-title { font-size: 26px; font-weight: 800; letter-spacing: -.5px; margin: 0 0 12px; line-height: 1.2; }
+.anuncios-intro { color: var(--muted); font-size: 14.5px; line-height: 1.55; margin: 0 0 10px; }
+.anuncios-block { margin-top: 22px; padding-top: 20px; border-top: 1px solid var(--line); }
+.anuncios-h2 { font-size: 18px; font-weight: 700; margin: 0 0 14px; }
+.anuncios-ejemplos { display: flex; flex-direction: column; gap: 12px; }
+.faq--anuncios dt.faq-seo-section { scroll-margin-top: 18px; }
+.faq--anuncios dt.faq-seo-section:not(:first-of-type) {
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+  margin-top: 16px;
+}
+.anuncios-cta { text-align: center; margin: 28px 0 8px; }
+.anuncios-cta__btn {
+  display: inline-block;
+  background: var(--brand);
+  color: #fff;
+  font-weight: 700;
+  font-size: 16px;
+  padding: 14px 22px;
+  border-radius: 14px;
+  text-decoration: none;
+}
+.anuncios-cta__btn:hover { opacity: .92; }
 
 footer.foot { color: var(--muted); font-size: 12px; text-align: center; padding: 20px 0 8px; line-height: 1.55; }
 footer.foot a { color: var(--brand); font-weight: 600; }

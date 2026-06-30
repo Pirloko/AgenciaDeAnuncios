@@ -15,6 +15,8 @@ import {
   clp,
 } from "@/lib/chimbis";
 import { enlaceWhatsApp } from "@/lib/whatsapp";
+import { CHIMBIS_EJEMPLOS } from "@/lib/chimbis-ejemplos";
+import { EjemploAviso } from "@/components/EjemploAviso";
 
 type Step = "region" | "dias" | "subidas" | "plan" | "resultado";
 
@@ -229,14 +231,16 @@ export default function CotizadorChimbis({ sitio }: { sitio: Sitio }) {
               <br />
               quieres?
             </h2>
-            <p className="qsub">Toca entre TOP, Destacado e Historias según lo que necesites.</p>
+            <p className="qsub qsub--tight">
+              Toca el plan. Así ves cómo quedará tu aviso en el listado.
+            </p>
             {planesOpciones.map(({ plan: p, precio }) => {
               const info = CHIMBIS_PLAN_INFO[p];
               return (
                 <button
                   key={p}
                   className={"opt opt--plan" + (plan === p ? " on" : "")}
-                  onClick={() => pickAdvance(() => setPlan(p))}
+                  onClick={() => setPlan(p)}
                 >
                   <span>
                     <span className="tt">
@@ -253,7 +257,25 @@ export default function CotizadorChimbis({ sitio }: { sitio: Sitio }) {
                 </button>
               );
             })}
-            <BackBar onBack={back} />
+            {plan && (
+              <div className="aviso-ejemplo--preview">
+                <EjemploAviso
+                  src={CHIMBIS_EJEMPLOS[plan].src}
+                  alt={CHIMBIS_EJEMPLOS[plan].alt}
+                  label={`Así se ve ${CHIMBIS_EJEMPLOS[plan].label} en el listado`}
+                  width={CHIMBIS_EJEMPLOS[plan].width}
+                  height={CHIMBIS_EJEMPLOS[plan].height}
+                />
+              </div>
+            )}
+            <div className="bar">
+              <button className="back" onClick={back}>
+                Atrás
+              </button>
+              <button className="cta" disabled={!plan} onClick={next}>
+                Continuar
+              </button>
+            </div>
           </>
         )}
       </div>

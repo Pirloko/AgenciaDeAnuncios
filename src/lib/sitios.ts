@@ -149,19 +149,58 @@ export const FALLBACK: Record<string, Sitio> = {
       },
     ],
   },
+  escorcitas: {
+    slug: "escorcitas",
+    nombre: "Escorcitas",
+    dominio: "escorcitas.cl",
+    slogan: "Agencia de publicaciones",
+    color: "#922B5C",
+    accent: "#C9A227",
+    disponible: true,
+    descripcion: [
+      "En Escorcitas publicas por tipo de escort (mujer, trans o masculino), eliges los días y el plan TOP, PREMIUM o GOLD.",
+      "Los anuncios rotan dentro de su categoría: TOP abajo, PREMIUM más arriba y GOLD en la parte más alta del listado.",
+    ],
+    niveles: [
+      { id: "TOP", nombre: "TOP", beneficio: "Etiqueta verde TOP. Hasta 8 fotos." },
+      { id: "PREMIUM", nombre: "PREMIUM", beneficio: "Destacado en azul. Hasta 10 fotos y 1 video." },
+      { id: "GOLD", nombre: "GOLD", beneficio: "El más visible. Hasta 12 fotos, videos, historias y clave de acceso." },
+    ],
+    horarios: [],
+    diurno: {},
+    madrugada: {},
+    faq: [
+      {
+        q: "¿Cómo funciona la publicación en Escorcitas?",
+        a: "Eliges si publicas como escort mujer, trans o masculino, cuántos días (1, 3 o 7) y el plan TOP, PREMIUM o GOLD. El cotizador te da el precio al tiro.",
+      },
+      {
+        q: "¿Qué diferencia hay entre TOP, PREMIUM y GOLD?",
+        a: "TOP lleva etiqueta verde y hasta 8 fotos. PREMIUM se destaca en azul, permite 2 fotos de perfil, hasta 10 fotos y 1 video opcional. GOLD es el más grande: 3 fotos de portada, hasta 12 fotos, videos, clave de acceso y estados/historias.",
+      },
+      {
+        q: "¿Cómo rotan los anuncios?",
+        a: "Cada anuncio rota dentro de su propia categoría (TOP, PREMIUM o GOLD). Periódicamente uno sube arriba y van turnándose entre los de la misma plan.",
+      },
+      {
+        q: "¿Cuánto cuesta publicar en Escorcitas?",
+        a: "Depende de los días y el plan. Ejemplo 7 días: TOP $8.000, PREMIUM $11.000, GOLD $16.000. El cotizador muestra el valor exacto.",
+      },
+    ],
+  },
 };
 
 const PRONTO_HOME: Pick<Sitio, "slug" | "nombre" | "dominio" | "color" | "disponible">[] = [
   {
-    slug: "escorcitas",
-    nombre: "Escorcitas",
-    dominio: "escorcitas.cl",
-    color: "#922B5C",
+    slug: "wenas",
+    nombre: "Wenas",
+    dominio: "wenas.cl",
+    color: "#D32F2F",
     disponible: false,
   },
 ];
 
-const HOME_ORDER = ["skokka", "chimbis", "locanto", "simpleescort", "escorcitas"];
+const HOME_ORDER = ["skokka", "chimbis", "locanto", "simpleescort", "escorcitas", "wenas"];
 
 // Slugs disponibles (para generateStaticParams / sitemap)
 export async function listarSlugs(): Promise<string[]> {
@@ -226,7 +265,7 @@ export async function listarSitios(): Promise<
 // Sitio completo por slug (arma la tabla de precios desde filas planas)
 export async function obtenerSitio(slug: string): Promise<Sitio | null> {
   // Sitios con cotizador propio usan datos locales (no el esquema Skokka de Supabase)
-  if (["chimbis", "locanto", "simpleescort"].includes(slug) && FALLBACK[slug]) {
+  if (["chimbis", "locanto", "simpleescort", "escorcitas"].includes(slug) && FALLBACK[slug]) {
     return FALLBACK[slug];
   }
 

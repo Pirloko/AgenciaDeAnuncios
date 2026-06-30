@@ -4,6 +4,7 @@ import Cotizador from "@/components/Cotizador";
 import CotizadorChimbis from "@/components/CotizadorChimbis";
 import CotizadorLocanto from "@/components/CotizadorLocanto";
 import CotizadorSimpleEscort from "@/components/CotizadorSimpleEscort";
+import CotizadorEscorcitas from "@/components/CotizadorEscorcitas";
 import CatalogoSEO from "@/components/CatalogoSEO";
 import JsonLd from "@/components/JsonLd";
 import { obtenerSitio, listarSlugs } from "@/lib/sitios";
@@ -15,6 +16,10 @@ import {
 } from "@/lib/chimbis";
 import { iterarOfertasLocanto, LOCANTO_DIAS } from "@/lib/locanto";
 import { iterarOfertasSimpleEscort } from "@/lib/simpleescort";
+import {
+  iterarOfertasEscorcitas,
+  ESCORCITAS_PLAN_INFO,
+} from "@/lib/escorcitas";
 import { SITE_NAME, SITE_URL, getKeywords, SEO_OVERRIDES } from "@/lib/seo";
 
 export const revalidate = 3600; // refresca precios desde Supabase cada hora
@@ -92,6 +97,14 @@ export default async function SitioPage({
               priceCurrency: "CLP",
               availability: "https://schema.org/InStock",
             }))
+          : slug === "escorcitas"
+            ? iterarOfertasEscorcitas().map((o) => ({
+                "@type": "Offer" as const,
+                name: `${ESCORCITAS_PLAN_INFO[o.plan].nombre} · ${o.dias} día${o.dias > 1 ? "s" : ""}`,
+                price: String(o.precio),
+                priceCurrency: "CLP",
+                availability: "https://schema.org/InStock",
+              }))
           : [
           ...Object.entries(sitio.diurno).flatMap(([key, precios]) => {
             const [s, d] = key.split("-").map(Number);
@@ -157,6 +170,8 @@ export default async function SitioPage({
         <CotizadorLocanto sitio={sitio} />
       ) : slug === "simpleescort" ? (
         <CotizadorSimpleEscort sitio={sitio} />
+      ) : slug === "escorcitas" ? (
+        <CotizadorEscorcitas sitio={sitio} />
       ) : (
         <Cotizador sitio={sitio} />
       )}
