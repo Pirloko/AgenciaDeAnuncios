@@ -4,12 +4,13 @@ import { useMemo, useState } from "react";
 import type { Sitio, Modalidad } from "@/types/sitio";
 import { clp, precioUnitario, calcularTotal } from "@/lib/precios";
 import { franjaDiurnaPorIndice, resumenHorarios } from "@/lib/horarios";
+import { SKOKKA_EJEMPLOS } from "@/lib/skokka-ejemplos";
+import { EjemploAviso } from "@/components/EjemploAviso";
+import { enlaceWhatsApp } from "@/lib/whatsapp";
 
 type Step = "cuando" | "dias" | "subidas" | "nivel" | "resultado";
 
-// 📲 Poné tu número con código país, sin signos (ej: "56912345678").
-// Vacío = WhatsApp deja elegir contacto.
-const NUMERO_WHATSAPP = "";
+// 📲 WhatsApp: +56 9 6355 0717 (ver src/lib/whatsapp.ts)
 
 export default function Cotizador({ sitio }: { sitio: Sitio }) {
   const [step, setStep] = useState(0);
@@ -83,9 +84,7 @@ export default function Cotizador({ sitio }: { sitio: Sitio }) {
         `• ${cuando}\n• ${dias} día${dias > 1 ? "s" : ""}\n• ${subidasEfectivas} subidas\n` +
         `• Nivel: ${nivelNombre}\n• Horarios: ${hTxt}\n• Total: ${clp(total)}`
     );
-    const wa = NUMERO_WHATSAPP
-      ? `https://wa.me/${NUMERO_WHATSAPP}?text=${msg}`
-      : `https://wa.me/?text=${msg}`;
+    const wa = enlaceWhatsApp(msg);
 
     return (
       <div className="cotizador" style={brandStyle}>
@@ -126,8 +125,8 @@ export default function Cotizador({ sitio }: { sitio: Sitio }) {
       <div className="step">
         {cur === "cuando" && (
           <>
-            <h2 className="q">¿Cuándo querés que se vea?</h2>
-            <p className="qsub">Elegí la franja del día.</p>
+            <h2 className="q">¿Cuándo quieres que se vea?</h2>
+            <p className="qsub">Toca la franja del día.</p>
             <Opt
               on={modalidad === "diurno"}
               icon="☀️"
@@ -140,7 +139,7 @@ export default function Cotizador({ sitio }: { sitio: Sitio }) {
             {modalidad === "diurno" && (
               <div className="horarios-inline">
                 <p className="qsub horarios-inline__hint">
-                  Tocá una o más franjas. Mientras más elijas, más se ve tu aviso.
+                  Toca una o más franjas. Mientras más definas, más se ve tu aviso.
                 </p>
                 <button
                   type="button"
@@ -169,8 +168,8 @@ export default function Cotizador({ sitio }: { sitio: Sitio }) {
                 </div>
                 <p className="runtot">
                   {horarios.length
-                    ? `${horarios.length} horario${horarios.length > 1 ? "s" : ""} elegido${horarios.length > 1 ? "s" : ""}`
-                    : "Elegí al menos un horario"}
+                    ? `${horarios.length} horario${horarios.length > 1 ? "s" : ""} marcado${horarios.length > 1 ? "s" : ""}`
+                    : "Toca al menos un horario"}
                 </p>
               </div>
             )}
@@ -203,7 +202,7 @@ export default function Cotizador({ sitio }: { sitio: Sitio }) {
           <>
             <h2 className="q">¿Por cuántos días?</h2>
             <p className="qsub">Cuántos días seguidos estará activo tu aviso.</p>
-            {([[1, "Para probar"], [3, "El más elegido"], [7, "Mejor precio por día"]] as [number, string][]).map(
+            {([[1, "Para probar"], [3, "El más pedido"], [7, "Mejor precio por día"]] as [number, string][]).map(
               ([d, nota]) => (
                 <Opt
                   key={d}
@@ -224,11 +223,11 @@ export default function Cotizador({ sitio }: { sitio: Sitio }) {
             <h2 className="q">
               ¿Cuántas veces
               <br />
-              querés que suba?
+              quieres que suba?
             </h2>
             <p className="qsub">Cada «subida» lleva tu aviso de nuevo a los primeros lugares.</p>
             <p className="step-note">
-              Las subidas son <b>en cada horario</b> que elegiste
+              Las subidas son <b>en cada horario</b> que definiste
               {horarios.length > 0 && (
                 <>
                   {" "}
@@ -256,10 +255,10 @@ export default function Cotizador({ sitio }: { sitio: Sitio }) {
             <h2 className="q">
               ¿Qué tan destacado
               <br />
-              lo querés?
+              lo quieres?
             </h2>
-            <p className="qsub">
-              {modalidad === "diurno" ? "Precio por cada horario que elijas." : "Precio total de la madrugada."}
+            <p className="qsub qsub--tight">
+              Toca TOP, Súper Top o Top All in One. Así ves cómo quedará tu aviso.
             </p>
             {sitio.niveles.map((n) => {
               const p = precioUnitario(sitio, modalidad!, subidasEfectivas, dias, n.id);
@@ -267,7 +266,7 @@ export default function Cotizador({ sitio }: { sitio: Sitio }) {
                 <button
                   key={n.id}
                   className={"opt" + (nivel === n.id ? " on" : "")}
-                  onClick={() => pickAdvance(() => setNivel(n.id))}
+                  onClick={() => setNivel(n.id)}
                 >
                   <span>
                     <span className="tt">{n.nombre}</span>
@@ -280,7 +279,25 @@ export default function Cotizador({ sitio }: { sitio: Sitio }) {
                 </button>
               );
             })}
-            <BackBar onBack={back} />
+            {nivel && SKOKKA_EJEMPLOS[nivel] && (
+              <div className="aviso-ejemplo--preview">
+                <EjemploAviso
+                  src={SKOKKA_EJEMPLOS[nivel].src}
+                  alt={SKOKKA_EJEMPLOS[nivel].alt}
+                  label={`Así se ve ${SKOKKA_EJEMPLOS[nivel].label} en el listado`}
+                  width={SKOKKA_EJEMPLOS[nivel].width}
+                  height={SKOKKA_EJEMPLOS[nivel].height}
+                />
+              </div>
+            )}
+            <div className="bar">
+              <button className="back" onClick={back}>
+                Atrás
+              </button>
+              <button className="cta" disabled={!nivel} onClick={next}>
+                Continuar
+              </button>
+            </div>
           </>
         )}
 

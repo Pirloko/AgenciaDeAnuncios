@@ -14,10 +14,9 @@ import {
   precioChimbis,
   clp,
 } from "@/lib/chimbis";
+import { enlaceWhatsApp } from "@/lib/whatsapp";
 
 type Step = "region" | "dias" | "subidas" | "plan" | "resultado";
-
-const NUMERO_WHATSAPP = "56963550717";
 
 const STEPS: Step[] = ["region", "dias", "subidas", "plan", "resultado"];
 
@@ -81,7 +80,7 @@ export default function CotizadorChimbis({ sitio }: { sitio: Sitio }) {
         `• Plan: ${planNombre}\n` +
         `• Total: ${clp(total)}`
     );
-    const wa = `https://wa.me/${NUMERO_WHATSAPP}?text=${msg}`;
+    const wa = enlaceWhatsApp(msg);
 
     return (
       <div className="cotizador" style={brandStyle}>
@@ -97,8 +96,8 @@ export default function CotizadorChimbis({ sitio }: { sitio: Sitio }) {
             <Row k="Plan" v={planNombre} />
           </div>
           <p className="chimbis-note chimbis-note--result">
-            Recordá: en Chimbis solo se publican avisos con fotos 100% reales comprobables. También
-            podés subir videos.
+            Recuerda: en Chimbis solo se publican avisos con fotos 100% reales comprobables. También
+            puedes subir videos.
           </p>
           <a className="wa" href={wa} target="_blank" rel="noopener noreferrer">
             <span>💬</span> Pedir este aviso por WhatsApp
@@ -125,8 +124,8 @@ export default function CotizadorChimbis({ sitio }: { sitio: Sitio }) {
       <div className="step">
         {cur === "region" && (
           <>
-            <h2 className="q">¿Dónde querés publicar?</h2>
-            <p className="qsub">Elegí la zona de Chile para tu aviso destacado.</p>
+            <h2 className="q">¿Dónde quieres publicar?</h2>
+            <p className="qsub">Toca la zona de Chile para tu aviso destacado.</p>
             <Opt
               on={region === "santiago"}
               icon="🏙️"
@@ -157,7 +156,7 @@ export default function CotizadorChimbis({ sitio }: { sitio: Sitio }) {
             />
             <p className="chimbis-note">
               En Chimbis solo se publican avisos destacados con <b>fotos 100% reales comprobables</b>.
-              También podés subir <b>videos</b>.
+              También puedes subir <b>videos</b>.
             </p>
             <BackBar onBack={back} show={step > 0} />
           </>
@@ -167,7 +166,7 @@ export default function CotizadorChimbis({ sitio }: { sitio: Sitio }) {
           <>
             <h2 className="q">¿Por cuántos días?</h2>
             <p className="qsub">
-              {CHIMBIS_REGION_LABEL[region]} · elegí la duración de tu aviso.
+              {CHIMBIS_REGION_LABEL[region]} · define la duración de tu aviso.
             </p>
             {diasOpciones.map((d) => (
               <Opt
@@ -194,7 +193,7 @@ export default function CotizadorChimbis({ sitio }: { sitio: Sitio }) {
             <h2 className="q">
               ¿Cuántas veces
               <br />
-              querés que suba?
+              quieres que suba?
             </h2>
             <p className="qsub">
               Cada «subida» lleva tu aviso de nuevo a los primeros lugares del listado.
@@ -228,9 +227,9 @@ export default function CotizadorChimbis({ sitio }: { sitio: Sitio }) {
             <h2 className="q">
               ¿Qué plan
               <br />
-              querés?
+              quieres?
             </h2>
-            <p className="qsub">Elegí entre TOP, Destacado e Historias según lo que necesites.</p>
+            <p className="qsub">Toca entre TOP, Destacado e Historias según lo que necesites.</p>
             {planesOpciones.map(({ plan: p, precio }) => {
               const info = CHIMBIS_PLAN_INFO[p];
               return (

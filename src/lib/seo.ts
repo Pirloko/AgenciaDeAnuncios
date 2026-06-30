@@ -3,13 +3,13 @@
 //  Este es EL lugar para editar palabras clave y textos de SEO.
 // ============================================================
 
-export const SITE_NAME = "Destacados"; // 👈 cambiá por el nombre de tu agencia
+export const SITE_NAME = "Agencia de Publicaciones para Escort";
 export const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ?? "https://tudominio.cl";
 
 // Descripción general del sitio (home / fallback)
 export const SITE_DESCRIPTION =
-  "Cotiza y contrata avisos destacados en los principales sitios de clasificados de Chile. Precios claros por horario, subidas y días.";
+  "Agencia de Publicaciones para Escort. Desde 2015 en el rubro: creamos títulos y textos que venden, difuminamos rostro y cubrimos tatuajes. Cotiza tu aviso destacado al instante.";
 
 // ============================================================
 //  PALABRAS CLAVE POR SITIO  ←  EDITÁ ACÁ
@@ -32,8 +32,21 @@ export const KEYWORDS: Record<string, string[]> = {
     "precios chimbis top super top",
     "subir aviso chimbis primeros lugares",
   ],
-  // locanto: [...],
-  // simpleescort: [...],
+  locanto: [
+    "destacar aviso en locanto",
+    "publicar en locanto chile",
+    "anuncio destacado locanto",
+    "precios locanto top galeria",
+    "aviso top locanto 7 dias",
+  ],
+  simpleescort: [
+    "super turbo simpleescorts",
+    "super turbo 5x simpleescorts",
+    "destacar aviso simpleescorts",
+    "anuncio super turbo simpleescorts chile",
+    "precios simpleescorts por horario",
+    "subidas simpleescorts",
+  ],
 };
 
 // Título/description por sitio (opcional; si no, se generan automáticamente)
@@ -44,12 +57,22 @@ export const SEO_OVERRIDES: Record<
   skokka: {
     title: "Precios de avisos destacados en Skokka (TOP, Súper Top, All in One)",
     description:
-      "Cotiza tu aviso destacado en Skokka en segundos: TOP, Súper Top y Top All in One por horario, subidas y días. Valores actualizados, fácil y rápido.",
+      "Cotiza tu aviso destacado en Skokka al tiro: TOP, Súper Top y Top All in One por horario, subidas y días. Toca, define y te damos el precio.",
   },
   chimbis: {
     title: "Precios de avisos destacados en Chimbis (TOP, Destacado, Historias)",
     description:
       "Cotiza tu aviso destacado en Chimbis: Santiago/RM u otras ciudades. Planes TOP, Destacado e Historias por días y subidas. Fotos reales comprobables.",
+  },
+  locanto: {
+    title: "Precios de avisos destacados en Locanto (TOP, Galería, 7 días)",
+    description:
+      "Cotiza tu aviso destacado en Locanto: TOP, Galería o ambos por 7 días. Visible 24 hrs, rotación dentro de cada categoría.",
+  },
+  simpleescort: {
+    title: "Super Turbo en SimpleEscorts — precios por horario",
+    description:
+      "Cotiza Super Turbo en SimpleEscorts: foto 2,5× más grande, etiqueta y color distintivo. 5 subidas por horario. Hasta 20× más contactos según franjas y días.",
   },
 };
 

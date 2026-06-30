@@ -15,9 +15,28 @@ on conflict (slug) do nothing;
 
 -- Sitios "pronto" (se ven en el home, deshabilitados)
 insert into sitios (slug, nombre, dominio, color, disponible, orden) values
-  ('locanto',      'Locanto',       'locanto.cl',         '#f0901e', false, 3),
-  ('simpleescort', 'SimpleEscorts', 'simpleescorts.com',  '#6c5ce7', false, 4)
+  ('simpleescort', 'SimpleEscorts', 'simpleescorts.com',  '#6c5ce7', true, 4),
+  ('escorcitas', 'Escorcitas', 'escorcitas.cl', '#922B5C', false, 5)
 on conflict (slug) do nothing;
+
+-- Locanto (activo)
+insert into sitios (slug, nombre, dominio, slogan, color, accent, disponible, descripcion, faq, orden)
+values (
+  'locanto', 'Locanto', 'locanto.cl', 'Anuncios en Chile', '#f0901e', '#e67e22', true,
+  '["En Locanto los avisos destacados son por 7 días, visibles las 24 horas de cada día. Podés elegir TOP, Galería o ambos.","Tu anuncio rota dentro de su categoría: los TOP compiten entre TOP y van destacándose arriba de forma rotativa."]'::jsonb,
+  '[{"q":"¿Cuántos días dura un aviso destacado en Locanto?","a":"Los avisos destacados en Locanto son por 7 días. Durante ese período tu anuncio está visible las 24 horas de cada día."},{"q":"¿Cómo funciona la rotación en Locanto?","a":"Los anuncios se mueven dentro de su propia categoría. Los TOP rotan entre los TOP. Lo mismo en Galería."},{"q":"¿Qué diferencia hay entre TOP, Galería y TOP + Galería?","a":"TOP te ubica en la categoría TOP. Galería en Galería. TOP + Galería es una sola publicación en ambas."}]'::jsonb,
+  3
+)
+on conflict (slug) do update set
+  nombre = excluded.nombre,
+  dominio = excluded.dominio,
+  slogan = excluded.slogan,
+  color = excluded.color,
+  accent = excluded.accent,
+  disponible = excluded.disponible,
+  descripcion = excluded.descripcion,
+  faq = excluded.faq,
+  orden = excluded.orden;
 
 -- Chimbis (activo)
 insert into sitios (slug, nombre, dominio, desde, slogan, color, accent, disponible, descripcion, faq, orden)

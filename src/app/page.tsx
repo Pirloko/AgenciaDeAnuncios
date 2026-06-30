@@ -11,12 +11,17 @@ export default async function Home() {
     <main className="app app--fill">
       <div className="home">
         <div className="big">
-          Cotiza tu aviso
+          Agencia de Publicaciones
           <br />
-          destacado al toque
+          para Escort
         </div>
+        <p className="home-since">Desde 2015 en el rubro</p>
         <p className="lead">
-          Elegí el sitio, respondé unas preguntas simples y te mostramos el precio. Sin vueltas.
+          ¿Sin título ni textos? Te creamos uno que <b>vende</b>. Difuminamos o tapamos rostro y
+          cubrimos tatuajes si lo necesitas.
+        </p>
+        <p className="home-cta">
+          Toca el sitio, define tu aviso y te damos el precio al instante.
         </p>
 
         <div className="sitecards">
