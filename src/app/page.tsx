@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { listarSitios } from "@/lib/sitios";
 import { SITE_NAME } from "@/lib/seo";
@@ -10,6 +11,16 @@ export default async function Home() {
   return (
     <main className="app app--fill">
       <div className="home">
+        <div className="home-avatar">
+          <Image
+            src="/perfil-agencia.png"
+            alt="Agencia de Publicaciones para Escort"
+            width={128}
+            height={128}
+            className="home-avatar__img"
+            priority
+          />
+        </div>
         <div className="big">
           Agencia de Publicaciones
           <br />
