@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { listarSlugs } from "@/lib/sitios";
 import { ANUNCIOS_SITIOS } from "@/lib/anuncios-seo";
+import { VALORES_SITIOS } from "@/lib/valores-seo";
 import { SITE_URL } from "@/lib/seo";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -20,6 +21,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: now,
       changeFrequency: "monthly" as const,
       priority: 0.75,
+    })),
+    ...VALORES_SITIOS.filter((s) => slugs.includes(s)).map((slug) => ({
+      url: `${SITE_URL}/${slug}-valores`,
+      lastModified: now,
+      changeFrequency: "monthly" as const,
+      priority: 0.8,
     })),
   ];
 }

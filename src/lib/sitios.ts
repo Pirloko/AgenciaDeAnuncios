@@ -202,6 +202,22 @@ const PRONTO_HOME: Pick<Sitio, "slug" | "nombre" | "dominio" | "color" | "dispon
 
 const HOME_ORDER = ["skokka", "chimbis", "locanto", "simpleescort", "escorcitas", "wenas"];
 
+/** Si Supabase trae datos incompletos, rellena con FALLBACK del mismo slug. */
+function completarSitioDesdeFallback(slug: string, sitio: Sitio): Sitio {
+  const fb = FALLBACK[slug];
+  if (!fb) return sitio;
+
+  return {
+    ...sitio,
+    horarios: sitio.horarios.length ? sitio.horarios : fb.horarios,
+    niveles: sitio.niveles.length ? sitio.niveles : fb.niveles,
+    descripcion: sitio.descripcion.length ? sitio.descripcion : fb.descripcion,
+    faq: sitio.faq.length ? sitio.faq : fb.faq,
+    diurno: Object.keys(sitio.diurno).length ? sitio.diurno : fb.diurno,
+    madrugada: Object.keys(sitio.madrugada).length ? sitio.madrugada : fb.madrugada,
+  };
+}
+
 // Slugs disponibles (para generateStaticParams / sitemap)
 export async function listarSlugs(): Promise<string[]> {
   const desdeFallback = Object.keys(FALLBACK).filter((s) => FALLBACK[s].disponible);
@@ -292,7 +308,7 @@ export async function obtenerSitio(slug: string): Promise<Sitio | null> {
         (tabla[key] ||= {})[p.nivel] = p.precio;
       }
 
-      return {
+      return completarSitioDesdeFallback(slug, {
         slug,
         nombre: row.nombre,
         dominio: row.dominio,
@@ -307,7 +323,7 @@ export async function obtenerSitio(slug: string): Promise<Sitio | null> {
         diurno,
         madrugada,
         faq: row.faq ?? [],
-      };
+      });
     }
   }
   return FALLBACK[slug] ?? null;

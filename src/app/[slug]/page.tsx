@@ -21,6 +21,8 @@ import {
   ESCORCITAS_PLAN_INFO,
 } from "@/lib/escorcitas";
 import { SITE_NAME, SITE_URL, getKeywords, SEO_OVERRIDES } from "@/lib/seo";
+import Link from "next/link";
+import { esValoresSitio, rutaValores } from "@/lib/valores-seo";
 
 export const revalidate = 3600; // refresca precios desde Supabase cada hora
 
@@ -178,7 +180,13 @@ export default async function SitioPage({
       <CatalogoSEO sitio={sitio} />
       <footer className="foot">
         {sitio.descripcion[0]} <br />
-        <a href="/">Ver otros sitios</a>
+        {esValoresSitio(slug) && (
+          <>
+            <Link href={rutaValores(slug)}>Ver tabla completa de valores</Link>
+            <br />
+          </>
+        )}
+        <Link href="/">Ver otros sitios</Link>
       </footer>
     </main>
   );
