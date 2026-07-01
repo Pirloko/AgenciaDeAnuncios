@@ -57,15 +57,18 @@ function TablasRegionChimbis({ region }: { region: ChimbisRegion }) {
   );
 }
 
-export default function ChimbisValoresRegiones() {
+export default function ChimbisValoresRegiones({ expandirTodo = false }: { expandirTodo?: boolean }) {
   const [abiertas, setAbiertas] = useState<Record<ChimbisRegion, boolean>>({
-    santiago: false,
-    ciudades: false,
+    santiago: expandirTodo,
+    ciudades: expandirTodo,
   });
 
   function toggle(region: ChimbisRegion) {
+    if (expandirTodo) return;
     setAbiertas((prev) => ({ ...prev, [region]: !prev[region] }));
   }
+
+  const regionAbierta = (region: ChimbisRegion) => expandirTodo || abiertas[region];
 
   return (
     <div className="valores-chimbis-regiones">
@@ -74,7 +77,7 @@ export default function ChimbisValoresRegiones() {
         distintas.
       </p>
       {REGIONES.map((region) => {
-        const open = abiertas[region];
+        const open = regionAbierta(region);
         const panelId = `chimbis-valores-${region}`;
         return (
           <div key={region} className="card valores-acordeon">

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
-import { SITE_NAME, SITE_URL, SITE_DESCRIPTION } from "@/lib/seo";
+import { SITE_NAME, SITE_URL, SITE_DESCRIPTION, SITE_KEYWORDS } from "@/lib/seo";
 import "./globals.css";
 
 const poppins = Poppins({
@@ -17,6 +17,7 @@ export const metadata: Metadata = {
     template: `%s | ${SITE_NAME}`,
   },
   description: SITE_DESCRIPTION,
+  keywords: SITE_KEYWORDS,
   applicationName: SITE_NAME,
   alternates: { canonical: "/" },
   openGraph: {

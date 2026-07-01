@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import JsonLd from "@/components/JsonLd";
 import { TablaValoresPorSitio } from "@/components/TablasValores";
 import { obtenerSitio } from "@/lib/sitios";
-import { SITE_NAME, SITE_URL } from "@/lib/seo";
+import { SITE_NAME, SITE_URL, getKeywords } from "@/lib/seo";
 import { esValoresSitio, rutaValores, VALORES_INTRO, type ValoresSitioSlug } from "@/lib/valores-seo";
 
 export async function metadataValores(sitioSlug: ValoresSitioSlug): Promise<Metadata> {
@@ -21,6 +21,7 @@ export async function metadataValores(sitioSlug: ValoresSitioSlug): Promise<Meta
   return {
     title,
     description,
+    keywords: getKeywords(sitioSlug),
     alternates: { canonical: rutaValores(sitioSlug) },
     openGraph: {
       type: "article",

@@ -11,7 +11,7 @@ import {
   type AnunciosSitioSlug,
 } from "@/lib/anuncios-seo";
 import { obtenerSitio } from "@/lib/sitios";
-import { SITE_NAME, SITE_URL } from "@/lib/seo";
+import { SITE_NAME, SITE_URL, getKeywords } from "@/lib/seo";
 
 export async function metadataAnuncios(sitioSlug: AnunciosSitioSlug): Promise<Metadata> {
   const sitio = await obtenerSitio(sitioSlug);
@@ -26,6 +26,7 @@ export async function metadataAnuncios(sitioSlug: AnunciosSitioSlug): Promise<Me
   return {
     title,
     description,
+    keywords: getKeywords(sitioSlug),
     alternates: { canonical: `/anuncios-${sitioSlug}` },
     openGraph: {
       type: "article",

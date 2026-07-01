@@ -1,0 +1,28 @@
+-- =============================================================================
+-- PASO 3 — Crear usuario administrador
+-- Ejecutar DESPUÉS de 01-admin-schema.sql y 02-seed-anuncio-costos.sql
+-- =============================================================================
+--
+-- OPCIÓN A (recomendada): Dashboard de Supabase
+-- 1. Ve a Authentication → Users → Add user
+-- 2. Crea tu email y contraseña
+-- 3. En el usuario, edita "App Metadata" (raw_app_meta_data) y pon:
+--      { "role": "admin" }
+--
+-- OPCIÓN B: Si ya tienes un usuario creado, ejecuta esto (cambia el email):
+--
+-- update auth.users
+-- set raw_app_meta_data = coalesce(raw_app_meta_data, '{}'::jsonb) || '{"role": "admin"}'::jsonb
+-- where email = 'tu@email.com';
+--
+-- Verificar:
+-- select id, email, raw_app_meta_data from auth.users where email = 'tu@email.com';
+--
+-- =============================================================================
+-- Variables de entorno en Netlify / .env.local:
+--
+-- NEXT_PUBLIC_SUPABASE_URL=https://xxxx.supabase.co
+-- NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ...
+--
+-- Panel: https://tudominio.cl/admin/login
+-- =============================================================================

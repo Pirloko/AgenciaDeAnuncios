@@ -1,9 +1,25 @@
 import Image from "next/image";
 import Link from "next/link";
+import type { Metadata } from "next";
 import { listarSitios } from "@/lib/sitios";
-import { SITE_NAME } from "@/lib/seo";
+import { SITE_NAME, SITE_DESCRIPTION, SITE_URL, getKeywords } from "@/lib/seo";
 
 export const revalidate = 3600;
+
+export const metadata: Metadata = {
+  title: `${SITE_NAME} — Avisos destacados en Chile`,
+  description: SITE_DESCRIPTION,
+  keywords: getKeywords(),
+  alternates: { canonical: "/" },
+  openGraph: {
+    type: "website",
+    locale: "es_CL",
+    url: SITE_URL,
+    siteName: SITE_NAME,
+    title: `${SITE_NAME} — Avisos destacados en Chile`,
+    description: SITE_DESCRIPTION,
+  },
+};
 
 export default async function Home() {
   const sitios = await listarSitios();
