@@ -12,11 +12,12 @@ export const dynamic = "force-dynamic";
 
 export default async function AdminCostosPage() {
   try {
-    const { costos, skokkaCreditos, locantoDolar } = await cargarCostosAdmin();
+    const { costos, skokkaCreditos, simpleescortCreditos, locantoDolar } = await cargarCostosAdmin();
     return (
       <AdminDashboard
         costos={costos}
         skokkaCreditos={skokkaCreditos}
+        simpleescortCreditos={simpleescortCreditos}
         locantoDolar={locantoDolar}
       />
     );

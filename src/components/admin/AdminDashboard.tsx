@@ -7,6 +7,7 @@ import {
   type AnuncioCosto,
   type CampoCostoEditable,
   type LocantoDolarConfig,
+  type SimpleEscortCreditosConfig,
   type SkokkaCreditosConfig,
   type SitioAdmin,
   SITIO_ADMIN_LABEL,
@@ -28,13 +29,13 @@ import {
   calcularCostoAgenciaLocanto,
   calcularCostoAgenciaSkokka,
   calcularCreditosSkokka,
-  parseDecimalInput,
   clpAdminDecimal,
 } from "@/lib/admin-costos";
 
 interface Props {
   costos: AnuncioCosto[];
   skokkaCreditos: SkokkaCreditosConfig | null;
+  simpleescortCreditos: SimpleEscortCreditosConfig | null;
   locantoDolar: LocantoDolarConfig | null;
 }
 
@@ -55,6 +56,8 @@ function CostoEditor({
   variant,
   modoSkokka,
   modoLocanto,
+  modoCreditos,
+  ventaEditable,
   valorDolarClp,
   valorCreditoClp,
 }: {
@@ -72,6 +75,10 @@ function CostoEditor({
   variant: "desk" | "movil";
   modoSkokka: boolean;
   modoLocanto: boolean;
+  /** Skokka o SimpleEscort: sincroniza créditos ↔ costo. */
+  modoCreditos: boolean;
+  /** Si true, precio venta se edita (SimpleEscort, Escorcitas, Wenas). */
+  ventaEditable: boolean;
   valorDolarClp: number | null;
   valorCreditoClp: number | null;
 }) {
@@ -90,7 +97,7 @@ function CostoEditor({
   }, [row.id, row.updated_at, row.valor_plataforma, row.costo_agencia, row.creditos, row.precio_venta]);
 
   const costoNum = parseInputCLP(costo) ?? row.costo_agencia;
-  const ventaNum = parseInputCLP(venta);
+  const ventaNum = parseInputCLP(venta) ?? row.precio_venta;
   const ganancia = calcularGananciaLocal(costoNum, ventaNum) ?? row.ganancia;
   const margen = calcularMargenLocal(costoNum, ventaNum) ?? row.margen_pct;
 
@@ -101,13 +108,13 @@ function CostoEditor({
   }
 
   function sincronizarCostoDesdeCreditos(creditosStr: string) {
-    if (!modoSkokka || !valorCreditoClp) return;
+    if (!modoCreditos || !valorCreditoClp) return;
     const cr = parseInputCLP(creditosStr);
     if (cr != null) setCosto(String(calcularCostoAgenciaSkokka(cr, valorCreditoClp)));
   }
 
   function sincronizarCreditosDesdeCosto(costoStr: string) {
-    if (!modoSkokka || !valorCreditoClp) return;
+    if (!modoCreditos || !valorCreditoClp) return;
     const c = parseInputCLP(costoStr);
     if (c != null) setCreditos(String(calcularCreditosSkokka(c, valorCreditoClp)));
   }
@@ -132,7 +139,7 @@ function CostoEditor({
       setCosto(String(row.costo_agencia));
       return;
     }
-    if (modoSkokka && valorCreditoClp) {
+    if (modoCreditos && valorCreditoClp) {
       await onGuardarSkokkaCosto(row.id, n, row.costo_agencia);
       return;
     }
@@ -150,7 +157,7 @@ function CostoEditor({
       setCreditos(row.creditos != null ? String(row.creditos) : "");
       return;
     }
-    if (modoSkokka && valorCreditoClp) {
+    if (modoCreditos && valorCreditoClp) {
       if (n == null) {
         setCreditos(row.creditos != null ? String(row.creditos) : "");
         setCosto(String(row.costo_agencia));
@@ -278,6 +285,63 @@ function CostoEditor({
       );
     }
 
+    if (modoCreditos && !modoSkokka) {
+      return (
+        <tr>
+          <td className="admin-table__name">
+            <span className="admin-item__plan">{PLAN_LABEL[row.plan] ?? row.plan}</span>
+            <span className="admin-item__sub">
+              {row.subidas != null ? `${row.subidas} sub · ` : ""}
+              {row.dias} día{row.dias > 1 ? "s" : ""}
+            </span>
+          </td>
+          <td>
+            <input
+              className="admin-input"
+              type="text"
+              inputMode="numeric"
+              value={creditos}
+              placeholder="—"
+              onChange={(e) => {
+                setCreditos(e.target.value);
+                sincronizarCostoDesdeCreditos(e.target.value);
+              }}
+              disabled={saving === row.id + "creditos"}
+              onBlur={blurCreditos}
+            />
+          </td>
+          <td>
+            <input
+              className="admin-input"
+              type="text"
+              inputMode="numeric"
+              value={costo}
+              onChange={(e) => {
+                setCosto(e.target.value);
+                sincronizarCreditosDesdeCosto(e.target.value);
+              }}
+              disabled={saving === row.id + "costo_agencia"}
+              onBlur={blurCosto}
+            />
+          </td>
+          <td>
+            <input
+              className="admin-input"
+              type="text"
+              inputMode="numeric"
+              value={venta}
+              placeholder="—"
+              onChange={(e) => setVenta(e.target.value)}
+              disabled={saving === row.id + "precio_venta"}
+              onBlur={blurVenta}
+            />
+          </td>
+          <td className="admin-table__gan">{clpAdmin(ganancia)}</td>
+          <td className="admin-table__pct">{pctAdmin(margen)}</td>
+        </tr>
+      );
+    }
+
     return (
       <tr>
         <td className="admin-table__name">
@@ -385,7 +449,7 @@ function CostoEditor({
             />
           </label>
           <label className="admin-ficha__field admin-ficha__field--full">
-            <span>Precio venta (web)</span>
+            <span>Precio venta</span>
             <input
               className="admin-input admin-input--full"
               type="text"
@@ -444,7 +508,77 @@ function CostoEditor({
             <p className="admin-ficha__costo-auto">{clpAdmin(costoNum)}</p>
           </label>
           <label className="admin-ficha__field admin-ficha__field--full">
-            <span>Precio venta (web)</span>
+            <span>Precio venta</span>
+            <input
+              className="admin-input admin-input--full"
+              type="text"
+              inputMode="numeric"
+              value={venta}
+              placeholder="Sin precio"
+              onChange={(e) => setVenta(e.target.value)}
+              disabled={saving === row.id + "precio_venta"}
+              onBlur={blurVenta}
+            />
+          </label>
+        </div>
+        <footer className="admin-ficha__foot">
+          <div>
+            <span className="admin-ficha__lbl">Ganancia</span>
+            <strong className="admin-ficha__gan">{clpAdmin(ganancia)}</strong>
+          </div>
+          <div>
+            <span className="admin-ficha__lbl">Margen</span>
+            <strong className="admin-ficha__pct">{pctAdmin(margen)}</strong>
+          </div>
+        </footer>
+      </article>
+    );
+  }
+
+  if (modoCreditos && !modoSkokka) {
+    return (
+      <article className="admin-ficha admin-ficha--skokka">
+        <header className="admin-ficha__hdr">
+          <h4 className="admin-ficha__tit">{PLAN_LABEL[row.plan] ?? row.plan}</h4>
+          <span className="admin-ficha__badge">
+            {row.subidas != null ? `${row.subidas} sub · ` : ""}
+            {row.dias}d
+          </span>
+        </header>
+        <div className="admin-ficha__edit admin-ficha__edit--skokka">
+          <label className="admin-ficha__field">
+            <span>Créditos</span>
+            <input
+              className="admin-input admin-input--full"
+              type="text"
+              inputMode="numeric"
+              value={creditos}
+              placeholder="Sin créditos"
+              onChange={(e) => {
+                setCreditos(e.target.value);
+                sincronizarCostoDesdeCreditos(e.target.value);
+              }}
+              disabled={saving === row.id + "creditos"}
+              onBlur={blurCreditos}
+            />
+          </label>
+          <label className="admin-ficha__field">
+            <span>Costo agencia</span>
+            <input
+              className="admin-input admin-input--full"
+              type="text"
+              inputMode="numeric"
+              value={costo}
+              onChange={(e) => {
+                setCosto(e.target.value);
+                sincronizarCreditosDesdeCosto(e.target.value);
+              }}
+              disabled={saving === row.id + "costo_agencia"}
+              onBlur={blurCosto}
+            />
+          </label>
+          <label className="admin-ficha__field admin-ficha__field--full">
+            <span>Precio venta</span>
             <input
               className="admin-input admin-input--full"
               type="text"
@@ -524,7 +658,7 @@ function CostoEditor({
             type="text"
             inputMode="numeric"
             value={venta}
-            placeholder="Sin venta"
+            placeholder="Sin precio"
             onChange={(e) => setVenta(e.target.value)}
             disabled={saving === row.id + "precio_venta"}
             onBlur={blurVenta}
@@ -545,7 +679,12 @@ function CostoEditor({
   );
 }
 
-export default function AdminDashboard({ costos, skokkaCreditos, locantoDolar }: Props) {
+export default function AdminDashboard({
+  costos,
+  skokkaCreditos,
+  simpleescortCreditos,
+  locantoDolar,
+}: Props) {
   const router = useRouter();
   const [sitio, setSitio] = useState<SitioAdmin>("skokka");
   const [q, setQ] = useState("");
@@ -558,8 +697,17 @@ export default function AdminDashboard({ costos, skokkaCreditos, locantoDolar }:
   const [valorDolarInput, setValorDolarInput] = useState(
     String(locantoDolar?.valor_dolar_clp ?? 868)
   );
-  const [valorCreditoInput, setValorCreditoInput] = useState(
-    String(skokkaCreditos?.valor_credito_clp ?? 40.241)
+  const [paqueteSkokkaInput, setPaqueteSkokkaInput] = useState(
+    String(skokkaCreditos?.costo_total_clp ?? 199993)
+  );
+  const [cantidadSkokkaInput, setCantidadSkokkaInput] = useState(
+    String(skokkaCreditos?.cantidad_creditos ?? 4970)
+  );
+  const [paqueteSeInput, setPaqueteSeInput] = useState(
+    String(simpleescortCreditos?.costo_total_clp ?? 100000)
+  );
+  const [cantidadCreditoSeInput, setCantidadCreditoSeInput] = useState(
+    String(simpleescortCreditos?.cantidad_creditos ?? 1000)
   );
 
   useEffect(() => {
@@ -567,11 +715,34 @@ export default function AdminDashboard({ costos, skokkaCreditos, locantoDolar }:
   }, [locantoDolar?.valor_dolar_clp]);
 
   useEffect(() => {
-    setValorCreditoInput(String(skokkaCreditos?.valor_credito_clp ?? 40.241));
-  }, [skokkaCreditos?.valor_credito_clp]);
+    setPaqueteSkokkaInput(String(skokkaCreditos?.costo_total_clp ?? 199993));
+    setCantidadSkokkaInput(String(skokkaCreditos?.cantidad_creditos ?? 4970));
+  }, [skokkaCreditos?.costo_total_clp, skokkaCreditos?.cantidad_creditos]);
+
+  useEffect(() => {
+    setPaqueteSeInput(String(simpleescortCreditos?.costo_total_clp ?? 100000));
+    setCantidadCreditoSeInput(String(simpleescortCreditos?.cantidad_creditos ?? 1000));
+  }, [simpleescortCreditos?.costo_total_clp, simpleescortCreditos?.cantidad_creditos]);
 
   const valorDolarClp = locantoDolar?.valor_dolar_clp ?? 868;
-  const valorCreditoClp = skokkaCreditos?.valor_credito_clp ?? 40.241;
+  const valorCreditoSkokka = skokkaCreditos?.valor_credito_clp ?? 40.241;
+  const valorCreditoSimpleEscort = simpleescortCreditos?.valor_credito_clp ?? 100;
+  const valorCreditoClp =
+    sitio === "simpleescort" ? valorCreditoSimpleEscort : valorCreditoSkokka;
+
+  const valorCreditoSkokkaPreview = useMemo(() => {
+    const paquete = parseInputCLP(paqueteSkokkaInput);
+    const cantidad = parseInputCLP(cantidadSkokkaInput);
+    if (paquete == null || cantidad == null || cantidad <= 0) return valorCreditoSkokka;
+    return Math.round((paquete / cantidad) * 1000) / 1000;
+  }, [paqueteSkokkaInput, cantidadSkokkaInput, valorCreditoSkokka]);
+
+  const valorCreditoSePreview = useMemo(() => {
+    const paquete = parseInputCLP(paqueteSeInput);
+    const cantidad = parseInputCLP(cantidadCreditoSeInput);
+    if (paquete == null || cantidad == null || cantidad <= 0) return valorCreditoSimpleEscort;
+    return Math.round((paquete / cantidad) * 1000) / 1000;
+  }, [paqueteSeInput, cantidadCreditoSeInput, valorCreditoSimpleEscort]);
 
   const delSitio = useMemo(
     () => filtrarCostosSitio(costos.filter((c) => c.sitio === sitio), sitio),
@@ -797,10 +968,18 @@ export default function AdminDashboard({ costos, skokkaCreditos, locantoDolar }:
     }
   }
 
-  async function guardarValorCreditoSkokka() {
-    const n = parseDecimalInput(valorCreditoInput);
-    if (n == null || n === valorCreditoClp) {
-      setValorCreditoInput(String(valorCreditoClp));
+  async function guardarConfigSkokka() {
+    const paquete = parseInputCLP(paqueteSkokkaInput);
+    const cantidad = parseInputCLP(cantidadSkokkaInput);
+    if (paquete == null || paquete <= 0 || cantidad == null || cantidad <= 0) {
+      setPaqueteSkokkaInput(String(skokkaCreditos?.costo_total_clp ?? 199993));
+      setCantidadSkokkaInput(String(skokkaCreditos?.cantidad_creditos ?? 4970));
+      return;
+    }
+    if (
+      paquete === (skokkaCreditos?.costo_total_clp ?? 199993) &&
+      cantidad === (skokkaCreditos?.cantidad_creditos ?? 4970)
+    ) {
       return;
     }
 
@@ -812,16 +991,60 @@ export default function AdminDashboard({ costos, skokkaCreditos, locantoDolar }:
       const res = await fetch("/api/admin/config/skokka-creditos", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ valor_credito_clp: n }),
+        body: JSON.stringify({ costo_total_clp: paquete, cantidad_creditos: cantidad }),
       });
 
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        setMsg(data.error ?? "Error al guardar el valor del crédito.");
+        setMsg(data.error ?? "Error al guardar el paquete Skokka.");
         setMsgError(true);
         return;
       }
-      setMsg("Valor del crédito actualizado ✓");
+      setMsg("Paquete Skokka actualizado ✓");
+      setMsgError(false);
+      router.refresh();
+      setTimeout(() => setMsg(""), 2500);
+    } catch {
+      setMsg("Sin conexión. Revisa tu red.");
+      setMsgError(true);
+    } finally {
+      setSaving(null);
+    }
+  }
+
+  async function guardarConfigSimpleEscort() {
+    const paquete = parseInputCLP(paqueteSeInput);
+    const cantidad = parseInputCLP(cantidadCreditoSeInput);
+    if (paquete == null || paquete <= 0 || cantidad == null || cantidad <= 0) {
+      setPaqueteSeInput(String(simpleescortCreditos?.costo_total_clp ?? 100000));
+      setCantidadCreditoSeInput(String(simpleescortCreditos?.cantidad_creditos ?? 1000));
+      return;
+    }
+    if (
+      paquete === (simpleescortCreditos?.costo_total_clp ?? 100000) &&
+      cantidad === (simpleescortCreditos?.cantidad_creditos ?? 1000)
+    ) {
+      return;
+    }
+
+    setSaving("simpleescort_credito");
+    setMsg("");
+    setMsgError(false);
+
+    try {
+      const res = await fetch("/api/admin/config/simpleescort-creditos", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ costo_total_clp: paquete, cantidad_creditos: cantidad }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        setMsg(data.error ?? "Error al guardar créditos SimpleEscort.");
+        setMsgError(true);
+        return;
+      }
+      setMsg("Paquete SimpleEscort actualizado ✓");
       setMsgError(false);
       router.refresh();
       setTimeout(() => setMsg(""), 2500);
@@ -842,6 +1065,9 @@ export default function AdminDashboard({ costos, skokkaCreditos, locantoDolar }:
 
   const esSkokka = sitio === "skokka";
   const esLocanto = sitio === "locanto";
+  const esSimpleEscort = sitio === "simpleescort";
+  const modoCreditos = esSkokka || esSimpleEscort;
+  const ventaEditable = true;
   const filtroSubidas = sitioTieneFiltroSubidas(sitio);
   const sinDatosSitio = delSitio.length === 0;
 
@@ -874,25 +1100,75 @@ export default function AdminDashboard({ costos, skokkaCreditos, locantoDolar }:
       {esSkokka && skokkaCreditos && (
         <div className="admin-skokka-creditos">
           <p className="admin-skokka-creditos__pack">
-            Paquete de créditos: <b>{clpAdmin(skokkaCreditos.costo_total_clp)}</b> por{" "}
-            <b>{skokkaCreditos.cantidad_creditos.toLocaleString("es-CL")}</b> créditos (
-            {clpAdminDecimal(skokkaCreditos.valor_credito_clp)} c/u)
+            Valor del crédito (auto): <b>{clpAdminDecimal(valorCreditoSkokkaPreview)}</b> c/u
           </p>
-          <label className="admin-skokka-creditos__field">
-            <span>Valor del crédito (CLP)</span>
-            <input
-              className="admin-input"
-              type="text"
-              inputMode="decimal"
-              value={valorCreditoInput}
-              onChange={(e) => setValorCreditoInput(e.target.value)}
-              disabled={saving === "skokka_credito"}
-              onBlur={guardarValorCreditoSkokka}
-            />
-          </label>
+          <div className="admin-skokka-creditos__row">
+            <label className="admin-skokka-creditos__field">
+              <span>Valor del paquete (CLP)</span>
+              <input
+                className="admin-input"
+                type="text"
+                inputMode="numeric"
+                value={paqueteSkokkaInput}
+                onChange={(e) => setPaqueteSkokkaInput(e.target.value)}
+                disabled={saving === "skokka_credito"}
+                onBlur={guardarConfigSkokka}
+              />
+            </label>
+            <label className="admin-skokka-creditos__field">
+              <span>Créditos del paquete</span>
+              <input
+                className="admin-input"
+                type="text"
+                inputMode="numeric"
+                value={cantidadSkokkaInput}
+                onChange={(e) => setCantidadSkokkaInput(e.target.value)}
+                disabled={saving === "skokka_credito"}
+                onBlur={guardarConfigSkokka}
+              />
+            </label>
+          </div>
           <p className="admin-skokka-creditos__hint">
-            En Skokka el <b>costo agencia</b> = créditos × valor del crédito. Si cambias créditos,
-            costo o el valor del crédito, los demás se actualizan solos.
+            En Skokka el <b>costo agencia</b> = créditos del anuncio × valor del crédito. El valor
+            unitario se calcula solo: paquete ÷ créditos.
+          </p>
+        </div>
+      )}
+
+      {esSimpleEscort && simpleescortCreditos && (
+        <div className="admin-skokka-creditos">
+          <p className="admin-skokka-creditos__pack">
+            Valor del crédito (auto): <b>{clpAdminDecimal(valorCreditoSePreview)}</b> c/u
+          </p>
+          <div className="admin-skokka-creditos__row">
+            <label className="admin-skokka-creditos__field">
+              <span>Valor del paquete (CLP)</span>
+              <input
+                className="admin-input"
+                type="text"
+                inputMode="numeric"
+                value={paqueteSeInput}
+                onChange={(e) => setPaqueteSeInput(e.target.value)}
+                disabled={saving === "simpleescort_credito"}
+                onBlur={guardarConfigSimpleEscort}
+              />
+            </label>
+            <label className="admin-skokka-creditos__field">
+              <span>Créditos del paquete</span>
+              <input
+                className="admin-input"
+                type="text"
+                inputMode="numeric"
+                value={cantidadCreditoSeInput}
+                onChange={(e) => setCantidadCreditoSeInput(e.target.value)}
+                disabled={saving === "simpleescort_credito"}
+                onBlur={guardarConfigSimpleEscort}
+              />
+            </label>
+          </div>
+          <p className="admin-skokka-creditos__hint">
+            En SimpleEscort el <b>costo agencia</b> = créditos × valor del crédito (valores propios,
+            distintos a Skokka). El valor unitario se calcula solo: paquete ÷ créditos.
           </p>
         </div>
       )}
@@ -1023,7 +1299,7 @@ export default function AdminDashboard({ costos, skokkaCreditos, locantoDolar }:
         <section className="admin-empty">
           <p>
             {sinDatosSitio
-              ? `Aún no hay costos cargados para ${SITIO_ADMIN_LABEL[sitio] ?? sitio}. Pronto podrás agregarlos aquí.`
+              ? `Aún no hay costos cargados para ${SITIO_ADMIN_LABEL[sitio] ?? sitio}. Recarga la página para crearlos automáticamente.`
               : "No hay anuncios con esos filtros."}
           </p>
           {!sinDatosSitio && (
@@ -1051,6 +1327,14 @@ export default function AdminDashboard({ costos, skokkaCreditos, locantoDolar }:
                       {esSkokka ? (
                         <>
                           <th>Valor plataforma</th>
+                          <th>Créditos</th>
+                          <th>Costo agencia</th>
+                          <th>Precio venta</th>
+                          <th>Ganancia</th>
+                          <th>%</th>
+                        </>
+                      ) : esSimpleEscort ? (
+                        <>
                           <th>Créditos</th>
                           <th>Costo agencia</th>
                           <th>Precio venta</th>
@@ -1090,6 +1374,8 @@ export default function AdminDashboard({ costos, skokkaCreditos, locantoDolar }:
                         variant="desk"
                         modoSkokka={esSkokka}
                         modoLocanto={esLocanto}
+                        modoCreditos={modoCreditos}
+                        ventaEditable={ventaEditable}
                         valorDolarClp={valorDolarClp}
                         valorCreditoClp={valorCreditoClp}
                       />
@@ -1111,6 +1397,8 @@ export default function AdminDashboard({ costos, skokkaCreditos, locantoDolar }:
                     variant="movil"
                     modoSkokka={esSkokka}
                     modoLocanto={esLocanto}
+                    modoCreditos={modoCreditos}
+                    ventaEditable={ventaEditable}
                     valorDolarClp={valorDolarClp}
                     valorCreditoClp={valorCreditoClp}
                   />

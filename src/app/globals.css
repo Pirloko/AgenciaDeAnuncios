@@ -631,7 +631,8 @@ footer.foot a { color: var(--brand); font-weight: 600; }
 }
 .admin-skokka-creditos__pack { margin: 0; font-size: 13px; color: var(--muted); line-height: 1.45; }
 .admin-skokka-creditos b { color: var(--ink); }
-.admin-skokka-creditos__field { display: flex; flex-direction: column; gap: 6px; max-width: 200px; }
+.admin-skokka-creditos__row { display: flex; flex-wrap: wrap; gap: 10px 14px; }
+.admin-skokka-creditos__field { display: flex; flex-direction: column; gap: 6px; max-width: 220px; flex: 1 1 160px; }
 .admin-skokka-creditos__field span { font-size: 12px; font-weight: 600; color: var(--muted); }
 .admin-skokka-creditos__hint { margin: 0; font-size: 12px; color: var(--muted); line-height: 1.45; }
 .admin-table__creditos { font-weight: 700; color: var(--brand); white-space: nowrap; }
@@ -823,6 +824,7 @@ footer.foot a { color: var(--brand); font-weight: 600; }
   line-height: 1.3;
 }
 .admin-promo__hint { margin: 0 0 14px; font-size: 13px; color: var(--muted); }
+.admin-promo__hint--block { margin: 0 0 18px; line-height: 1.45; }
 .admin-promo__warn { color: #c62828; font-size: 13px; margin: 0 0 12px; }
 .admin-promo__input {
   width: 100%;

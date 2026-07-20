@@ -8,10 +8,49 @@ import {
   filtrarCostosSitio,
   clpAdmin,
 } from "@/lib/admin-costos";
-
+import {
+  ESCORCITAS_PRECIOS,
+  type EscorcitasDias,
+  type EscorcitasPlan,
+} from "@/lib/escorcitas";
+import {
+  SIMPLEESCORT_DIAS,
+  SIMPLEESCORT_HORARIOS_TOTAL,
+  calcularTotalSimpleEscort,
+  type SimpleEscortDias,
+} from "@/lib/simpleescort";
 
 /** Sobrante máximo deseable al ajustar una promoción al presupuesto. */
 export const SOBRANTE_OBJETIVO = 1500;
+
+/** Días que ofrece el asistente de promociones. */
+export const DIAS_PROMO = [1, 3, 7, 15, 30] as const;
+export type DiasPromo = (typeof DIAS_PROMO)[number];
+
+/** Zona geográfica (afecta precios de Chimbis; otras páginas se mantienen). */
+export type ZonaPromo = "santiago" | "regiones";
+
+export const ZONA_PROMO_OPTS: { id: ZonaPromo; label: string; hint: string }[] = [
+  {
+    id: "santiago",
+    label: "Santiago / Región Metropolitana",
+    hint: "Precios Chimbis de Santiago/RM",
+  },
+  {
+    id: "regiones",
+    label: "Ciudades del norte o sur de Chile",
+    hint: "Precios Chimbis de otras ciudades",
+  },
+];
+
+export const ZONA_PROMO_LABEL: Record<ZonaPromo, string> = {
+  santiago: "Santiago / RM",
+  regiones: "Norte o sur",
+};
+
+/** Cuántas opciones distintas se muestran (si existen). */
+export const MIN_OPCIONES_PROMO = 3;
+export const MAX_OPCIONES_PROMO = 8;
 
 export interface LineaPromo {
   id: string;
@@ -31,12 +70,13 @@ export interface PromocionSugerida {
   lineas: LineaPromo[];
   total: number;
   sobrante: number;
+  sitios: SitioAdmin[];
 }
 
 export interface FiltrosPromo {
   presupuesto: number;
-  sitiosElegidos: SitioAdmin[];
-  dias: number | "all";
+  dias: number;
+  zona: ZonaPromo;
 }
 
 export function parsePresupuestoCLP(raw: string): number | null {
@@ -46,27 +86,70 @@ export function parsePresupuestoCLP(raw: string): number | null {
   return Number.isFinite(n) && n > 0 ? Math.round(n) : null;
 }
 
-export function sitiosConPrecioVenta(costos: AnuncioCosto[]): SitioAdmin[] {
-  const catalogo = construirCatalogo(costos);
-  const set = new Set(catalogo.map((i) => i.sitio));
-  return SITIOS_ADMIN.filter((s) => set.has(s));
-}
+/** Ofertas SimpleEscort / Escorcitas desde precios de la web pública (no hay filas en costos admin). */
+function catalogoDesdeWebPublica(): LineaPromo[] {
+  const out: LineaPromo[] = [];
 
-export function diasDisponiblesPromo(
-  costos: AnuncioCosto[],
-  sitios: SitioAdmin[]
-): number[] {
-  const catalogo = construirCatalogo(costos).filter((i) => sitios.includes(i.sitio));
-  return [...new Set(catalogo.map((i) => i.dias))].sort((a, b) => a - b);
+  for (const dias of SIMPLEESCORT_DIAS) {
+    const d = dias as SimpleEscortDias;
+    const full = calcularTotalSimpleEscort(d, SIMPLEESCORT_HORARIOS_TOTAL);
+    out.push({
+      id: `web-simpleescort-full-${d}`,
+      sitio: "simpleescort",
+      plan: "SUPER_TURBO_FULL",
+      etiqueta: `Super Turbo 5X full · ${d}d`,
+      categoria: "general",
+      dias: d,
+      subidas: 20,
+      precio: full,
+    });
+    for (const horarios of [1, 2, 3] as const) {
+      const precio = calcularTotalSimpleEscort(d, horarios);
+      if (precio >= full) continue;
+      out.push({
+        id: `web-simpleescort-${horarios}h-${d}`,
+        sitio: "simpleescort",
+        plan: `SUPER_TURBO_${horarios}H`,
+        etiqueta: `Super Turbo 5X · ${horarios} horario${horarios > 1 ? "s" : ""} · ${d}d`,
+        categoria: "general",
+        dias: d,
+        subidas: 5 * horarios,
+        precio,
+      });
+    }
+  }
+
+  const planes: EscorcitasPlan[] = ["TOP", "PREMIUM", "GOLD"];
+  const diasEsc: EscorcitasDias[] = [1, 3, 7];
+  for (const dias of diasEsc) {
+    for (const plan of planes) {
+      out.push({
+        id: `web-escorcitas-${plan}-${dias}`,
+        sitio: "escorcitas",
+        plan,
+        etiqueta: `${plan} · ${dias}d`,
+        categoria: "general",
+        dias,
+        subidas: null,
+        precio: ESCORCITAS_PRECIOS[dias][plan],
+      });
+    }
+  }
+
+  // wenas se carga desde anuncio_costos (seed admin)
+  return out;
 }
 
 export function construirCatalogo(costos: AnuncioCosto[]): LineaPromo[] {
   const out: LineaPromo[] = [];
+  const sitiosConFilas = new Set<SitioAdmin>();
+
   for (const sitio of SITIOS_ADMIN) {
     const items = filtrarCostosSitio(
       costos.filter((c) => c.sitio === sitio && c.precio_venta != null && c.precio_venta > 0),
       sitio
     );
+    if (items.length) sitiosConFilas.add(sitio);
     for (const c of items) {
       out.push({
         id: c.id,
@@ -80,25 +163,48 @@ export function construirCatalogo(costos: AnuncioCosto[]): LineaPromo[] {
       });
     }
   }
+
+  // Completar SimpleEscort / Escorcitas desde la web si no hay filas en admin
+  for (const linea of catalogoDesdeWebPublica()) {
+    if (sitiosConFilas.has(linea.sitio)) continue;
+    out.push(linea);
+  }
+
   return out;
 }
 
-function filtrarCatalogo(
-  catalogo: LineaPromo[],
-  sitios: SitioAdmin[],
-  dias: number | "all"
-): LineaPromo[] {
-  let r = catalogo.filter((i) => sitios.includes(i.sitio));
-  if (dias !== "all") r = r.filter((i) => i.dias === dias);
-  return r;
+/** Días del asistente que tienen al menos un anuncio con precio web. */
+export function diasDisponiblesPromo(costos: AnuncioCosto[]): number[] {
+  const catalogo = construirCatalogo(costos);
+  const set = new Set(catalogo.map((i) => i.dias));
+  return DIAS_PROMO.filter((d) => set.has(d));
+}
+
+/** Filtra catálogo por zona: Chimbis según Santiago/regiones; el resto se mantiene. */
+function filtrarPorZona(catalogo: LineaPromo[], zona: ZonaPromo): LineaPromo[] {
+  return catalogo.filter((i) => {
+    if (i.sitio !== "chimbis") return true;
+    return i.categoria === zona;
+  });
+}
+
+/** Páginas donde hay al menos un anuncio que cabe en el presupuesto para esos días y zona. */
+export function sitiosAlcanzables(
+  costos: AnuncioCosto[],
+  presupuesto: number,
+  dias: number,
+  zona: ZonaPromo
+): SitioAdmin[] {
+  const catalogo = filtrarPorZona(
+    construirCatalogo(costos).filter((i) => i.dias === dias && i.precio <= presupuesto),
+    zona
+  );
+  const set = new Set(catalogo.map((i) => i.sitio));
+  return SITIOS_ADMIN.filter((s) => set.has(s));
 }
 
 function totalLineas(lineas: LineaPromo[]): number {
   return lineas.reduce((s, l) => s + l.precio, 0);
-}
-
-function cubreSitios(lineas: LineaPromo[], sitios: SitioAdmin[]): boolean {
-  return sitios.every((s) => lineas.some((l) => l.sitio === s));
 }
 
 function descripcionLinea(l: LineaPromo): string {
@@ -116,108 +222,69 @@ function idCombo(lineas: LineaPromo[]): string {
 }
 
 function textoSobrante(sobrante: number): string {
+  if (sobrante === 0) return "Queda justo en el presupuesto.";
   if (sobrante <= SOBRANTE_OBJETIVO) {
     return `Ajustado al presupuesto — sobran solo ${clpAdmin(sobrante)}.`;
   }
-  return `Usa ${clpAdmin(sobrante)} menos que tu tope (no hay combinación más cercana con estos filtros).`;
+  return `Sobra ${clpAdmin(sobrante)} del presupuesto.`;
 }
 
-function empaquetar(
-  nombre: string,
-  descripcion: string,
-  lineas: LineaPromo[],
-  presupuesto: number
-): PromocionSugerida | null {
+function nombrePromo(lineas: LineaPromo[]): string {
+  const sitios = [...new Set(lineas.map((l) => l.sitio))];
+  const n = lineas.length;
+  if (n === 1) {
+    return `1 anuncio en ${SITIO_ADMIN_LABEL[sitios[0]]}`;
+  }
+  if (sitios.length === 1) {
+    return `${n} anuncios en ${SITIO_ADMIN_LABEL[sitios[0]]}`;
+  }
+  if (sitios.length === n) {
+    return `1 anuncio en ${sitios.length} páginas`;
+  }
+  return `${n} anuncios · ${sitios.length} páginas`;
+}
+
+function empaquetar(lineas: LineaPromo[], presupuesto: number): PromocionSugerida | null {
   if (!lineas.length) return null;
   const total = totalLineas(lineas);
-  if (total > presupuesto) return null;
+  if (total > presupuesto || total <= 0) return null;
   const sobrante = presupuesto - total;
+  const sitios = [...new Set(lineas.map((l) => l.sitio))];
   return {
     id: idCombo(lineas),
-    nombre,
-    descripcion: `${descripcion} ${textoSobrante(sobrante)}`,
-    lineas,
+    nombre: nombrePromo(lineas),
+    descripcion: textoSobrante(sobrante),
+    lineas: [...lineas].sort((a, b) => b.precio - a.precio),
     total,
     sobrante,
+    sitios,
   };
 }
 
-/** Añade o mejora ítems hasta acercarse al presupuesto (mínimo sobrante). */
-function optimizarAlPresupuesto(
-  inicio: LineaPromo[],
-  catalogo: LineaPromo[],
-  presupuesto: number,
-  sitiosRequeridos: SitioAdmin[]
-): LineaPromo[] | null {
-  const lineas = [...inicio];
-  const usados = new Set(lineas.map((l) => l.id));
-
-  for (const sitio of sitiosRequeridos) {
-    if (lineas.some((l) => l.sitio === sitio)) continue;
-    const opciones = catalogo
-      .filter((i) => i.sitio === sitio && !usados.has(i.id))
-      .filter((i) => totalLineas(lineas) + i.precio <= presupuesto)
-      .sort((a, b) => b.precio - a.precio);
-    if (!opciones.length) return null;
-    lineas.push(opciones[0]);
-    usados.add(opciones[0].id);
-  }
-
-  if (!cubreSitios(lineas, sitiosRequeridos)) return null;
-
-  const maxPasos = catalogo.length * 3;
-  for (let paso = 0; paso < maxPasos; paso++) {
-    const total = totalLineas(lineas);
-    const sobrante = presupuesto - total;
-    if (sobrante <= SOBRANTE_OBJETIVO) break;
-
-    let mejorSobrante = sobrante;
-    let mejorLineas: LineaPromo[] | null = null;
-
-    for (let i = 0; i < lineas.length; i++) {
-      const actual = lineas[i];
-      const cupo = sobrante + actual.precio;
-      for (const cand of catalogo) {
-        if (cand.sitio !== actual.sitio || usados.has(cand.id) || cand.precio > cupo) continue;
-        const nuevoTotal = total - actual.precio + cand.precio;
-        const nuevoSobrante = presupuesto - nuevoTotal;
-        if (nuevoSobrante >= 0 && nuevoSobrante < mejorSobrante) {
-          mejorSobrante = nuevoSobrante;
-          const next = [...lineas];
-          next[i] = cand;
-          mejorLineas = next;
-        }
-      }
+/** Subconjuntos no vacíos de sitios (máx. 5 sitios para cubrir el catálogo actual). */
+function subconjuntosSitios(sitios: SitioAdmin[]): SitioAdmin[][] {
+  const base = sitios.slice(0, 5);
+  const out: SitioAdmin[][] = [];
+  const n = base.length;
+  for (let mask = 1; mask < 1 << n; mask++) {
+    const sub: SitioAdmin[] = [];
+    for (let i = 0; i < n; i++) {
+      if (mask & (1 << i)) sub.push(base[i]);
     }
-
-    for (const cand of catalogo) {
-      if (usados.has(cand.id)) continue;
-      const nuevoTotal = total + cand.precio;
-      if (nuevoTotal > presupuesto) continue;
-      const nuevoSobrante = presupuesto - nuevoTotal;
-      if (nuevoSobrante < mejorSobrante) {
-        mejorSobrante = nuevoSobrante;
-        mejorLineas = [...lineas, cand];
-      }
-    }
-
-    if (!mejorLineas) break;
-
-    usados.clear();
-    for (const l of mejorLineas) usados.add(l.id);
-    lineas.splice(0, lineas.length, ...mejorLineas);
+    out.push(sub);
   }
-
-  return cubreSitios(lineas, sitiosRequeridos) ? lineas : null;
+  return out.sort((a, b) => a.length - b.length || a.join().localeCompare(b.join()));
 }
 
-/** Mejor combinación de un anuncio por sitio que más se acerca al presupuesto. */
+/** Mejor combo: exactamente un anuncio por sitio, más cercano al presupuesto. */
 function mejorUnoPorSitio(
   catalogo: LineaPromo[],
   sitios: SitioAdmin[],
   presupuesto: number
 ): LineaPromo[] | null {
-  const porSitio = sitios.map((s) => catalogo.filter((i) => i.sitio === s));
+  const porSitio = sitios.map((s) =>
+    catalogo.filter((i) => i.sitio === s).sort((a, b) => b.precio - a.precio)
+  );
   if (porSitio.some((arr) => !arr.length)) return null;
 
   let mejor: LineaPromo[] | null = null;
@@ -242,129 +309,146 @@ function mejorUnoPorSitio(
   return mejor;
 }
 
-function semillaUnAnuncio(catalogo: LineaPromo[], presupuesto: number): LineaPromo[] | null {
-  const ok = catalogo
+/** Paquetes de 1 anuncio (los más cercanos al tope). */
+function paquetesUnAnuncio(catalogo: LineaPromo[], presupuesto: number): LineaPromo[][] {
+  return catalogo
     .filter((i) => i.precio <= presupuesto)
-    .sort((a, b) => presupuesto - a.precio - (presupuesto - b.precio));
-  return ok[0] ? [ok[0]] : null;
+    .sort((a, b) => presupuesto - a.precio - (presupuesto - b.precio) || b.precio - a.precio)
+    .slice(0, 12)
+    .map((i) => [i]);
 }
 
-function semillaPorSitio(
-  catalogo: LineaPromo[],
-  sitios: SitioAdmin[],
-  presupuesto: number,
-  modo: "min" | "max"
-): LineaPromo[] | null {
-  const cupo = Math.floor(presupuesto / sitios.length);
-  const lineas: LineaPromo[] = [];
-  for (const sitio of sitios) {
-    const delSitio = catalogo
-      .filter((i) => i.sitio === sitio && i.precio <= cupo)
-      .sort((a, b) => (modo === "min" ? a.precio - b.precio : b.precio - a.precio));
-    if (!delSitio.length) return null;
-    lineas.push(modo === "min" ? delSitio[0] : delSitio[delSitio.length - 1]);
-  }
-  return lineas;
-}
-
-function semillaGreedy(
-  catalogo: LineaPromo[],
-  sitios: SitioAdmin[],
-  presupuesto: number
-): LineaPromo[] | null {
+/** Paquetes de 2 anuncios distintos que quepan. */
+function paquetesDosAnuncios(catalogo: LineaPromo[], presupuesto: number): LineaPromo[][] {
   const ordenados = [...catalogo].sort((a, b) => b.precio - a.precio);
-  const lineas: LineaPromo[] = [];
-  const usados = new Set<string>();
+  const out: LineaPromo[][] = [];
+  const vistos = new Set<string>();
 
-  for (const sitio of sitios) {
-    const pick = ordenados.find((i) => i.sitio === sitio && !usados.has(i.id) && i.precio <= presupuesto);
-    if (!pick) return null;
-    lineas.push(pick);
-    usados.add(pick.id);
-  }
-
-  let resto = presupuesto - totalLineas(lineas);
-  for (const item of ordenados) {
-    if (usados.has(item.id)) continue;
-    if (item.precio <= resto) {
-      lineas.push(item);
-      usados.add(item.id);
-      resto -= item.precio;
+  for (let i = 0; i < ordenados.length; i++) {
+    for (let j = i + 1; j < ordenados.length; j++) {
+      const a = ordenados[i];
+      const b = ordenados[j];
+      const total = a.precio + b.precio;
+      if (total > presupuesto) continue;
+      const key = [a.id, b.id].sort().join("-");
+      if (vistos.has(key)) continue;
+      vistos.add(key);
+      out.push([a, b]);
+      if (out.length >= 40) return out;
     }
   }
-
-  return lineas;
+  return out;
 }
 
-function nombrePromo(lineas: LineaPromo[], sitios: SitioAdmin[]): string {
-  const n = lineas.length;
-  const sitiosUsados = new Set(lineas.map((l) => l.sitio)).size;
-  if (n === 1) return "Un destacado ajustado al tope";
-  if (sitiosUsados === sitios.length && n === sitios.length) return "Un aviso por página, al máximo";
-  if (n > sitios.length) return `Paquete ampliado (${n} anuncios)`;
-  return `Combinación optimizada (${n} anuncios)`;
+/** Paquetes de 3 anuncios (muestra limitada). */
+function paquetesTresAnuncios(catalogo: LineaPromo[], presupuesto: number): LineaPromo[][] {
+  const ordenados = [...catalogo].sort((a, b) => b.precio - a.precio).slice(0, 20);
+  const out: LineaPromo[][] = [];
+  const vistos = new Set<string>();
+
+  for (let i = 0; i < ordenados.length; i++) {
+    for (let j = i + 1; j < ordenados.length; j++) {
+      const parcial = ordenados[i].precio + ordenados[j].precio;
+      if (parcial >= presupuesto) continue;
+      for (let k = j + 1; k < ordenados.length; k++) {
+        const total = parcial + ordenados[k].precio;
+        if (total > presupuesto) continue;
+        const lineas = [ordenados[i], ordenados[j], ordenados[k]];
+        const key = lineas
+          .map((l) => l.id)
+          .sort()
+          .join("-");
+        if (vistos.has(key)) continue;
+        vistos.add(key);
+        out.push(lineas);
+        if (out.length >= 30) return out;
+      }
+    }
+  }
+  return out;
 }
 
-function procesarSemilla(
-  semilla: LineaPromo[] | null,
-  catalogo: LineaPromo[],
-  presupuesto: number,
-  sitios: SitioAdmin[]
-): PromocionSugerida | null {
-  if (!semilla) return null;
-  const optimizado = optimizarAlPresupuesto(semilla, catalogo, presupuesto, sitios);
-  if (!optimizado) return null;
-  return empaquetar(
-    nombrePromo(optimizado, sitios),
-    "Combinación calculada con precios de venta web.",
-    optimizado,
-    presupuesto
-  );
-}
-
+/**
+ * Genera opciones de promoción con presupuesto + días + zona.
+ * Incluye combinaciones de 1 o más páginas / anuncios, priorizando las más cercanas al monto.
+ */
 export function generarPromociones(
   costos: AnuncioCosto[],
   filtros: FiltrosPromo
 ): PromocionSugerida[] {
-  const catalogo = filtrarCatalogo(
-    construirCatalogo(costos),
-    filtros.sitiosElegidos,
-    filtros.dias
+  const { presupuesto, dias, zona } = filtros;
+  if (presupuesto <= 0 || !Number.isFinite(dias)) return [];
+
+  const catalogo = filtrarPorZona(
+    construirCatalogo(costos).filter((i) => i.dias === dias && i.precio <= presupuesto),
+    zona
   );
+  if (!catalogo.length) return [];
 
-  if (!catalogo.length || filtros.presupuesto <= 0) return [];
-
-  const { presupuesto, sitiosElegidos: sitios } = filtros;
-
-  const semillas: (LineaPromo[] | null)[] = [
-    mejorUnoPorSitio(catalogo, sitios, presupuesto),
-    semillaUnAnuncio(catalogo, presupuesto),
-    semillaPorSitio(catalogo, sitios, presupuesto, "max"),
-    semillaPorSitio(catalogo, sitios, presupuesto, "min"),
-    semillaGreedy(catalogo, sitios, presupuesto),
-  ];
-
+  const sitios = [...new Set(catalogo.map((i) => i.sitio))];
   const candidatas: PromocionSugerida[] = [];
   const vistas = new Set<string>();
 
-  for (const semilla of semillas) {
-    const promo = procesarSemilla(semilla, catalogo, presupuesto, sitios);
-    if (!promo || vistas.has(promo.id)) continue;
+  function agregar(lineas: LineaPromo[] | null) {
+    if (!lineas?.length) return;
+    const promo = empaquetar(lineas, presupuesto);
+    if (!promo || vistas.has(promo.id)) return;
     vistas.add(promo.id);
     candidatas.push(promo);
   }
 
+  for (const sub of subconjuntosSitios(sitios)) {
+    agregar(mejorUnoPorSitio(catalogo, sub, presupuesto));
+  }
+
+  for (const pack of paquetesUnAnuncio(catalogo, presupuesto)) {
+    agregar(pack);
+  }
+  for (const pack of paquetesDosAnuncios(catalogo, presupuesto)) {
+    agregar(pack);
+  }
+  for (const pack of paquetesTresAnuncios(catalogo, presupuesto)) {
+    agregar(pack);
+  }
+
   candidatas.sort((a, b) => {
-    const dentroA = a.sobrante <= SOBRANTE_OBJETIVO;
-    const dentroB = b.sobrante <= SOBRANTE_OBJETIVO;
-    if (dentroA !== dentroB) return dentroA ? -1 : 1;
     if (a.sobrante !== b.sobrante) return a.sobrante - b.sobrante;
+    if (a.sitios.length !== b.sitios.length) return b.sitios.length - a.sitios.length;
     return b.total - a.total;
   });
 
-  return candidatas.slice(0, 5);
+  // Diversificar: no solo el mismo sitio/estilo
+  const elegidas: PromocionSugerida[] = [];
+  const firmas = new Set<string>();
+
+  function firma(p: PromocionSugerida): string {
+    return `${p.sitios.slice().sort().join("+")}|${p.lineas.length}|${p.total}`;
+  }
+
+  for (const p of candidatas) {
+    const f = firma(p);
+    if (firmas.has(f) && elegidas.length >= MIN_OPCIONES_PROMO) continue;
+    firmas.add(f);
+    elegidas.push(p);
+    if (elegidas.length >= MAX_OPCIONES_PROMO) break;
+  }
+
+  // Si aún faltan para llegar a 3, completar con las siguientes por sobrante
+  if (elegidas.length < MIN_OPCIONES_PROMO) {
+    for (const p of candidatas) {
+      if (elegidas.some((e) => e.id === p.id)) continue;
+      elegidas.push(p);
+      if (elegidas.length >= MIN_OPCIONES_PROMO) break;
+    }
+  }
+
+  return elegidas;
 }
 
 export function resumenLineaPromo(l: LineaPromo): string {
   return descripcionLinea(l);
+}
+
+export function resumenSitiosPromo(sitios: SitioAdmin[]): string {
+  return sitios.map((s) => SITIO_ADMIN_LABEL[s]).join(" · ");
 }

@@ -57,31 +57,33 @@ function fraseContacto(
     const t = telefono.trim();
     if (categoria === "masculino") {
       return pick([
-        `Llama de inmediato al ${t} para resolver cualquier duda y agendar nuestra cita al instante.`,
-        `Marca a mi número ${t} y con gusto estaré para atenderte en ${ciudad}.`,
-        `Contáctame por teléfono o WhatsApp al ${t} para coordinar nuestro encuentro.`,
-        `Comunícate directamente conmigo al ${t} para que coordinemos ahora mismo.`,
+        `Escríbeme al tiro por WhatsApp al ${t} y agendamos en ${ciudad}, sin rollos.`,
+        `Llama o mándame un WhatsApp al ${t}: te atiendo piola y coordinamos ahora.`,
+        `Marca al ${t} o escríbeme por WhatsApp y quedamos en ${ciudad} hoy mismo.`,
+        `Contáctame al ${t}: te respondo rápido y armamos la cita sin vueltas.`,
+        `WhatsApp ${t} — avísame a qué hora pasas y te espero listo.`,
       ]);
     }
     return pick([
-      `Para agendar una cita contáctame al ${t} o déjame un mensajito de WhatsApp y concretamos.`,
-      `Llámame al ${t} para coordinar nuestra cita ahora mismo. Te espero. Besos.`,
-      `Agenda tu espacio a mi teléfono ${t} y recuerda que estoy lista para atenderte.`,
-      `Marca a mi número ${t} y con gusto estaré para atenderte en ${ciudad}.`,
-      `Contáctame llamando o escribiendo por WhatsApp al ${t} para acordar una cita, besos.`,
+      `Escríbeme al tiro por WhatsApp al ${t} y agendamos, te espero con ganas.`,
+      `Llama o mándame un mensajito al ${t}: te atiendo piola y sin apuro.`,
+      `WhatsApp ${t} — dime a qué hora quieres y quedamos en ${ciudad}.`,
+      `Marca a mi número ${t} o escríbeme: estoy disponible ahora mismo, besitos.`,
+      `Contáctame al ${t} por llamada o WhatsApp y armamos la cita al tiro.`,
+      `Escríbeme al ${t}: te respondo rápido, discreta y con muchas ganas.`,
     ]);
   }
   if (categoria === "masculino") {
     return pick([
-      `Contáctame para agendar una cita en ${ciudad}, te espero con la mejor actitud.`,
-      `Escríbeme para coordinar en ${ciudad}, no te arrepentirás.`,
-      `Ven a conocerme en ${ciudad}, disponible para encuentros discretos.`,
+      `Escríbeme para agendar en ${ciudad}: te atiendo piola, discreto y sin vueltas.`,
+      `Avísame y coordinamos en ${ciudad}, disponible ahora.`,
+      `Contáctame para una cita en ${ciudad}: trato rico, seguro y confidencial.`,
     ]);
   }
   return pick([
-    `Contáctame para agendar una cita en ${ciudad}, aquí te estaré esperando con muchos besos.`,
-    `Escríbeme para coordinar nuestra cita en ${ciudad}, no te arrepentirás.`,
-    `Ven a conocerme en ${ciudad}, te espero con la mejor actitud.`,
+    `Escríbeme para agendar en ${ciudad}: te espero mojadita y con ganas.`,
+    `Avísame y quedamos en ${ciudad}, sin apuro y a puro gusto.`,
+    `Contáctame para una cita en ${ciudad}: discreta, caliente y lista pa ti.`,
   ]);
 }
 
@@ -89,32 +91,54 @@ const SALUDOS_MUJER = [
   "Hola, cariño",
   "Hola, amor",
   "Hola, mis amores",
-  "Hola, amorcito mío",
+  "Hola, amorcito",
+  "Hola corazón",
+  "Hola mi vida",
+  "Hola rey",
+  "Hola bb",
   "Amor",
+  "Hola mi pololo",
 ];
 
-const SALUDOS_TRANS = ["Hola, amor", "Hola, cariño", "Hola", "Hola, mi vida"];
+const SALUDOS_TRANS = [
+  "Hola, amor",
+  "Hola, cariño",
+  "Hola",
+  "Hola, mi corazón",
+  "Hola bb",
+  "Hola rey",
+  "Hola mi vida",
+];
 
-const SALUDOS_MASC = ["Hola", "Hola, espero que estés muy bien"];
+const SALUDOS_MASC = [
+  "Hola",
+  "Hola, espero que estés muy bien",
+  "Hola, cómo estás",
+  "Buenas",
+  "Hola, un gusto",
+];
 
-/** Frases que deben aparecer en todo anuncio generado */
+/** Frases obligatorias: explícitas, tono chileno, con variación */
 function parrafoFrasesObligatorias(categoria: CategoriaEscort): string {
-  const variantes: string[] = [
-    "Si buscas rico sexo, aquí tienes el mejor sexo: sexo oral bien dedicado, te lo chupo rico, sexo con condón, diferentes posiciones y diferentes poses. Tengo lencería sexy para volverte loco.",
-    "Te garantizo rico sexo y sexo sin apuros. Disfruta mi sexo oral, te lo chupo rico, siempre sexo con condón, en diferentes posiciones y diferentes poses. Tengo lencería lista para complacerte.",
-    "Ven por rico sexo y buen sexo de verdad: sexo oral húmedo, te lo chupo rico, sexo con condón en diferentes posiciones y diferentes poses. Tengo lencería provocadora para que la pasemos increíble.",
-    "Quiero darte rico sexo y sexo bien caliente. Mi sexo oral es de lujo, te lo chupo rico, todo sexo con condón, en diferentes posiciones y diferentes poses. Tengo lencería para encender la noche.",
-  ];
-
   if (categoria === "masculino") {
     return pick([
-      "Te ofrezco rico sexo y sexo intenso: sexo oral bien hecho, te lo chupo rico, sexo con condón en diferentes posiciones y diferentes poses. Tengo lencería si te gusta algo más atrevido.",
-      "Mira, rico sexo y buen sexo es lo mío: sexo oral dedicado, te lo chupo rico, sexo con condón, diferentes posiciones y diferentes poses. Tengo lencería para sorprenderte.",
-      "Cumplo con rico sexo y sexo sin límites. Sexo oral profundo, te lo chupo rico, sexo con condón en diferentes posiciones y diferentes poses. Tengo lencería lista para ti.",
+      "Te ofrezco rico sexo sin apuro: te lo chupo entero, sexo oral bien hecho, sexo con condón, distintas posiciones y poses. Si te gusta lo más atrevido, también tengo look provocador listo pa ti.",
+      "Rico sexo y buen sexo es lo mío: oral profundo, te lo chupo rico, siempre con condón, te la meto en las poses que más te calienten. Higiene piola y entrega total.",
+      "Ven por sexo intenso de verdad: te lo chupo hasta el fondo, sexo con condón, varias posiciones, gemidos reales. Sin tabúes y con ganas de hacerte acabar rico.",
+      "Te doy sexo bien caliente: oral jugoso, te lo chupo rico, penetración con condón en distintas poses. Trato de pololos, discreto y a puro gusto.",
+      "Cumplo con rico sexo sin límites: sexo oral dedicado, te lo chupo entero, sexo con condón, diferentes posiciones. Listo pa dejarte temblando.",
     ]);
   }
 
-  return pick(variantes);
+  return pick([
+    "Si buscas rico sexo, aquí lo tienes: te lo chupo rico, sexo oral bien baboso, sexo con condón, distintas posiciones y poses. Tengo lencería sexy pa volverte loco.",
+    "Te garantizo rico sexo sin apuro. Disfruta mi oral húmedo, te lo chupo entero, siempre con condón, en las poses que más te calienten. Lencería lista pa complacerte.",
+    "Ven por buen sexo de verdad: oral hasta el fondo, te lo chupo rico, sexo con condón, varias posiciones. Estoy mojadita y con lencería provocadora.",
+    "Quiero darte sexo bien caliente. Mi oral es de lujo, te lo chupo rico, todo con condón, en distintas poses. Tengo lencería pa encender la noche.",
+    "Rico sexo, sin vueltas: te lo chupo baboso, sexo oral profundo, sexo con condón, te monto o te dejo que me la metas como quieras. Lencería y muchas ganas.",
+    "Pasémosla filete: oral goloso, te lo chupo rico, sexo con condón, diferentes posiciones y gemidos reales. Tengo lencería sexy y cero tabúes.",
+    "Te ofrezco sexo a puro gusto: te lo chupo entero, oral con ganas, sexo con condón, te la meto en las poses que elijas. Lencería y entrega total.",
+  ]);
 }
 
 export const TITULO_MIN_CARACTERES = 63;
@@ -142,6 +166,13 @@ const KEYWORDS_TITULO: Record<CategoriaEscort, string[]> = {
     "disponible",
     "nalgona",
     "piernona",
+    "culona",
+    "cachonda",
+    "mojadita",
+    "sin apuro",
+    "piola",
+    "filete",
+    "pololos",
   ],
   trans: [
     "trans",
@@ -164,6 +195,11 @@ const KEYWORDS_TITULO: Record<CategoriaEscort, string[]> = {
     "nalgona",
     "piernona",
     "lechera",
+    "cachonda",
+    "vergona",
+    "activa",
+    "piola",
+    "sin apuro",
   ],
   masculino: [
     "hombre",
@@ -186,6 +222,10 @@ const KEYWORDS_TITULO: Record<CategoriaEscort, string[]> = {
     "fitness",
     "exclusivo",
     "versátil",
+    "dotado",
+    "piola",
+    "sin apuro",
+    "filete",
   ],
 };
 
@@ -300,62 +340,84 @@ function generarTitulo(datos: DatosAnuncio): string {
 const POOLS: Record<CategoriaEscort, PoolsCategoria> = {
   mujer: {
     sinNacionalidad: [
-      "soy una atractiva escort recién llegadita a tu ciudad",
-      "soy una joven escort con piel muy suave y cuerpo natural",
-      "soy una linda escort que te ofrece una buena experiencia",
-      "soy una linda escort gordita y traviesa con senos grandes y una colita golosa",
-      "me considero una mujer cariñosa y sin apuros para que disfrutemos de una compañía muy especial",
-      "soy una ardiente escort lista para darte un trato lujurioso y súper apasionado",
-      "en mí vas a encontrar a una escort hermosa con figura esbelta, bonitos pechos y buena cola",
+      "soy una escort rica recién llegadita a tu ciudad, lista pa darte placer",
+      "soy una joven escort de piel suave, cuerpo natural y mucha calentura",
+      "soy una linda escort que te ofrece sexo rico, sin apuro y a puro gusto",
+      "soy una escort gordita y traviesa, pechos grandes y una culita golosa",
+      "me considero cariñosa, cachonda y sin apuros: compañía especial y sexo filete",
+      "soy una ardiente escort lista pa un trato bien porno y súper apasionado",
+      "en mí vas a encontrar una escort nalgona, pechos ricos y cola pa agarrar",
+      "soy independiente, piola y bien caliente: te atiendo como corresponde",
+      "soy una minita fogosa, mojadita fácil y con ganas de que me la metas rico",
+      "soy escort verificada, fotos reales, cuerpo natural y cero engaños",
     ],
     conNacionalidad: (n) => [
-      `soy una escort ${n} independiente, caliente, divertida, deliciosa y encantadora`,
-      `soy ${n} de piel suave y cuerpo natural`,
-      `me considero una ${n} linda, ardiente, apasionada y muy coqueta`,
-      `soy una ${n} linda que te ofrece una buena experiencia`,
+      `soy una escort ${n} independiente, caliente, divertida y bien rica`,
+      `soy ${n} de piel suave, cuerpo natural y muchas ganas de sexo`,
+      `me considero una ${n} linda, ardiente, cachonda y bien coqueta`,
+      `soy una ${n} fogosa que te ofrece sexo rico sin vueltas`,
+      `soy ${n} piola, complaciente y lista pa cumplir tus fantasías`,
     ],
     intros: [
       (d) => {
         const nat = fraseNacionalidad(d, POOLS.mujer);
-        return `${pick(SALUDOS_MUJER)}, me llamo ${d.nombre} y tengo ${d.edad} años. ${cap(nat)}, con un precioso cuerpo para endulzarte el día.`;
+        return `${pick(SALUDOS_MUJER)}, me llamo ${d.nombre} y tengo ${d.edad} años. ${cap(nat)}. Tengo un cuerpo pa endulzarte el día y dejarte seco.`;
       },
       (d) => {
         const nat = fraseNacionalidad(d, POOLS.mujer);
-        return `Hola, me llamo ${d.nombre} y soy una linda escort de ${d.edad} años que te ofrece una buena experiencia. ${cap(nat)}, te aseguro que no te arrepentirás de conocerme hoy.`;
+        return `Hola, me llamo ${d.nombre}: escort de ${d.edad} años que te ofrece una experiencia filete. ${cap(nat)}. Si vienes, no te vas a arrepentir.`;
       },
       (d) => {
         const extra = d.nacionalidad?.trim()
           ? `escort ${d.nacionalidad.trim()} independiente`
           : "escort independiente";
-        return `${pick(SALUDOS_MUJER)}, me llamo ${d.nombre}, y soy una ${extra}, caliente, divertida, deliciosa y encantadora. Tengo ${d.edad} años, estoy con ganas de pasarla bien y lista para que juntos gocemos de un buen sexo.`;
+        return `${pick(SALUDOS_MUJER)}, soy ${d.nombre}, ${extra}, caliente, divertida y deliciosa. Tengo ${d.edad} años y ganas de un buen sexo contigo.`;
       },
       (d) =>
-        `${pick(SALUDOS_MUJER)}, me llamo ${d.nombre}, en mí vas a encontrar a una escort hermosa de ${d.edad} años con figura esbelta, bonitos pechos y buena cola. Me distingo por ser cariñosa, divertida y tu amante ideal.`,
+        `${pick(SALUDOS_MUJER)}, me llamo ${d.nombre}: escort de ${d.edad} años, pechos ricos, buena cola y trato de pololos. Cariñosa, traviesa y tu amante ideal.`,
       (d) => {
         const nat = fraseNacionalidad(d, POOLS.mujer);
-        return `Hola mi amor, soy ${d.nombre}, una ardiente escort de ${d.edad} años. ${cap(nat)}. Ven y descubre que soy una verdadera ninfómana lista para llevarte al placer.`;
+        return `Hola mi amor, soy ${d.nombre}, una ninfómana de ${d.edad} años. ${cap(nat)}. Ven y descubre lo mojadita que me pongo pa ti.`;
       },
+      (d) =>
+        `${pick(SALUDOS_MUJER)}, soy ${d.nombre} (${d.edad}). Escort piola, fotos reales, disponible ahora en ${d.ciudad}. Quiero que me chupes y que me la metas rico.`,
+      (d) => {
+        const nat = fraseNacionalidad(d, POOLS.mujer);
+        return `Hola bb, ${d.nombre} de ${d.edad} años al habla. ${cap(nat)}. Busco alguien con ganas de sexo oral baboso y una culiada sin apuro.`;
+      },
+      (d) =>
+        `${pick(SALUDOS_MUJER)}, me presento: ${d.nombre}, ${d.edad} añitos, nalgona y complaciente. Te atiendo en ${d.ciudad} con cero tabúes y mucha saliva.`,
     ],
     cuerpos: [
       () =>
-        "Mi trato es de novios con besos apasionados, ricos masajes y bailes eróticos. Ven y enloquece con mi servicio bien porno, culo de infarto y pechos para que te vuelvas loco.",
+        "Trato de pololos: besos con lengua, masajes eróticos y baile sensual. Servicio bien porno, culo de infarto y pechos pa que te vuelvas loco.",
       () =>
-        "Me encantará chupártela y cuando me tengas toda mojada quiero que me la metas entera y me hagas acabar. Haré todo para que tengas uno de los mejores orgasmos de tu vida.",
+        "Me encanta chupártela babosa hasta el fondo. Cuando esté toda mojadita, métela entera y hazme acabar. Quiero dejarte con uno de los mejores orgasmos.",
       () =>
-        "Te ofrezco trato de novios con ricos besos, oral a garganta profunda y un rico anal muy placentero. Lluvia dorada, beso negro y muchas ganas de repetir.",
+        "Trato de novios con ricos besos, oral a garganta profunda y anal bien rico si te late. Lluvia dorada, beso negro y ganas de repetir.",
       () =>
-        "Soy cariñosa, sensual y traviesa. Provocadoras caricias, bailes eróticos y sexo bien húmedo, mojadita y caliente hasta que no aguantes más.",
+        "Soy cariñosa, sensual y bien putita cuando hay que serlo. Caricias, bailes y sexo húmedo hasta que no aguantes más.",
       () =>
-        "Te garantizo cumplir tus deseos más ocultos. Sexo salvaje con preservativo, gemidos reales y entrega total en la cama.",
+        "Cumplo fantasías: sexo salvaje con condón, gemidos reales, te monto o te dejo que me la metas como quieras. Entrega total.",
       () =>
-        "Oral hasta el fondo en las posturas que más te exciten. Estaré súper mojadita y ansiosa por ti, con atención llena de pasión y sin tabúes.",
+        "Oral hasta el fondo en las poses que más te calienten. Quedo súper mojadita, ansiosa, sin tabúes y con mucha saliva.",
+      () =>
+        "Te lo chupo rico, te lo masajeo con las tetas y después te la meto yo. Sexo sin apuro, piola y a puro gusto.",
+      () =>
+        "Me gusta el 69, que me agarres el culo y que me hables sucio. Condón siempre, higiene piola y muchas ganas de que te corras rico.",
+      () =>
+        "Disponible pa hotel, motel o domicilio. Lencería sexy, oral profundo, penetración en distintas poses y cero apuro.",
+      () =>
+        "Si te gusta lo más explícito: te lo chupo entero, oral bien baboso, y seguimos hasta que quedes seco.",
     ],
     ubicaciones: [
-      (d) => `Me ubico en ${d.ciudad}, tengo lugar propio y también voy a domicilio u hotel.`,
-      (d) => `Estoy en la zona de ${d.ciudad} con un ambiente discreto y cómodo, cuento con lugar privado.`,
-      (d) => `Me ubico en ${d.ciudad} y realizo salidas a domicilio, hotel o motel.`,
-      (d) => `Estoy de paso por ${d.ciudad}. Hago salidas cuando lo desees y me traslado a hoteles.`,
-      (d) => `Estoy en ${d.ciudad}, en una zona céntrica y bien conectada, para un encuentro placentero.`,
+      (d) => `Me ubico en ${d.ciudad}: tengo lugar propio y también salgo a domicilio, hotel o motel.`,
+      (d) => `Estoy en ${d.ciudad}, ambiente discreto y cómodo, con lugar privado pa nosotros.`,
+      (d) => `Me ubico en ${d.ciudad} y hago salidas a domicilio, hotel o motel cuando quieras.`,
+      (d) => `Estoy de paso por ${d.ciudad}. Salgo cuando me avises y me traslado a hoteles.`,
+      (d) => `Estoy en ${d.ciudad}, zona céntrica y piola, ideal pa un encuentro rico y discreto.`,
+      (d) => `Atiendo en ${d.ciudad}: lugar propio limpio o me voy a donde estés tú.`,
+      (d) => `En ${d.ciudad} te espero. Si prefieres, quedamos en motel o en tu depto, tú eliges.`,
     ],
     titulos: [
       (d) => `${d.nombre}, ${d.edad}a escort ${d.ciudad}`,
@@ -363,109 +425,145 @@ const POOLS: Record<CategoriaEscort, PoolsCategoria> = {
       (d) => `Escort ${d.nombre} ${d.ciudad}`,
       (d) => `Ardiente ${d.nombre}, ${d.edad}a, ${d.ciudad}`,
       (d) => `${d.nombre} escort ${d.ciudad} ${d.edad}a`,
+      (d) => `${d.nombre} ${d.edad}a nalgona ${d.ciudad}`,
+      (d) => `Fogosa ${d.nombre} ${d.ciudad}`,
+      (d) => `${d.nombre} rico sexo ${d.ciudad}`,
     ],
   },
 
   trans: {
     sinNacionalidad: [
-      "soy una escort trans con un cuerpo bien cuidado y lleno de energía",
-      "soy una hermosa transexual totalmente genuina, tal como me ves en las fotos",
-      "soy una hermosa trans bien dotada y muy ardiente",
-      "soy una linda escort trans nueva en tu ciudad para cumplir todas tus fantasías",
-      "me destaco por ser sumamente ardiente, atractiva y la compañera ideal",
+      "soy una escort trans con cuerpo cuidado, energía y mucha calentura",
+      "soy una transexual genuina, igualita a las fotos, sin engaños",
+      "soy una trans bien dotada, ardiente y lista pa darte placer",
+      "soy una linda escort trans nueva en tu ciudad pa cumplir fantasías",
+      "me destaco por ser ardiente, atractiva y compañera ideal en la cama",
+      "soy trans independiente, piola, nalgona y con ganas de culiar rico",
+      "soy una trans lechera, oral profundo y activa o pasiva como te guste",
+      "fotos 100% reales: trans fogosa, discreta y bien complaciente",
     ],
     conNacionalidad: (n) => [
-      `soy una escort trans ${n} con mucha pasión y energía`,
-      `soy una hermosa trans ${n}, genuina y muy complaciente`,
-      `me presento como escort trans ${n}, atractiva y fogosa`,
+      `soy una escort trans ${n} con mucha pasión y energía sexual`,
+      `soy una hermosa trans ${n}, genuina, caliente y complaciente`,
+      `me presento como escort trans ${n}: atractiva, fogosa y piola`,
+      `soy trans ${n} bien dotada, lista pa un sexo filete contigo`,
     ],
     intros: [
       (d) =>
-        `Hola, soy ${d.nombre}, una escort trans con un cuerpo bien cuidado y lleno de energía. Tengo ${d.edad} años y estoy lista para ofrecerte una experiencia única, con mucha pasión y diversión.`,
+        `Hola, soy ${d.nombre}, escort trans de cuerpo cuidado y pura energía. Tengo ${d.edad} años y quiero darte una experiencia caliente, divertida y sin rollos.`,
       (d) =>
-        `Hola, cariño, me llamo ${d.nombre} y soy una hermosa transexual totalmente genuina, tal como me ves en las fotos. Tengo ${d.edad} años, soy muy complaciente y cumplo cada una de tus fantasías.`,
+        `Hola, cariño, me llamo ${d.nombre}: transexual genuina, igualita a las fotos. ${d.edad} años, muy complaciente y lista pa tus fantasías.`,
       (d) =>
-        `Hola, me llamo ${d.nombre}, soy una hermosa trans bien dotada y muy ardiente. ${d.edad} años, sumamente atractiva y la compañera ideal para un encuentro inolvidable.`,
+        `Hola, me llamo ${d.nombre}, trans bien dotada y ardiente. ${d.edad} años, atractiva y la compañera ideal pa un encuentro inolvidable.`,
       (d) =>
-        `Hola, amor, me llamo ${d.nombre}, una linda escort trans de ${d.edad} años en ${d.ciudad} para cumplir todas tus fantasías. Soy de piel suave, bien nalgona y piernona. Mis fotos son auténticas.`,
+        `Hola, amor, soy ${d.nombre}, escort trans de ${d.edad} años en ${d.ciudad}. Piel suave, bien nalgona y piernona. Fotos auténticas, cero mentiras.`,
       (d) =>
-        `Hola, soy tu ${d.nombre}, escort trans de ${d.edad} años con mucha energía y ganas de darte placer. Busco clientes con buen gusto que deseen una experiencia caliente y llena de complicidad.`,
+        `Hola, soy tu ${d.nombre}, escort trans de ${d.edad} años con ganas de darte placer. Busco gente con buen gusto pa un rato caliente y cómplice.`,
+      (d) =>
+        `${pick(SALUDOS_TRANS)}, ${d.nombre} al habla (${d.edad}). Trans piola, oral baboso y activa/pasiva según te late. Disponible en ${d.ciudad}.`,
+      (d) =>
+        `Hola bb, soy ${d.nombre}, ${d.edad} añitos, trans fogosa y lechera. Quiero chupártela rico y que me la metas o te la meta yo.`,
     ],
     cuerpos: [
       () =>
-        "Me especializo en encuentros inolvidables, placer intenso y momentos bien calientes. Mi servicio es súper seguro, discreto y sin rollos.",
+        "Encuentros intensos, placer real y momentos bien calientes. Servicio seguro, discreto y sin vueltas.",
       () =>
-        "Trato de pareja, oral con preservativo, 69 y lluvia dorada. Cambio de roles, anal con protección y eyaculación corporal. También vendo contenido y hago videollamadas.",
+        "Trato de pareja, oral con condón, 69 y lluvia dorada. Cambio de roles, anal con protección y eyaculación donde quieras. También contenido y videollamadas.",
       () =>
-        "Dispuesta a cumplir todas tus fantasías en la cama. Trato de novios, bien cachonda y experta en oral de lujo. Puedes venirte donde quieras.",
+        "Cumplo fantasías en la cama: trato de pololos, bien cachonda y experta en oral de lujo. Puedes venirte donde te guste.",
       () =>
-        "Me pones en la posición que gustes, soy bien nalgona y piernona. Fotos auténticas, servicio discreto y muchas ganas de darte placer sin límites.",
+        "Me pones en la pose que quieras: nalgona, piernona, fotos reales. Discreta, con ganas y sin límites.",
       () =>
-        "Experiencia caliente y auténtica, con total entrega. Atiendo independiente, higiene impecable y muchas ganas de repetir contigo.",
+        "Experiencia caliente y auténtica. Independiente, higiene piola y muchas ganas de repetir contigo.",
+      () =>
+        "Te lo chupo entero, te monto o te penetro con condón. Activa, pasiva o versátil: tú mandas.",
+      () =>
+        "Oral profundo, besos, caricias y sexo bien rico. Si te late lo más explícito, también hago beso negro y lluvia dorada.",
+      () =>
+        "Disponible pa hotel o domicilio. Lencería, oral goloso, penetración y cero apuro. Quiero dejarte temblando.",
     ],
     ubicaciones: [
-      (d) => `Estoy en ${d.ciudad}, con un lugar discreto y privado para nuestros encuentros.`,
-      (d) => `Me ubico en ${d.ciudad}, hago salidas a hotel y domicilio cuando lo desees.`,
-      (d) => `Estoy ubicada en ${d.ciudad}, zona céntrica y bien conectada, con espacio discreto.`,
-      (d) => `Me ubico en ${d.ciudad}. Estaré solo por pocos días, así que no dudes en contactarme.`,
+      (d) => `Estoy en ${d.ciudad}, con lugar discreto y privado pa nuestros encuentros.`,
+      (d) => `Me ubico en ${d.ciudad}: salgo a hotel y domicilio cuando me avises.`,
+      (d) => `Estoy en ${d.ciudad}, zona céntrica, espacio discreto y piola.`,
+      (d) => `Me ubico en ${d.ciudad}. Estaré pocos días, así que escríbeme al tiro.`,
+      (d) => `Atiendo en ${d.ciudad}: lugar propio o me voy a donde estés tú.`,
     ],
     titulos: [
       (d) => `Trans ${d.nombre} ${d.edad}a ${d.ciudad}`,
       (d) => `${d.nombre} trans ${d.ciudad}`,
       (d) => `Escort trans ${d.nombre} ${d.ciudad}`,
       (d) => `${d.nombre}, ${d.edad}a, ${d.ciudad}`,
+      (d) => `${d.nombre} trans dotada ${d.ciudad}`,
+      (d) => `Fogosa trans ${d.nombre} ${d.ciudad}`,
     ],
   },
 
   masculino: {
     sinNacionalidad: [
-      "soy un sabroso escort hombre, deportista con excelente actitud y carisma",
-      "soy un escort hombre alto y varonil, con presencia segura y elegante",
-      "soy un escort hombre serio y versátil, deseoso de compartir un espacio de pleno placer",
-      "quiero ser tu chico de compañía, 100% exclusivo, activo y discreto",
-      "soy un escort hombre mulato con imponente presencia y personalidad decidida",
-      "me considero una persona sumamente apasionada y entregada en la intimidad",
+      "soy un escort hombre deportista, rico, con actitud y carisma",
+      "soy un escort alto y varonil, presencia segura y trato piola",
+      "soy un escort serio y versátil, listo pa un espacio de pleno placer",
+      "quiero ser tu chico de compañía: exclusivo, activo y discreto",
+      "soy un escort mulato con presencia fuerte y personalidad decidida",
+      "me considero apasionado, entregado y bien caliente en la intimidad",
+      "soy hombre independiente, vergón, higiene piola y cero rollos",
+      "soy escort fitness, activo, discreto y con ganas de culiar rico",
     ],
     conNacionalidad: (n) => [
-      `soy un escort hombre ${n}, deportista con excelente actitud`,
-      `me presento como escort hombre ${n}, varonil y discreto`,
-      `soy un ${n} activo, educado e impecable, listo para complacerte`,
+      `soy un escort hombre ${n}, deportista y con excelente actitud`,
+      `me presento como escort hombre ${n}: varonil, discreto y caliente`,
+      `soy un ${n} activo, educado e impecable, listo pa complacerte`,
+      `soy escort ${n}, vergón, piola y con ganas de darte rico sexo`,
     ],
     intros: [
       (d) =>
-        `Hola, me presento, mi nombre es ${d.nombre} y soy un sabroso escort hombre de ${d.edad} años, deportista con excelente actitud y carisma. Me considero sumamente apasionado y entregado para cumplir todo lo que pase por tu mente.`,
+        `Hola, me presento: ${d.nombre}, escort hombre de ${d.edad} años, deportista y con carisma. Apasionado y entregado pa cumplir lo que se te ocurra.`,
       (d) =>
-        `Hola, me llamo ${d.nombre}, y soy un escort hombre alto y varonil de ${d.edad} años. Mi presencia transmite seguridad, elegancia y una masculinidad natural que se siente desde el primer momento.`,
+        `Hola, me llamo ${d.nombre}: escort hombre alto y varonil de ${d.edad} años. Seguridad, elegancia y masculinidad desde el primer momento.`,
       (d) =>
-        `Hola, espero que estés muy bien, me llamo ${d.nombre} y soy un escort hombre serio y versátil de ${d.edad} años. Me caracterizo por brindar un trato sumamente masculino, directo y con total discreción.`,
+        `${pick(SALUDOS_MASC)}, me llamo ${d.nombre}, escort hombre serio y versátil de ${d.edad} años. Trato masculino, directo y con total discreción.`,
       (d) =>
-        `Hola, me llamo ${d.nombre} y quiero ser tu chico de compañía de ${d.edad} años, 100% exclusivo. Soy activo, discreto, educado e impecable, dispuesto a complacer tus mayores deseos con atención personalizada.`,
+        `Hola, soy ${d.nombre}, tu chico de compañía de ${d.edad} años, 100% exclusivo. Activo, discreto, educado e impecable.`,
       (d) =>
-        `Hola, me llamo ${d.nombre}, un escort hombre de ${d.edad} años con imponente presencia y personalidad decidida para brindarte un encuentro totalmente inolvidable en ${d.ciudad}.`,
+        `Hola, me llamo ${d.nombre}, escort hombre de ${d.edad} años en ${d.ciudad}. Presencia fuerte y ganas de un encuentro inolvidable.`,
+      (d) =>
+        `Buenas, ${d.nombre} al habla (${d.edad}). Hombre piola, vergón y disponible ahora en ${d.ciudad}. Sexo rico, sin vueltas.`,
+      (d) =>
+        `Hola, soy ${d.nombre}, ${d.edad} años, escort activo/versátil. Te atiendo con higiene, condón y muchas ganas de hacerte acabar.`,
     ],
     cuerpos: [
       () =>
-        "Cumplo todas tus fantasías y deseos más íntimos. Anal jugoso en varias posturas, bien delicioso. Bailes exóticos, trato de pololos y siempre con higiene.",
+        "Cumplo fantasías íntimas: anal jugoso en varias poses, bien delicioso. Bailes, trato de pololos y siempre con higiene.",
       () =>
-        "Penetración profunda, masajes sensuales y fantasías compartidas con entrega total. Sé cómo hacerte sentir deseada y completamente satisfecha.",
+        "Penetración profunda, masajes sensuales y fantasías compartidas. Sé cómo hacerte sentir deseada y bien satisfecha.",
       () =>
-        "Trato de pareja higiénico con ricos besos, caricias y penetraciones, más un jugoso oral. Sexo seguro y confidencialidad absoluta.",
+        "Trato de pareja con ricos besos, caricias, penetración y oral jugoso. Sexo seguro y confidencialidad total.",
       () =>
-        "Experiencia exclusiva: cenas, eventos, viajes o encuentros privados. Masajes deliciosos, atiendo parejas y vendo contenido si lo deseas.",
+        "Experiencia exclusiva: cenas, eventos, viajes o privado. Masajes ricos, atiendo parejas y vendo contenido si quieres.",
       () =>
-        "Activo, con total protección. Atiendo mujeres, parejas o pasivos con profesionalismo. Vergón, discreto y con ganas de romper la rutina.",
+        "Activo, siempre con protección. Atiendo mujeres, parejas o pasivos. Vergón, discreto y con ganas de romper la rutina.",
+      () =>
+        "Te lo chupo rico, te la meto con condón y te dejo temblando. Sin apuro, piola y a puro gusto.",
+      () =>
+        "Oral profundo, 69, distintas poses y gemidos reales. Si te late lo más explícito, también hago anal y lluvia dorada.",
+      () =>
+        "Disponible pa hotel o domicilio. Fitness, energía y entrega total. Quiero que te corras rico más de una vez.",
     ],
     ubicaciones: [
-      (d) => `Me ubico en ${d.ciudad}, específicamente en zona céntrica, esperando tu comunicación para encontrarnos.`,
-      (d) => `Estoy en ${d.ciudad}, con departamento privado y ambiente elegante y relajado.`,
-      (d) => `Me ubico en ${d.ciudad}, sector bien conectado en transporte público, listo para coordinar contigo.`,
-      (d) => `Recién llegué a ${d.ciudad}, tengo lugar propio y también hago salidas a hotel o domicilio.`,
+      (d) => `Me ubico en ${d.ciudad}, zona céntrica: avísame y nos encontramos.`,
+      (d) => `Estoy en ${d.ciudad}, con departamento privado, ambiente piola y relajado.`,
+      (d) => `Me ubico en ${d.ciudad}, sector bien conectado, listo pa coordinar contigo.`,
+      (d) => `Recién llegué a ${d.ciudad}: tengo lugar propio y también salgo a hotel o domicilio.`,
+      (d) => `Atiendo en ${d.ciudad}: tú eliges si quedamos en mi lugar, hotel o donde estés.`,
     ],
     titulos: [
       (d) => `${d.nombre} hombre ${d.edad}a ${d.ciudad}`,
       (d) => `Escort ${d.nombre} ${d.ciudad}`,
       (d) => `${d.nombre}, ${d.edad}a, ${d.ciudad}`,
       (d) => `Hombre ${d.nombre} ${d.ciudad}`,
+      (d) => `${d.nombre} vergón ${d.ciudad}`,
+      (d) => `Activo ${d.nombre} ${d.edad}a ${d.ciudad}`,
     ],
   },
 };

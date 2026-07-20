@@ -60,7 +60,8 @@ export default function CrearTextoForm() {
           </Link>
           <h1 className="admin-title">Crear título y texto</h1>
           <p className="admin-muted">
-            Completa los datos y genera un anuncio aleatorio listo para publicar.
+            Completa los datos y genera un anuncio en tono chileno, más explícito y con variedad.
+            Usa «Otra versión» para probar distintas combinaciones.
           </p>
         </div>
       </header>

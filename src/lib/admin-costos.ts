@@ -23,6 +23,9 @@ export interface SkokkaCreditosConfig {
   valor_credito_clp: number;
 }
 
+/** Misma forma que Skokka; el admin configura valores distintos. */
+export type SimpleEscortCreditosConfig = SkokkaCreditosConfig;
+
 export interface LocantoDolarConfig {
   valor_dolar_clp: number;
 }
@@ -32,16 +35,19 @@ export function calcularCostoAgenciaLocanto(usd: number, valorDolarClp: number):
   return Math.round(usd * valorDolarClp);
 }
 
-/** Costo agencia Skokka = créditos del anuncio × valor del crédito. */
+/** Costo agencia = créditos × valor del crédito (Skokka / SimpleEscort). */
 export function calcularCostoAgenciaSkokka(creditos: number, valorCreditoClp: number): number {
   return Math.round(creditos * valorCreditoClp);
 }
 
-/** Créditos Skokka a partir del costo agencia y el valor del crédito. */
+/** Créditos a partir del costo agencia y el valor del crédito. */
 export function calcularCreditosSkokka(costoAgencia: number, valorCreditoClp: number): number {
   if (valorCreditoClp <= 0) return 0;
   return Math.round(costoAgencia / valorCreditoClp);
 }
+
+export const calcularCostoAgenciaPorCreditos = calcularCostoAgenciaSkokka;
+export const calcularCreditosPorCosto = calcularCreditosSkokka;
 
 export function parseDecimalInput(val: string): number | null {
   const limpio = val.trim();
@@ -92,6 +98,14 @@ export const PLAN_LABEL: Record<string, string> = {
   TOP_DESTACADO_HISTORIA: "Full Destacado",
   GALERIA: "Galería",
   TOP_GALERIA: "TOP + Galería",
+  DESTACADO: "Destacado",
+  PREMIUM: "PREMIUM",
+  GOLD: "GOLD",
+  VIP: "VIP",
+  SUPER_TURBO_FULL: "Super Turbo 5X · 4 horarios",
+  SUPER_TURBO_1H: "Super Turbo 5X · 1 horario",
+  SUPER_TURBO_2H: "Super Turbo 5X · 2 horarios",
+  SUPER_TURBO_3H: "Super Turbo 5X · 3 horarios",
 };
 
 export const SITIOS_ADMIN = [
@@ -118,6 +132,11 @@ export function esPlanSkokkaWeb(plan: string): boolean {
 }
 
 export function filtrarCostosSitio(items: AnuncioCosto[], sitio: SitioAdmin): AnuncioCosto[] {
+  if (sitio === "wenas") {
+    return items.filter(
+      (i) => i.plan === "VIP" && (i.dias === 7 || i.dias === 15 || i.dias === 30)
+    );
+  }
   if (sitio !== "skokka") return items;
   return items.filter(
     (i) =>

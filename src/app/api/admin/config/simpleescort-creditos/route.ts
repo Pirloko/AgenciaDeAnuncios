@@ -1,6 +1,18 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { calcularCostoAgenciaSkokka, type SkokkaCreditosConfig } from "@/lib/admin-costos";
+import {
+  calcularCostoAgenciaPorCreditos,
+  type SimpleEscortCreditosConfig,
+} from "@/lib/admin-costos";
+
+const CONFIG_KEY = "simpleescort_creditos";
+
+/** Defaults si aún no hay config en BD (el admin puede cambiarlos). */
+const DEFAULTS: SimpleEscortCreditosConfig = {
+  costo_total_clp: 100000,
+  cantidad_creditos: 1000,
+  valor_credito_clp: 100,
+};
 
 export async function PATCH(request: Request) {
   const supabase = await createClient();
@@ -23,24 +35,24 @@ export async function PATCH(request: Request) {
   const { data: actual, error: readErr } = await supabase
     .from("admin_config")
     .select("value")
-    .eq("key", "skokka_creditos")
+    .eq("key", CONFIG_KEY)
     .maybeSingle();
 
   if (readErr) {
     return NextResponse.json({ error: readErr.message }, { status: 500 });
   }
 
-  const prev = (actual?.value ?? null) as SkokkaCreditosConfig | null;
+  const prev = (actual?.value ?? null) as SimpleEscortCreditosConfig | null;
 
   const cantidad =
     typeof body.cantidad_creditos === "number" && body.cantidad_creditos > 0
       ? Math.round(body.cantidad_creditos)
-      : (prev?.cantidad_creditos ?? 4970);
+      : (prev?.cantidad_creditos ?? DEFAULTS.cantidad_creditos);
 
   const costoTotal =
     typeof body.costo_total_clp === "number" && body.costo_total_clp > 0
       ? Math.round(body.costo_total_clp)
-      : (prev?.costo_total_clp ?? 200000);
+      : (prev?.costo_total_clp ?? DEFAULTS.costo_total_clp);
 
   if (cantidad <= 0 || costoTotal <= 0) {
     return NextResponse.json({ error: "Paquete o créditos inválidos" }, { status: 400 });
@@ -48,34 +60,40 @@ export async function PATCH(request: Request) {
 
   const valor = Math.round((costoTotal / cantidad) * 1000) / 1000;
 
-  const nuevoConfig: SkokkaCreditosConfig = {
+  const nuevoConfig: SimpleEscortCreditosConfig = {
     costo_total_clp: costoTotal,
     cantidad_creditos: cantidad,
     valor_credito_clp: valor,
   };
 
-  const { data: guardado, error: saveErr } = await supabase
-    .from("admin_config")
-    .update({ value: nuevoConfig })
-    .eq("key", "skokka_creditos")
-    .select("value")
-    .maybeSingle();
-
-  if (saveErr) {
-    return NextResponse.json({ error: saveErr.message }, { status: 500 });
+  let guardado;
+  if (actual) {
+    const { data, error } = await supabase
+      .from("admin_config")
+      .update({ value: nuevoConfig })
+      .eq("key", CONFIG_KEY)
+      .select("value")
+      .maybeSingle();
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    guardado = data;
+  } else {
+    const { data, error } = await supabase
+      .from("admin_config")
+      .insert({ key: CONFIG_KEY, value: nuevoConfig })
+      .select("value")
+      .maybeSingle();
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    guardado = data;
   }
 
   if (!guardado) {
-    return NextResponse.json(
-      { error: "Config skokka_creditos no encontrada. Ejecuta supabase/01-admin-schema.sql en Supabase." },
-      { status: 404 }
-    );
+    return NextResponse.json({ error: "No se pudo guardar la config de SimpleEscort." }, { status: 500 });
   }
 
   const { data: filas, error: filasErr } = await supabase
     .from("anuncio_costos")
     .select("id, creditos")
-    .eq("sitio", "skokka")
+    .eq("sitio", "simpleescort")
     .not("creditos", "is", null);
 
   if (filasErr) {
@@ -84,7 +102,7 @@ export async function PATCH(request: Request) {
 
   for (const fila of filas ?? []) {
     if (fila.creditos == null) continue;
-    const costo = calcularCostoAgenciaSkokka(Number(fila.creditos), valor);
+    const costo = calcularCostoAgenciaPorCreditos(Number(fila.creditos), valor);
     const { error: updErr } = await supabase
       .from("anuncio_costos")
       .update({ costo_agencia: costo })
