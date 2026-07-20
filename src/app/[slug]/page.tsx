@@ -5,6 +5,7 @@ import CotizadorChimbis from "@/components/CotizadorChimbis";
 import CotizadorLocanto from "@/components/CotizadorLocanto";
 import CotizadorSimpleEscort from "@/components/CotizadorSimpleEscort";
 import CotizadorEscorcitas from "@/components/CotizadorEscorcitas";
+import CotizadorWenas from "@/components/CotizadorWenas";
 import CatalogoSEO from "@/components/CatalogoSEO";
 import JsonLd from "@/components/JsonLd";
 import { obtenerSitio, listarSlugs } from "@/lib/sitios";
@@ -20,6 +21,7 @@ import {
   iterarOfertasEscorcitas,
   ESCORCITAS_PLAN_INFO,
 } from "@/lib/escorcitas";
+import { iterarOfertasWenas, WENAS_PLAN_INFO } from "@/lib/wenas";
 import { SITE_NAME, SITE_URL, getKeywords, SEO_OVERRIDES } from "@/lib/seo";
 import Link from "next/link";
 import { esValoresSitio, rutaValores } from "@/lib/valores-seo";
@@ -107,6 +109,14 @@ export default async function SitioPage({
                 priceCurrency: "CLP",
                 availability: "https://schema.org/InStock",
               }))
+            : slug === "wenas"
+              ? iterarOfertasWenas().map((o) => ({
+                  "@type": "Offer" as const,
+                  name: `${WENAS_PLAN_INFO.VIP.nombre} · ${o.dias} días`,
+                  price: String(o.precio),
+                  priceCurrency: "CLP",
+                  availability: "https://schema.org/InStock",
+                }))
           : [
           ...Object.entries(sitio.diurno).flatMap(([key, precios]) => {
             const [s, d] = key.split("-").map(Number);
@@ -174,6 +184,8 @@ export default async function SitioPage({
         <CotizadorSimpleEscort sitio={sitio} />
       ) : slug === "escorcitas" ? (
         <CotizadorEscorcitas sitio={sitio} />
+      ) : slug === "wenas" ? (
+        <CotizadorWenas sitio={sitio} />
       ) : (
         <Cotizador sitio={sitio} />
       )}

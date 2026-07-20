@@ -4,6 +4,7 @@ export const VALORES_SITIOS = [
   "locanto",
   "simpleescort",
   "escorcitas",
+  "wenas",
 ] as const;
 
 export type ValoresSitioSlug = (typeof VALORES_SITIOS)[number];
@@ -28,4 +29,6 @@ export const VALORES_INTRO: Record<ValoresSitioSlug, string> = {
     "En SimpleEscorts contratas Super Turbo 5X: defines los días y las franjas horarias. Cada franja incluye 5 subidas. Puedes marcar una, varias o las 4 (precio full).",
   escorcitas:
     "En Escorcitas eliges el tipo de escort, los días (1, 3 o 7) y el plan TOP, PREMIUM o GOLD. El precio es el mismo para mujer, trans o masculino.",
+  wenas:
+    "En Wenas el plan es VIP: eliges 7, 15 o 30 días y tu aviso queda destacado en wenas.cl durante ese período.",
 };

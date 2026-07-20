@@ -11,6 +11,13 @@ import {
   type SimpleEscortDias,
 } from "@/lib/simpleescort";
 
+import {
+  WENAS_COSTOS,
+  WENAS_DIAS_ORDER,
+  WENAS_PRECIOS,
+  type WenasDias,
+} from "@/lib/wenas";
+
 export type FilaCostoNueva = Omit<
   AnuncioCosto,
   "id" | "ganancia" | "margen_pct" | "updated_at" | "activo"
@@ -86,7 +93,7 @@ export function filasSeedEscorcitas(): FilaCostoNueva[] {
 }
 
 /** Solo VIP 7 / 15 / 30 — cualquier otra fila de Wenas se elimina. */
-export const WENAS_DIAS_VIP = [7, 15, 30] as const;
+export const WENAS_DIAS_VIP = WENAS_DIAS_ORDER;
 
 export function esWenasVipCanonico(row: { sitio: string; plan: string; dias: number }): boolean {
   return (
@@ -97,25 +104,22 @@ export function esWenasVipCanonico(row: { sitio: string; plan: string; dias: num
 }
 
 export function filasSeedWenas(): FilaCostoNueva[] {
-  const planes = [
-    { plan: "VIP", dias: 7, costo: 26900, venta: 31900, orden: 400 },
-    { plan: "VIP", dias: 15, costo: 49900, venta: 55900, orden: 401 },
-    { plan: "VIP", dias: 30, costo: 89900, venta: 96900, orden: 402 },
-  ];
-
-  return planes.map((p) => ({
-    sitio: "wenas" as const,
-    categoria: "general",
-    plan: p.plan,
-    subidas: null,
-    dias: p.dias,
-    etiqueta: `VIP · ${p.dias} días`,
-    valor_plataforma: null,
-    creditos: null,
-    costo_agencia: p.costo,
-    precio_venta: p.venta,
-    orden: p.orden,
-  }));
+  return WENAS_DIAS_ORDER.map((dias, i) => {
+    const d = dias as WenasDias;
+    return {
+      sitio: "wenas" as const,
+      categoria: "general",
+      plan: "VIP",
+      subidas: null,
+      dias: d,
+      etiqueta: `VIP · ${d} días`,
+      valor_plataforma: null,
+      creditos: null,
+      costo_agencia: WENAS_COSTOS[d],
+      precio_venta: WENAS_PRECIOS[d],
+      orden: 400 + i,
+    };
+  });
 }
 
 export function filasSeedSitiosNuevos(): FilaCostoNueva[] {

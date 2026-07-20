@@ -188,17 +188,44 @@ export const FALLBACK: Record<string, Sitio> = {
       },
     ],
   },
-};
-
-const PRONTO_HOME: Pick<Sitio, "slug" | "nombre" | "dominio" | "color" | "disponible">[] = [
-  {
+  wenas: {
     slug: "wenas",
     nombre: "Wenas",
     dominio: "wenas.cl",
+    slogan: "Publicación VIP",
     color: "#D32F2F",
-    disponible: false,
+    accent: "#B71C1C",
+    disponible: true,
+    descripcion: [
+      "En Wenas publicas con plan VIP: tu aviso queda destacado durante 7, 15 o 30 días.",
+      "Eliges la duración, ves el precio al tiro y pedís la publicación por WhatsApp.",
+    ],
+    niveles: [
+      {
+        id: "VIP",
+        nombre: "VIP",
+        beneficio: "Anuncio VIP destacado en el listado de wenas.cl.",
+      },
+    ],
+    horarios: [],
+    diurno: {},
+    madrugada: {},
+    faq: [
+      {
+        q: "¿Cómo funciona la publicación en Wenas?",
+        a: "Eliges cuántos días quieres el plan VIP (7, 15 o 30). El cotizador te muestra el precio exacto y puedes pedir la publicación por WhatsApp.",
+      },
+      {
+        q: "¿Qué incluye el plan VIP?",
+        a: "Es la publicación destacada VIP en wenas.cl durante el período que contrates: 7, 15 o 30 días.",
+      },
+      {
+        q: "¿Cuánto cuesta el VIP en Wenas?",
+        a: "VIP 7 días: $31.900. VIP 15 días: $55.900. VIP 30 días: $96.900. El cotizador y la tabla de valores muestran el detalle.",
+      },
+    ],
   },
-];
+};
 
 const HOME_ORDER = ["skokka", "chimbis", "locanto", "simpleescort", "escorcitas", "wenas"];
 
@@ -258,9 +285,6 @@ export async function listarSitios(): Promise<
           });
         }
       }
-      for (const p of PRONTO_HOME) {
-        porSlug.set(p.slug, p);
-      }
       return [...porSlug.values()].sort(
         (a, b) => HOME_ORDER.indexOf(a.slug) - HOME_ORDER.indexOf(b.slug)
       );
@@ -274,14 +298,13 @@ export async function listarSitios(): Promise<
       color: s.color,
       disponible: s.disponible,
     }))
-    .concat(PRONTO_HOME)
     .sort((a, b) => HOME_ORDER.indexOf(a.slug) - HOME_ORDER.indexOf(b.slug));
 }
 
 // Sitio completo por slug (arma la tabla de precios desde filas planas)
 export async function obtenerSitio(slug: string): Promise<Sitio | null> {
   // Sitios con cotizador propio usan datos locales (no el esquema Skokka de Supabase)
-  if (["chimbis", "locanto", "simpleescort", "escorcitas"].includes(slug) && FALLBACK[slug]) {
+  if (["chimbis", "locanto", "simpleescort", "escorcitas", "wenas"].includes(slug) && FALLBACK[slug]) {
     return FALLBACK[slug];
   }
 

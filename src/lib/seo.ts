@@ -9,7 +9,7 @@ export const SITE_URL =
 
 // Descripción general del sitio (home / fallback)
 export const SITE_DESCRIPTION =
-  "Agencia de publicaciones para escort en Chile. Escort anuncios y anuncios escort en Skokka, Chimbis, Locanto, SimpleEscorts y Escorcitas. Desde 2015: títulos que venden, difuminado de rostro y cobertura de tatuajes. Cotiza tu aviso destacado al instante.";
+  "Agencia de publicaciones para escort en Chile. Escort anuncios y anuncios escort en Skokka, Chimbis, Locanto, SimpleEscorts, Escorcitas y Wenas. Desde 2015: títulos que venden, difuminado de rostro y cobertura de tatuajes. Cotiza tu aviso destacado al instante.";
 
 // ============================================================
 //  PALABRAS CLAVE GLOBALES  ←  EDITÁ ACÁ
@@ -92,6 +92,8 @@ export const KEYWORDS: Record<string, string[]> = {
     "publicar en wenas chile",
     "anuncios escort wenas",
     "publicaciones para escort wenas",
+    "precios wenas vip",
+    "aviso vip wenas",
   ],
 };
 
@@ -124,6 +126,11 @@ export const SEO_OVERRIDES: Record<
     title: "Precios de publicación en Escorcitas (TOP, PREMIUM, GOLD)",
     description:
       "Cotiza tu publicación escort en Escorcitas: mujer, trans o masculino. Planes TOP, PREMIUM y GOLD por 1, 3 o 7 días. Anuncios escort con rotación por categoría.",
+  },
+  wenas: {
+    title: "Precios VIP en Wenas (7, 15 y 30 días)",
+    description:
+      "Cotiza tu publicación VIP en Wenas: 7, 15 o 30 días en wenas.cl. Anuncios escort destacados con precio al instante.",
   },
 };
 

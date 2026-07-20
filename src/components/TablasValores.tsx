@@ -16,6 +16,11 @@ import {
   SIMPLEESCORT_HORARIOS_TOTAL,
   calcularTotalSimpleEscort,
 } from "@/lib/simpleescort";
+import {
+  WENAS_DIAS_ORDER,
+  WENAS_PLAN_INFO,
+  WENAS_PRECIOS,
+} from "@/lib/wenas";
 
 const LOCANTO_ORDER: LocantoPlan[] = ["TOP", "GALERIA", "TOP_GALERIA"];
 const ESCORCITAS_DIAS_ORDER: EscorcitasDias[] = [1, 3, 7];
@@ -239,6 +244,28 @@ export function TablaValoresEscorcitas() {
   );
 }
 
+export function TablaValoresWenas() {
+  return (
+    <section className="valores-block">
+      <h2 className="valores-h2">Plan VIP</h2>
+      <p className="valores-note">
+        En Wenas solo hay plan VIP. Eliges la duración y tu aviso queda destacado en wenas.cl.
+      </p>
+      <ValoresTabla
+        columnas={["Duración", WENAS_PLAN_INFO.VIP.nombre]}
+        filas={WENAS_DIAS_ORDER.map((dias) => ({
+          id: String(dias),
+          etiqueta: `${dias} días`,
+          valores: [clp(WENAS_PRECIOS[dias])],
+        }))}
+      />
+      <p className="valores-note valores-note--inline">
+        <b>{WENAS_PLAN_INFO.VIP.nombre}:</b> {WENAS_PLAN_INFO.VIP.detalle}
+      </p>
+    </section>
+  );
+}
+
 export function TablaValoresPorSitio({
   slug,
   sitio,
@@ -259,6 +286,8 @@ export function TablaValoresPorSitio({
       return <TablaValoresSimpleEscort />;
     case "escorcitas":
       return <TablaValoresEscorcitas />;
+    case "wenas":
+      return <TablaValoresWenas />;
     default:
       return null;
   }

@@ -19,6 +19,7 @@ import {
   calcularTotalSimpleEscort,
   type SimpleEscortDias,
 } from "@/lib/simpleescort";
+import { WENAS_DIAS_ORDER, WENAS_PRECIOS, type WenasDias } from "@/lib/wenas";
 
 /** Sobrante máximo deseable al ajustar una promoción al presupuesto. */
 export const SOBRANTE_OBJETIVO = 1500;
@@ -136,7 +137,21 @@ function catalogoDesdeWebPublica(): LineaPromo[] {
     }
   }
 
-  // wenas se carga desde anuncio_costos (seed admin)
+  // wenas: catálogo web VIP si aún no hay filas admin
+  for (const dias of WENAS_DIAS_ORDER) {
+    const d = dias as WenasDias;
+    out.push({
+      id: `web-wenas-vip-${d}`,
+      sitio: "wenas",
+      plan: "VIP",
+      etiqueta: `VIP · ${d}d`,
+      categoria: "general",
+      dias: d,
+      subidas: null,
+      precio: WENAS_PRECIOS[d],
+    });
+  }
+
   return out;
 }
 
