@@ -115,7 +115,7 @@ export default function PromocionesWizard({ costos }: Props) {
       {step === "dias" && (
         <section className="admin-promo__panel">
           <h2 className="admin-promo__q">¿Por cuántos días quieres publicar?</h2>
-          <p className="admin-promo__hint">Elige una duración. Después indicas la zona.</p>
+          <p className="admin-promo__hint">Elige una duración (1, 3 o 7 días). Después indicas la zona.</p>
           <div className="admin-promo__opts admin-promo__opts--wrap">
             {diasOpts.map((d) => (
               <button
@@ -157,7 +157,8 @@ export default function PromocionesWizard({ costos }: Props) {
         <section className="admin-promo__panel">
           <h2 className="admin-promo__q">¿Dónde quieres publicar?</h2>
           <p className="admin-promo__hint">
-            Santiago/RM o ciudades del norte o sur. En Chimbis los precios cambian según la zona.
+            Santiago o comunas de Santiago, o regiones sur o norte. En Chimbis los precios cambian
+            según la zona.
           </p>
           <div className="admin-promo__opts">
             {ZONA_PROMO_OPTS.map((z) => {

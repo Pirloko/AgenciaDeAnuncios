@@ -227,7 +227,38 @@ export const FALLBACK: Record<string, Sitio> = {
   },
 };
 
-const HOME_ORDER = ["skokka", "chimbis", "locanto", "simpleescort", "escorcitas", "wenas"];
+/** Sitios en el home aún no cotizables (solo aviso). */
+const PRONTO_HOME: {
+  slug: string;
+  nombre: string;
+  dominio: string;
+  color: string;
+  disponible: false;
+  mensajePronto: string;
+}[] = [
+  {
+    slug: "gemidos",
+    nombre: "Gemidos.tv",
+    dominio: "gemidos.tv",
+    color: "#3E828E",
+    disponible: false,
+    mensajePronto: "Pronto valores e información",
+  },
+];
+
+const HOME_ORDER = [
+  "skokka",
+  "chimbis",
+  "locanto",
+  "simpleescort",
+  "escorcitas",
+  "wenas",
+  "gemidos",
+];
+
+export type SitioHome = Pick<Sitio, "slug" | "nombre" | "dominio" | "color" | "disponible"> & {
+  mensajePronto?: string;
+};
 
 /** Si Supabase trae datos incompletos, rellena con FALLBACK del mismo slug. */
 function completarSitioDesdeFallback(slug: string, sitio: Sitio): Sitio {
@@ -263,9 +294,7 @@ export async function listarSlugs(): Promise<string[]> {
 }
 
 // Resumen de todos los sitios (home)
-export async function listarSitios(): Promise<
-  Pick<Sitio, "slug" | "nombre" | "dominio" | "color" | "disponible">[]
-> {
+export async function listarSitios(): Promise<SitioHome[]> {
   const sb = getSupabase();
   if (sb) {
     const { data, error } = await sb
@@ -273,7 +302,9 @@ export async function listarSitios(): Promise<
       .select("slug,nombre,dominio,color,disponible")
       .order("orden", { ascending: true });
     if (!error && data && data.length) {
-      const porSlug = new Map(data.map((row) => [row.slug, row]));
+      const porSlug = new Map<string, SitioHome>(
+        data.map((row) => [row.slug, row as SitioHome])
+      );
       for (const s of Object.values(FALLBACK)) {
         if (s.disponible) {
           porSlug.set(s.slug, {
@@ -285,19 +316,25 @@ export async function listarSitios(): Promise<
           });
         }
       }
+      for (const p of PRONTO_HOME) {
+        porSlug.set(p.slug, p);
+      }
       return [...porSlug.values()].sort(
         (a, b) => HOME_ORDER.indexOf(a.slug) - HOME_ORDER.indexOf(b.slug)
       );
     }
   }
   return Object.values(FALLBACK)
-    .map((s) => ({
-      slug: s.slug,
-      nombre: s.nombre,
-      dominio: s.dominio,
-      color: s.color,
-      disponible: s.disponible,
-    }))
+    .map(
+      (s): SitioHome => ({
+        slug: s.slug,
+        nombre: s.nombre,
+        dominio: s.dominio,
+        color: s.color,
+        disponible: s.disponible,
+      })
+    )
+    .concat(PRONTO_HOME)
     .sort((a, b) => HOME_ORDER.indexOf(a.slug) - HOME_ORDER.indexOf(b.slug));
 }
 

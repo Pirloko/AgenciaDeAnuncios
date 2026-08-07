@@ -1,5 +1,6 @@
 import { SITE_URL } from "@/lib/seo";
 import { rutaValores, type ValoresSitioSlug } from "@/lib/valores-seo";
+import { NUMERO_WHATSAPP } from "@/lib/whatsapp";
 
 export function urlValoresPublica(slug: ValoresSitioSlug): string {
   if (typeof window !== "undefined") {
@@ -13,7 +14,11 @@ export function mensajeWhatsappValores(slug: ValoresSitioSlug, nombreSitio: stri
 }
 
 export function abrirWhatsappTexto(texto: string): void {
-  window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, "_blank", "noopener,noreferrer");
+  window.open(
+    `https://wa.me/${NUMERO_WHATSAPP}?text=${encodeURIComponent(texto)}`,
+    "_blank",
+    "noopener,noreferrer"
+  );
 }
 
 export async function capturarElementoComoPng(el: HTMLElement): Promise<Blob> {
@@ -36,33 +41,59 @@ export async function capturarElementoComoPng(el: HTMLElement): Promise<Blob> {
   });
 }
 
-export type ResultadoCompartirImagen = "shared" | "downloaded";
+export type ResultadoCompartirImagen = "shared" | "copied" | "unsupported";
 
+/**
+ * Comparte la imagen sin descargar:
+ * 1) Menú nativo de compartir (ideal en celular → WhatsApp)
+ * 2) Copia la foto al portapapeles para pegarla en el chat
+ */
 export async function compartirImagenWhatsapp(
   blob: Blob,
   nombreArchivo: string,
   textoFallback: string
 ): Promise<ResultadoCompartirImagen> {
   const file = new File([blob], nombreArchivo, { type: "image/png" });
+  const titulo = nombreArchivo.replace(/\.png$/i, "");
 
-  if (typeof navigator.share === "function" && navigator.canShare?.({ files: [file] })) {
-    await navigator.share({
+  if (typeof navigator.share === "function") {
+    const conArchivos: ShareData = {
       files: [file],
-      title: nombreArchivo.replace(/\.png$/i, ""),
+      title: titulo,
       text: textoFallback,
-    });
-    return "shared";
+    };
+    try {
+      const puedeArchivos =
+        typeof navigator.canShare !== "function" || navigator.canShare({ files: [file] });
+      if (puedeArchivos) {
+        await navigator.share(conArchivos);
+        return "shared";
+      }
+    } catch (err) {
+      if (esAbortoUsuario(err)) throw err;
+      // Sigue con portapapeles
+    }
   }
 
-  const url = URL.createObjectURL(blob);
-  const enlace = document.createElement("a");
-  enlace.href = url;
-  enlace.download = nombreArchivo;
-  enlace.click();
-  URL.revokeObjectURL(url);
+  try {
+    if (typeof ClipboardItem !== "undefined" && navigator.clipboard?.write) {
+      await navigator.clipboard.write([
+        new ClipboardItem({
+          "image/png": blob,
+        }),
+      ]);
+      abrirWhatsappTexto(textoFallback);
+      return "copied";
+    }
+  } catch {
+    // Sigue a unsupported
+  }
 
-  abrirWhatsappTexto(`${textoFallback}\n\n(Adjunta la imagen "${nombreArchivo}" que se acaba de descargar)`);
-  return "downloaded";
+  return "unsupported";
+}
+
+function esAbortoUsuario(err: unknown): boolean {
+  return err instanceof DOMException && err.name === "AbortError";
 }
 
 function esperarImagenesEn(container: HTMLElement): Promise<void> {

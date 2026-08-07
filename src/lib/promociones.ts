@@ -20,12 +20,16 @@ import {
   type SimpleEscortDias,
 } from "@/lib/simpleescort";
 import { WENAS_DIAS_ORDER, WENAS_PRECIOS, type WenasDias } from "@/lib/wenas";
+import { iterarOfertasLocanto, LOCANTO_DIAS } from "@/lib/locanto";
+import { iterarOfertasChimbis } from "@/lib/chimbis";
+import { FALLBACK } from "@/lib/sitios";
+import { SKOKKA_PLANES_WEB } from "@/lib/admin-costos";
 
 /** Sobrante máximo deseable al ajustar una promoción al presupuesto. */
 export const SOBRANTE_OBJETIVO = 1500;
 
-/** Días que ofrece el asistente de promociones. */
-export const DIAS_PROMO = [1, 3, 7, 15, 30] as const;
+/** Días que ofrece el asistente de promociones (público y admin). */
+export const DIAS_PROMO = [1, 3, 7] as const;
 export type DiasPromo = (typeof DIAS_PROMO)[number];
 
 /** Zona geográfica (afecta precios de Chimbis; otras páginas se mantienen). */
@@ -34,19 +38,19 @@ export type ZonaPromo = "santiago" | "regiones";
 export const ZONA_PROMO_OPTS: { id: ZonaPromo; label: string; hint: string }[] = [
   {
     id: "santiago",
-    label: "Santiago / Región Metropolitana",
-    hint: "Precios Chimbis de Santiago/RM",
+    label: "Santiago o comunas de Santiago",
+    hint: "Región Metropolitana",
   },
   {
     id: "regiones",
-    label: "Ciudades del norte o sur de Chile",
-    hint: "Precios Chimbis de otras ciudades",
+    label: "Regiones sur o norte",
+    hint: "Ciudades fuera de Santiago / RM",
   },
 ];
 
 export const ZONA_PROMO_LABEL: Record<ZonaPromo, string> = {
-  santiago: "Santiago / RM",
-  regiones: "Norte o sur",
+  santiago: "Santiago / comunas",
+  regiones: "Sur o norte",
 };
 
 /** Cuántas opciones distintas se muestran (si existen). */
@@ -78,7 +82,12 @@ export interface FiltrosPromo {
   presupuesto: number;
   dias: number;
   zona: ZonaPromo;
+  /** Páginas elegidas por la usuaria (mín. 2 en flujo público). */
+  sitios?: SitioAdmin[];
 }
+
+/** Mínimo de páginas a elegir en el asistente público. */
+export const MIN_SITIOS_PROMO = 2;
 
 export function parsePresupuestoCLP(raw: string): number | null {
   const limpio = raw.trim().replace(/\./g, "").replace(/,/g, "");
@@ -87,9 +96,71 @@ export function parsePresupuestoCLP(raw: string): number | null {
   return Number.isFinite(n) && n > 0 ? Math.round(n) : null;
 }
 
-/** Ofertas SimpleEscort / Escorcitas desde precios de la web pública (no hay filas en costos admin). */
+/** Ofertas desde precios de la web pública (sin filas admin). */
 function catalogoDesdeWebPublica(): LineaPromo[] {
   const out: LineaPromo[] = [];
+
+  // Skokka — precio por 1 horario (diurno) / precio plano (madrugada)
+  const skokka = FALLBACK.skokka;
+  if (skokka) {
+    const mapPlan: Record<string, string> = {
+      TOP: "TOP",
+      "SUPER TOP": "SUPERTOP",
+      "TOP ALL IN ONE": "FULL DESTACADO",
+    };
+    for (const [modalidad, tabla] of [
+      ["diurno", skokka.diurno],
+      ["madrugada", skokka.madrugada],
+    ] as const) {
+      for (const [key, precios] of Object.entries(tabla)) {
+        const [subidas, dias] = key.split("-").map(Number);
+        for (const [nivelWeb, precio] of Object.entries(precios)) {
+          const plan = mapPlan[nivelWeb] ?? nivelWeb;
+          if (!(SKOKKA_PLANES_WEB as readonly string[]).includes(plan)) continue;
+          if (typeof precio !== "number" || precio <= 0) continue;
+          out.push({
+            id: `web-skokka-${modalidad}-${plan}-${subidas}-${dias}`,
+            sitio: "skokka",
+            plan,
+            etiqueta: `${PLAN_LABEL[plan] ?? plan} · ${subidas} sub · ${dias}d · ${modalidad === "diurno" ? "día" : "madrugada"}`,
+            categoria: modalidad,
+            dias,
+            subidas,
+            precio,
+          });
+        }
+      }
+    }
+  }
+
+  // Chimbis
+  for (const o of iterarOfertasChimbis()) {
+    const categoria = o.region === "santiago" ? "santiago" : "regiones";
+    out.push({
+      id: `web-chimbis-${o.region}-${o.plan}-${o.subidas}-${o.dias}`,
+      sitio: "chimbis",
+      plan: o.plan,
+      etiqueta: `${PLAN_LABEL[o.plan] ?? o.plan} · ${o.subidas} sub · ${o.dias}d`,
+      categoria,
+      dias: o.dias,
+      subidas: o.subidas,
+      precio: o.precio,
+    });
+  }
+
+  // Locanto
+  for (const o of iterarOfertasLocanto()) {
+    out.push({
+      id: `web-locanto-${o.plan}`,
+      sitio: "locanto",
+      plan: o.plan,
+      etiqueta: o.nombre,
+      categoria: "general",
+      dias: LOCANTO_DIAS,
+      subidas: null,
+      precio: o.precio,
+    });
+  }
 
   for (const dias of SIMPLEESCORT_DIAS) {
     const d = dias as SimpleEscortDias;
@@ -137,7 +208,6 @@ function catalogoDesdeWebPublica(): LineaPromo[] {
     }
   }
 
-  // wenas: catálogo web VIP si aún no hay filas admin
   for (const dias of WENAS_DIAS_ORDER) {
     const d = dias as WenasDias;
     out.push({
@@ -153,6 +223,11 @@ function catalogoDesdeWebPublica(): LineaPromo[] {
   }
 
   return out;
+}
+
+/** Catálogo solo con precios públicos (sin login admin). */
+export function catalogoPublicoPromo(): LineaPromo[] {
+  return construirCatalogo([]);
 }
 
 export function construirCatalogo(costos: AnuncioCosto[]): LineaPromo[] {
@@ -384,8 +459,9 @@ function paquetesTresAnuncios(catalogo: LineaPromo[], presupuesto: number): Line
 }
 
 /**
- * Genera opciones de promoción con presupuesto + días + zona.
+ * Genera opciones de promoción con presupuesto + días + zona (+ páginas opcionales).
  * Incluye combinaciones de 1 o más páginas / anuncios, priorizando las más cercanas al monto.
+ * Si se pasan `sitios` (≥2), solo usa esas páginas y prioriza paquetes multipágina.
  */
 export function generarPromociones(
   costos: AnuncioCosto[],
@@ -394,18 +470,35 @@ export function generarPromociones(
   const { presupuesto, dias, zona } = filtros;
   if (presupuesto <= 0 || !Number.isFinite(dias)) return [];
 
-  const catalogo = filtrarPorZona(
+  let catalogo = filtrarPorZona(
     construirCatalogo(costos).filter((i) => i.dias === dias && i.precio <= presupuesto),
     zona
   );
+
+  const sitiosFiltro = filtros.sitios?.length
+    ? [...new Set(filtros.sitios)]
+    : null;
+  if (sitiosFiltro) {
+    catalogo = catalogo.filter((i) => sitiosFiltro.includes(i.sitio));
+  }
   if (!catalogo.length) return [];
 
-  const sitios = [...new Set(catalogo.map((i) => i.sitio))];
+  const sitiosEnCatalogo = [...new Set(catalogo.map((i) => i.sitio))];
+  const sitios = sitiosFiltro
+    ? sitiosFiltro.filter((s) => sitiosEnCatalogo.includes(s))
+    : sitiosEnCatalogo;
+  if (!sitios.length) return [];
+
+  const exigirMulti = Boolean(sitiosFiltro && sitiosFiltro.length >= MIN_SITIOS_PROMO);
   const candidatas: PromocionSugerida[] = [];
   const vistas = new Set<string>();
 
   function agregar(lineas: LineaPromo[] | null) {
     if (!lineas?.length) return;
+    if (exigirMulti) {
+      const nSitios = new Set(lineas.map((l) => l.sitio)).size;
+      if (nSitios < MIN_SITIOS_PROMO) return;
+    }
     const promo = empaquetar(lineas, presupuesto);
     if (!promo || vistas.has(promo.id)) return;
     vistas.add(promo.id);
@@ -413,11 +506,14 @@ export function generarPromociones(
   }
 
   for (const sub of subconjuntosSitios(sitios)) {
+    if (exigirMulti && sub.length < MIN_SITIOS_PROMO) continue;
     agregar(mejorUnoPorSitio(catalogo, sub, presupuesto));
   }
 
-  for (const pack of paquetesUnAnuncio(catalogo, presupuesto)) {
-    agregar(pack);
+  if (!exigirMulti) {
+    for (const pack of paquetesUnAnuncio(catalogo, presupuesto)) {
+      agregar(pack);
+    }
   }
   for (const pack of paquetesDosAnuncios(catalogo, presupuesto)) {
     agregar(pack);
@@ -466,4 +562,21 @@ export function resumenLineaPromo(l: LineaPromo): string {
 
 export function resumenSitiosPromo(sitios: SitioAdmin[]): string {
   return sitios.map((s) => SITIO_ADMIN_LABEL[s]).join(" · ");
+}
+
+/** Texto listo para WhatsApp al pedir una promoción. */
+export function mensajeWhatsAppPromo(
+  promo: PromocionSugerida,
+  filtros: { presupuesto: number; dias: number; zona: ZonaPromo }
+): string {
+  const lineas = promo.lineas.map((l) => `• ${resumenLineaPromo(l)} — ${clpAdmin(l.precio)}`).join("\n");
+  return (
+    `¡Hola! Quiero esta promoción:\n` +
+    `• Presupuesto: ${clpAdmin(filtros.presupuesto)}\n` +
+    `• ${filtros.dias} día${filtros.dias > 1 ? "s" : ""} · ${ZONA_PROMO_LABEL[filtros.zona]}\n` +
+    `• Opción: ${promo.nombre}\n` +
+    `${lineas}\n` +
+    `• Total: ${clpAdmin(promo.total)}` +
+    (promo.sobrante > 0 ? `\n• Sobra: ${clpAdmin(promo.sobrante)}` : "")
+  );
 }

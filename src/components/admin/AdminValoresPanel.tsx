@@ -73,7 +73,9 @@ export default function AdminValoresPanel({ sitios }: Props) {
       setAviso(
         resultado === "shared"
           ? "Listo. Elige WhatsApp en el menú de compartir."
-          : "Imagen descargada. Se abrió WhatsApp: adjunta el archivo PNG al chat."
+          : resultado === "copied"
+            ? "Imagen copiada. En WhatsApp pégala en el chat."
+            : "No se pudo compartir desde este navegador. Prueba en el celular con Chrome o Safari."
       );
     } catch {
       setAviso("No se pudo generar la imagen. Intenta de nuevo.");

@@ -51,6 +51,17 @@ export default async function Home() {
           Toca el sitio, define tu aviso y te damos el precio al instante.
         </p>
 
+        <Link href="/promociones" className="scard scard--promo">
+          <span className="scard--promo__text">
+            <span className="scard--promo__q">¿Cuánto dinero tienes?</span>
+            <span className="scard--promo__q">¿Necesitas una promoción?</span>
+            <span className="scard--promo__cta">Entra aquí</span>
+          </span>
+          <span className="go" aria-hidden="true">
+            →
+          </span>
+        </Link>
+
         <div className="sitecards">
           {sitios.map((s) =>
             s.disponible ? (
@@ -62,12 +73,15 @@ export default async function Home() {
                 <span className="go">→</span>
               </Link>
             ) : (
-              <div key={s.slug} className="scard off">
+              <div
+                key={s.slug}
+                className={`scard off${s.slug === "gemidos" ? " scard--gemidos" : ""}`}
+              >
                 <span className="slogo" style={{ color: s.color }}>
                   {s.nombre}
                 </span>
                 <span className="sdom">{s.dominio}</span>
-                <span className="soon">Pronto</span>
+                <span className="soon">{s.mensajePronto ?? "Pronto"}</span>
               </div>
             )
           )}
