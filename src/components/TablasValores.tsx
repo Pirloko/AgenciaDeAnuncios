@@ -21,6 +21,15 @@ import {
   WENAS_PLAN_INFO,
   WENAS_PRECIOS,
 } from "@/lib/wenas";
+import {
+  GEMIDOS_DIAS_TABLA,
+  GEMIDOS_PAUSA,
+  GEMIDOS_PLAN_INFO,
+  GEMIDOS_PLAN_ORDER,
+  GEMIDOS_VACACIONES,
+  GEMIDOS_VERIFICACION,
+  precioGemidos,
+} from "@/lib/gemidos";
 
 const LOCANTO_ORDER: LocantoPlan[] = ["TOP", "GALERIA", "TOP_GALERIA"];
 const ESCORCITAS_DIAS_ORDER: EscorcitasDias[] = [1, 3, 7];
@@ -266,6 +275,66 @@ export function TablaValoresWenas() {
   );
 }
 
+export function TablaValoresGemidos() {
+  return (
+    <>
+      <section className="valores-block">
+        <h2 className="valores-h2">Planes y duraciones</h2>
+        <p className="valores-note">
+          Cada plan tiene duraciones distintas. Si una celda está vacía, esa combinación no se ofrece.
+        </p>
+        <ValoresTabla
+          columnas={["Duración", ...GEMIDOS_PLAN_ORDER.map((p) => GEMIDOS_PLAN_INFO[p].nombre)]}
+          filas={GEMIDOS_DIAS_TABLA.map((dias) => ({
+            id: String(dias),
+            etiqueta: `${dias} días`,
+            valores: GEMIDOS_PLAN_ORDER.map((plan) => {
+              const precio = precioGemidos(plan, dias);
+              return precio != null ? clp(precio) : "—";
+            }),
+          }))}
+        />
+        {GEMIDOS_PLAN_ORDER.map((plan) => (
+          <p key={plan} className="valores-note valores-note--inline">
+            <b>{GEMIDOS_PLAN_INFO[plan].nombre}:</b> {GEMIDOS_PLAN_INFO[plan].beneficio}
+          </p>
+        ))}
+      </section>
+
+      <section className="valores-block">
+        <h2 className="valores-h2">Verificación de perfil</h2>
+        <p className="valores-note">
+          Requisito único: se pide una sola vez. La verificación real es obligatoria; perfiles con
+          datos falsos se eliminan sin reembolso.
+        </p>
+        <ul className="valores-list">
+          {GEMIDOS_VERIFICACION.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ul>
+      </section>
+
+      <section className="valores-block">
+        <h2 className="valores-h2">Modo pausa</h2>
+        <ul className="valores-list">
+          {GEMIDOS_PAUSA.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ul>
+      </section>
+
+      <section className="valores-block">
+        <h2 className="valores-h2">Modo vacaciones</h2>
+        <ul className="valores-list">
+          {GEMIDOS_VACACIONES.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ul>
+      </section>
+    </>
+  );
+}
+
 export function TablaValoresPorSitio({
   slug,
   sitio,
@@ -288,6 +357,8 @@ export function TablaValoresPorSitio({
       return <TablaValoresEscorcitas />;
     case "wenas":
       return <TablaValoresWenas />;
+    case "gemidos":
+      return <TablaValoresGemidos />;
     default:
       return null;
   }

@@ -17,6 +17,11 @@ import {
   WENAS_PRECIOS,
   type WenasDias,
 } from "@/lib/wenas";
+import {
+  GEMIDOS_OFERTAS,
+  GEMIDOS_PLAN_INFO,
+  type GemidosPlan,
+} from "@/lib/gemidos";
 
 export type FilaCostoNueva = Omit<
   AnuncioCosto,
@@ -122,8 +127,42 @@ export function filasSeedWenas(): FilaCostoNueva[] {
   });
 }
 
+export function esGemidosCanonico(row: {
+  sitio: string;
+  plan: string;
+  dias: number;
+}): boolean {
+  if (row.sitio !== "gemidos") return false;
+  return GEMIDOS_OFERTAS.some((o) => o.plan === row.plan && o.dias === row.dias);
+}
+
+/** Filas iniciales Gemidos.tv (precios web). */
+export function filasSeedGemidos(): FilaCostoNueva[] {
+  return GEMIDOS_OFERTAS.map((o, i) => {
+    const plan = o.plan as GemidosPlan;
+    return {
+      sitio: "gemidos" as const,
+      categoria: "general",
+      plan,
+      subidas: null,
+      dias: o.dias,
+      etiqueta: `${GEMIDOS_PLAN_INFO[plan].nombre} · ${o.dias} días`,
+      valor_plataforma: null,
+      creditos: null,
+      costo_agencia: 0,
+      precio_venta: o.precio,
+      orden: 500 + i,
+    };
+  });
+}
+
 export function filasSeedSitiosNuevos(): FilaCostoNueva[] {
-  return [...filasSeedSimpleEscort(), ...filasSeedEscorcitas(), ...filasSeedWenas()];
+  return [
+    ...filasSeedSimpleEscort(),
+    ...filasSeedEscorcitas(),
+    ...filasSeedWenas(),
+    ...filasSeedGemidos(),
+  ];
 }
 
 /** Clave estable para saber si ya existe la fila en BD. */

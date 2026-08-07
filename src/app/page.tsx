@@ -75,7 +75,7 @@ export default async function Home() {
             ) : (
               <div
                 key={s.slug}
-                className={`scard off${s.slug === "gemidos" ? " scard--gemidos" : ""}`}
+                className="scard off"
               >
                 <span className="slogo" style={{ color: s.color }}>
                   {s.nombre}

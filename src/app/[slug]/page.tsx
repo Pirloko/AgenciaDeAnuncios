@@ -6,6 +6,7 @@ import CotizadorLocanto from "@/components/CotizadorLocanto";
 import CotizadorSimpleEscort from "@/components/CotizadorSimpleEscort";
 import CotizadorEscorcitas from "@/components/CotizadorEscorcitas";
 import CotizadorWenas from "@/components/CotizadorWenas";
+import CotizadorGemidos from "@/components/CotizadorGemidos";
 import CatalogoSEO from "@/components/CatalogoSEO";
 import JsonLd from "@/components/JsonLd";
 import { obtenerSitio, listarSlugs } from "@/lib/sitios";
@@ -22,6 +23,7 @@ import {
   ESCORCITAS_PLAN_INFO,
 } from "@/lib/escorcitas";
 import { iterarOfertasWenas, WENAS_PLAN_INFO } from "@/lib/wenas";
+import { iterarOfertasGemidos, GEMIDOS_PLAN_INFO } from "@/lib/gemidos";
 import { SITE_NAME, SITE_URL, getKeywords, SEO_OVERRIDES } from "@/lib/seo";
 import Link from "next/link";
 import { esValoresSitio, rutaValores } from "@/lib/valores-seo";
@@ -117,28 +119,36 @@ export default async function SitioPage({
                   priceCurrency: "CLP",
                   availability: "https://schema.org/InStock",
                 }))
-          : [
-          ...Object.entries(sitio.diurno).flatMap(([key, precios]) => {
-            const [s, d] = key.split("-").map(Number);
-            return sitio.niveles.map((n) => ({
-              "@type": "Offer" as const,
-              name: `${n.nombre} · ${planLabel(s, d)} (diurno, por horario)`,
-              price: String(precios[n.id]),
-              priceCurrency: "CLP",
-              availability: "https://schema.org/InStock",
-            }));
-          }),
-          ...Object.entries(sitio.madrugada).flatMap(([key, precios]) => {
-            const [s, d] = key.split("-").map(Number);
-            return sitio.niveles.map((n) => ({
-              "@type": "Offer" as const,
-              name: `${n.nombre} · ${planLabel(s, d)} (madrugada)`,
-              price: String(precios[n.id]),
-              priceCurrency: "CLP",
-              availability: "https://schema.org/InStock",
-            }));
-          }),
-        ];
+              : slug === "gemidos"
+                ? iterarOfertasGemidos().map((o) => ({
+                    "@type": "Offer" as const,
+                    name: `${GEMIDOS_PLAN_INFO[o.plan].nombre} · ${o.dias} día${o.dias > 1 ? "s" : ""}`,
+                    price: String(o.precio),
+                    priceCurrency: "CLP",
+                    availability: "https://schema.org/InStock",
+                  }))
+                : [
+                    ...Object.entries(sitio.diurno).flatMap(([key, precios]) => {
+                      const [s, d] = key.split("-").map(Number);
+                      return sitio.niveles.map((n) => ({
+                        "@type": "Offer" as const,
+                        name: `${n.nombre} · ${planLabel(s, d)} (diurno, por horario)`,
+                        price: String(precios[n.id]),
+                        priceCurrency: "CLP",
+                        availability: "https://schema.org/InStock",
+                      }));
+                    }),
+                    ...Object.entries(sitio.madrugada).flatMap(([key, precios]) => {
+                      const [s, d] = key.split("-").map(Number);
+                      return sitio.niveles.map((n) => ({
+                        "@type": "Offer" as const,
+                        name: `${n.nombre} · ${planLabel(s, d)} (madrugada)`,
+                        price: String(precios[n.id]),
+                        priceCurrency: "CLP",
+                        availability: "https://schema.org/InStock",
+                      }));
+                    }),
+                  ];
 
   const serviceLd = {
     "@context": "https://schema.org",
@@ -186,6 +196,8 @@ export default async function SitioPage({
         <CotizadorEscorcitas sitio={sitio} />
       ) : slug === "wenas" ? (
         <CotizadorWenas sitio={sitio} />
+      ) : slug === "gemidos" ? (
+        <CotizadorGemidos sitio={sitio} />
       ) : (
         <Cotizador sitio={sitio} />
       )}

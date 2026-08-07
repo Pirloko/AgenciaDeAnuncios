@@ -95,6 +95,16 @@ export const KEYWORDS: Record<string, string[]> = {
     "precios wenas vip",
     "aviso vip wenas",
   ],
+  gemidos: [
+    "gemidos.tv",
+    "gemidos escort",
+    "publicar en gemidos chile",
+    "anuncios escort gemidos",
+    "precios gemidos classic gold platinum",
+    "diamond vip gemidos",
+    "black rose gemidos",
+    "verificacion perfil gemidos",
+  ],
 };
 
 // Título/description por sitio (opcional; si no, se generan automáticamente)
@@ -131,6 +141,11 @@ export const SEO_OVERRIDES: Record<
     title: "Precios VIP en Wenas (7, 15 y 30 días)",
     description:
       "Cotiza tu publicación VIP en Wenas: 7, 15 o 30 días en wenas.cl. Anuncios escort destacados con precio al instante.",
+  },
+  gemidos: {
+    title: "Precios en Gemidos.tv (Classic, Gold, Platinum, Diamond)",
+    description:
+      "Cotiza tu publicación en Gemidos.tv: Classic, Gold, Platinum, Diamond, Diamond VIP y Black Rose. Precios por días al instante.",
   },
 };
 

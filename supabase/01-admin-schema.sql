@@ -13,7 +13,7 @@ create table if not exists public.admin_config (
 -- 2) Tabla principal: costo + precio venta por anuncio
 create table if not exists public.anuncio_costos (
   id uuid primary key default gen_random_uuid(),
-  sitio text not null check (sitio in ('skokka', 'chimbis', 'locanto', 'simpleescort', 'escorcitas', 'wenas')),
+  sitio text not null check (sitio in ('skokka', 'chimbis', 'locanto', 'simpleescort', 'escorcitas', 'wenas', 'gemidos')),
   categoria text not null,
   plan text not null,
   subidas integer,

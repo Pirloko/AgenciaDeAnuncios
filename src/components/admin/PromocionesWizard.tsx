@@ -211,9 +211,6 @@ export default function PromocionesWizard({ costos }: Props) {
                   : `${sitiosPosibles.length} páginas`}
               </strong>
               : {sitiosPosibles.map((s) => SITIO_ADMIN_LABEL[s]).join(", ")}.
-              {!sitiosPosibles.includes("wenas") && (
-                <> Wenas entra a las opciones cuando completes su precio de venta en Costos.</>
-              )}
             </p>
           ) : (
             <p className="admin-promo__warn">

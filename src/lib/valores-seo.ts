@@ -5,6 +5,7 @@ export const VALORES_SITIOS = [
   "simpleescort",
   "escorcitas",
   "wenas",
+  "gemidos",
 ] as const;
 
 export type ValoresSitioSlug = (typeof VALORES_SITIOS)[number];
@@ -31,4 +32,6 @@ export const VALORES_INTRO: Record<ValoresSitioSlug, string> = {
     "En Escorcitas eliges el tipo de escort, los días (1, 3 o 7) y el plan TOP, PREMIUM o GOLD. El precio es el mismo para mujer, trans o masculino.",
   wenas:
     "En Wenas el plan es VIP: eliges 7, 15 o 30 días y tu aviso queda destacado en wenas.cl durante ese período.",
+  gemidos:
+    "En Gemidos.tv eliges el plan (Classic, Gold, Platinum, Diamond, Diamond VIP o Black Rose) y la duración disponible. La verificación de perfil es obligatoria.",
 };

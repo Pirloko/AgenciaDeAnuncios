@@ -386,6 +386,15 @@ a { color: inherit; }
 .valores-note b { color: var(--ink); font-weight: 600; }
 .valores-note--inline { margin-top: 10px; margin-bottom: 0; }
 .valores-note--lead { margin-bottom: 16px; font-size: 14px; }
+.valores-list {
+  margin: 0 0 8px;
+  padding-left: 1.15em;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+.valores-list li { margin-bottom: 6px; }
+.valores-list li:last-child { margin-bottom: 0; }
 .valores-ejemplo { font-size: 13px; color: var(--muted); margin: 12px 0 0; line-height: 1.5; }
 .valores-ejemplo b { color: var(--brand); }
 .valores-scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 14px; background: #fff; }

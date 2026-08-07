@@ -225,6 +225,48 @@ export const FALLBACK: Record<string, Sitio> = {
       },
     ],
   },
+  gemidos: {
+    slug: "gemidos",
+    nombre: "Gemidos.tv",
+    dominio: "gemidos.tv",
+    slogan: "Publicación verificada",
+    color: "#3E828E",
+    accent: "#B91D2F",
+    disponible: true,
+    descripcion: [
+      "En Gemidos.tv eliges el plan (Classic, Gold, Platinum, Diamond, Diamond VIP o Black Rose) y la duración disponible para ese plan.",
+      "La verificación de perfil es obligatoria. También puedes usar modo pausa o vacaciones según las reglas del sitio.",
+    ],
+    niveles: [
+      { id: "CLASSIC", nombre: "Classic", beneficio: "Publicación estándar." },
+      { id: "GOLD", nombre: "Gold", beneficio: "Más visibilidad que Classic." },
+      { id: "PLATINUM", nombre: "Platinum", beneficio: "Posicionamiento alto." },
+      { id: "DIAMOND", nombre: "Diamond", beneficio: "Alta prioridad." },
+      { id: "DIAMOND_VIP", nombre: "Diamond VIP", beneficio: "Diamond exclusivo." },
+      { id: "BLACK_ROSE", nombre: "Black Rose", beneficio: "Máxima exposición." },
+    ],
+    horarios: [],
+    diurno: {},
+    madrugada: {},
+    faq: [
+      {
+        q: "¿Qué planes hay en Gemidos.tv?",
+        a: "Classic, Gold, Platinum, Diamond, Diamond VIP y Black Rose. Cada uno tiene duraciones y precios distintos. El cotizador te muestra el valor exacto.",
+      },
+      {
+        q: "¿Cómo se verifica el perfil?",
+        a: "Se pide una sola vez: foto de documento frente y dorso, selfie tocándote el cuello, y un video real presentándote en Gemidos con fecha y hora. La verificación real es obligatoria.",
+      },
+      {
+        q: "¿Qué es el modo pausa?",
+        a: "Hasta 10 días sin descontar vigencia. Luego se reactiva solo. Semanal: 1 pausa. Mensual: 2 pausas.",
+      },
+      {
+        q: "¿Qué es el modo vacaciones?",
+        a: "Puedes activarlo el tiempo que quieras. Sí se descuentan días, pero el perfil sigue visible y mantiene su posición e imagen.",
+      },
+    ],
+  },
 };
 
 /** Sitios en el home aún no cotizables (solo aviso). */
@@ -235,16 +277,7 @@ const PRONTO_HOME: {
   color: string;
   disponible: false;
   mensajePronto: string;
-}[] = [
-  {
-    slug: "gemidos",
-    nombre: "Gemidos.tv",
-    dominio: "gemidos.tv",
-    color: "#3E828E",
-    disponible: false,
-    mensajePronto: "Pronto valores e información",
-  },
-];
+}[] = [];
 
 const HOME_ORDER = [
   "skokka",
@@ -341,7 +374,7 @@ export async function listarSitios(): Promise<SitioHome[]> {
 // Sitio completo por slug (arma la tabla de precios desde filas planas)
 export async function obtenerSitio(slug: string): Promise<Sitio | null> {
   // Sitios con cotizador propio usan datos locales (no el esquema Skokka de Supabase)
-  if (["chimbis", "locanto", "simpleescort", "escorcitas", "wenas"].includes(slug) && FALLBACK[slug]) {
+  if (["chimbis", "locanto", "simpleescort", "escorcitas", "wenas", "gemidos"].includes(slug) && FALLBACK[slug]) {
     return FALLBACK[slug];
   }
 

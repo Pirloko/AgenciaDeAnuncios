@@ -73,7 +73,7 @@ async function sincronizarWenasVip(
   return true;
 }
 
-/** Inserta SimpleEscort / Escorcitas / Wenas si aún no existen filas. */
+/** Inserta SimpleEscort / Escorcitas / Wenas / Gemidos si aún no existen filas. */
 async function asegurarCostosSitiosNuevos(
   supabase: Awaited<ReturnType<typeof createClient>>,
   existentes: AnuncioCosto[]

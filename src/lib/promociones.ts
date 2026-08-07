@@ -20,6 +20,7 @@ import {
   type SimpleEscortDias,
 } from "@/lib/simpleescort";
 import { WENAS_DIAS_ORDER, WENAS_PRECIOS, type WenasDias } from "@/lib/wenas";
+import { GEMIDOS_OFERTAS, GEMIDOS_PLAN_INFO } from "@/lib/gemidos";
 import { iterarOfertasLocanto, LOCANTO_DIAS } from "@/lib/locanto";
 import { iterarOfertasChimbis } from "@/lib/chimbis";
 import { FALLBACK } from "@/lib/sitios";
@@ -219,6 +220,19 @@ function catalogoDesdeWebPublica(): LineaPromo[] {
       dias: d,
       subidas: null,
       precio: WENAS_PRECIOS[d],
+    });
+  }
+
+  for (const o of GEMIDOS_OFERTAS) {
+    out.push({
+      id: `web-gemidos-${o.plan}-${o.dias}`,
+      sitio: "gemidos",
+      plan: o.plan,
+      etiqueta: `${GEMIDOS_PLAN_INFO[o.plan].nombre} · ${o.dias}d`,
+      categoria: "general",
+      dias: o.dias,
+      subidas: null,
+      precio: o.precio,
     });
   }
 

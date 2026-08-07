@@ -1,6 +1,8 @@
+import { GEMIDOS_OFERTAS } from "@/lib/gemidos";
+
 export interface AnuncioCosto {
   id: string;
-  sitio: "skokka" | "chimbis" | "locanto" | "simpleescort" | "escorcitas" | "wenas";
+  sitio: "skokka" | "chimbis" | "locanto" | "simpleescort" | "escorcitas" | "wenas" | "gemidos";
   categoria: string;
   plan: string;
   subidas: number | null;
@@ -76,6 +78,7 @@ export const SITIO_ADMIN_LABEL: Record<string, string> = {
   simpleescort: "simpleescort.cl",
   escorcitas: "escorcitas.cl",
   wenas: "wenas.cl",
+  gemidos: "gemidos.tv",
 };
 
 export const CATEGORIA_LABEL: Record<string, string> = {
@@ -102,6 +105,11 @@ export const PLAN_LABEL: Record<string, string> = {
   PREMIUM: "PREMIUM",
   GOLD: "GOLD",
   VIP: "VIP",
+  CLASSIC: "Classic",
+  PLATINUM: "Platinum",
+  DIAMOND: "Diamond",
+  DIAMOND_VIP: "Diamond VIP",
+  BLACK_ROSE: "Black Rose",
   SUPER_TURBO_FULL: "Super Turbo 5X · 4 horarios",
   SUPER_TURBO_1H: "Super Turbo 5X · 1 horario",
   SUPER_TURBO_2H: "Super Turbo 5X · 2 horarios",
@@ -115,6 +123,7 @@ export const SITIOS_ADMIN = [
   "simpleescort",
   "escorcitas",
   "wenas",
+  "gemidos",
 ] as const;
 export type SitioAdmin = (typeof SITIOS_ADMIN)[number];
 
@@ -136,6 +145,10 @@ export function filtrarCostosSitio(items: AnuncioCosto[], sitio: SitioAdmin): An
     return items.filter(
       (i) => i.plan === "VIP" && (i.dias === 7 || i.dias === 15 || i.dias === 30)
     );
+  }
+  if (sitio === "gemidos") {
+    const claves = new Set(GEMIDOS_OFERTAS.map((o) => `${o.plan}|${o.dias}`));
+    return items.filter((i) => claves.has(`${i.plan}|${i.dias}`));
   }
   if (sitio !== "skokka") return items;
   return items.filter(
