@@ -9,7 +9,7 @@ import {
   FRANJAS_SIMPLEESCORT,
   franjaSimpleEscortPorIndice,
   resumenHorariosSimpleEscort,
-  calcularTotalSimpleEscort,
+  calcularTotalSimpleEscortEfectivo,
   type SimpleEscortDias,
   clp,
 } from "@/lib/simpleescort";
@@ -20,7 +20,13 @@ type Step = "dias" | "horarios" | "resultado";
 
 const STEPS: Step[] = ["dias", "horarios", "resultado"];
 
-export default function CotizadorSimpleEscort({ sitio }: { sitio: Sitio }) {
+export default function CotizadorSimpleEscort({
+  sitio,
+  preciosAdmin = null,
+}: {
+  sitio: Sitio;
+  preciosAdmin?: Record<string, number> | null;
+}) {
   const [step, setStep] = useState(0);
   const [dias, setDias] = useState<SimpleEscortDias | null>(null);
   const [horarios, setHorarios] = useState<number[]>([]);
@@ -63,7 +69,7 @@ export default function CotizadorSimpleEscort({ sitio }: { sitio: Sitio }) {
 
   // ---------- RESULTADO ----------
   if (cur === "resultado" && dias && horarios.length > 0) {
-    const total = calcularTotalSimpleEscort(dias, horarios.length);
+    const total = calcularTotalSimpleEscortEfectivo(dias, horarios.length, preciosAdmin);
     const hTxt = resumenHorariosSimpleEscort(horarios);
     const subidasTotal = SIMPLEESCORT_SUBIDAS * horarios.length;
 
@@ -187,7 +193,7 @@ export default function CotizadorSimpleEscort({ sitio }: { sitio: Sitio }) {
               {horarios.length ? (
                 <>
                   {horarios.length} horario{horarios.length > 1 ? "s" : ""} ·{" "}
-                  <b>{clp(calcularTotalSimpleEscort(dias, horarios.length))}</b>
+                  <b>{clp(calcularTotalSimpleEscortEfectivo(dias, horarios.length, preciosAdmin))}</b>
                   {horariosCompletos ? " (full)" : ""}
                 </>
               ) : (

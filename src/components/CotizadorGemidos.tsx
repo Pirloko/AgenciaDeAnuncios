@@ -9,7 +9,7 @@ import {
   GEMIDOS_PLAN_ORDER,
   clp,
   ofertasGemidosPorPlan,
-  precioGemidos,
+  precioGemidosEfectivo,
 } from "@/lib/gemidos";
 import { enlaceWhatsApp } from "@/lib/whatsapp";
 
@@ -17,7 +17,13 @@ type Step = "plan" | "dias" | "resultado";
 
 const STEPS: Step[] = ["plan", "dias", "resultado"];
 
-export default function CotizadorGemidos({ sitio }: { sitio: Sitio }) {
+export default function CotizadorGemidos({
+  sitio,
+  preciosAdmin = null,
+}: {
+  sitio: Sitio;
+  preciosAdmin?: Record<string, number> | null;
+}) {
   const [step, setStep] = useState(0);
   const [plan, setPlan] = useState<GemidosPlan | null>(null);
   const [dias, setDias] = useState<GemidosDias | null>(null);
@@ -29,7 +35,7 @@ export default function CotizadorGemidos({ sitio }: { sitio: Sitio }) {
   } as unknown as React.CSSProperties;
 
   const cur = STEPS[step];
-  const ofertasPlan = plan ? ofertasGemidosPorPlan(plan) : [];
+  const ofertasPlan = plan ? ofertasGemidosPorPlan(plan, preciosAdmin) : [];
 
   function next() {
     setStep((s) => Math.min(s + 1, STEPS.length - 1));
@@ -55,7 +61,7 @@ export default function CotizadorGemidos({ sitio }: { sitio: Sitio }) {
   }
 
   if (cur === "resultado" && plan && dias) {
-    const total = precioGemidos(plan, dias);
+    const total = precioGemidosEfectivo(plan, dias, preciosAdmin);
     const info = GEMIDOS_PLAN_INFO[plan];
     if (total == null) {
       return (
@@ -125,7 +131,9 @@ export default function CotizadorGemidos({ sitio }: { sitio: Sitio }) {
             <div className="opts">
               {GEMIDOS_PLAN_ORDER.map((p) => {
                 const info = GEMIDOS_PLAN_INFO[p];
-                const desde = Math.min(...ofertasGemidosPorPlan(p).map((o) => o.precio));
+                const desde = Math.min(
+                  ...ofertasGemidosPorPlan(p, preciosAdmin).map((o) => o.precio)
+                );
                 return (
                   <button
                     key={p}

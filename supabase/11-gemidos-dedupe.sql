@@ -1,20 +1,6 @@
--- Gemidos.tv: habilitar sitio en anuncio_costos + seed de planes.
--- Ejecutar en Supabase SQL Editor (después de 04/05/07).
+-- Limpia duplicados de Gemidos y deja exactamente las 11 filas canónicas.
+-- Ejecutar en Supabase SQL Editor.
 
-alter table public.anuncio_costos drop constraint if exists anuncio_costos_sitio_check;
-
-alter table public.anuncio_costos add constraint anuncio_costos_sitio_check
-  check (sitio in (
-    'skokka',
-    'chimbis',
-    'locanto',
-    'simpleescort',
-    'escorcitas',
-    'wenas',
-    'gemidos'
-  ));
-
--- Evitar duplicados si se re-ejecuta
 delete from public.anuncio_costos
 where sitio = 'gemidos';
 

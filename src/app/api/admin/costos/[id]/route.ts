@@ -1,5 +1,20 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { rutaValores } from "@/lib/valores-seo";
+
+function revalidarPublico(sitio: string) {
+  revalidatePath(`/${sitio}`);
+  revalidatePath(`/${sitio}-valores`);
+  revalidatePath("/promociones");
+  revalidatePath("/");
+  // Rutas de valores usan patrón slug-valores
+  try {
+    revalidatePath(rutaValores(sitio));
+  } catch {
+    /* sitio sin página de valores */
+  }
+}
 
 export async function PATCH(
   request: Request,
@@ -58,15 +73,26 @@ export async function PATCH(
     return NextResponse.json({ error: "Sin cambios" }, { status: 400 });
   }
 
+  const { data: antes } = await supabase
+    .from("anuncio_costos")
+    .select("sitio")
+    .eq("id", id)
+    .maybeSingle();
+
   const { data, error } = await supabase
     .from("anuncio_costos")
     .update(patch)
     .eq("id", id)
-    .select("id, valor_plataforma, creditos, costo_agencia, precio_venta, ganancia, margen_pct")
+    .select("id, sitio, valor_plataforma, creditos, costo_agencia, precio_venta, ganancia, margen_pct")
     .single();
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  const sitio = data?.sitio ?? antes?.sitio;
+  if (sitio && patch.precio_venta !== undefined) {
+    revalidarPublico(String(sitio));
   }
 
   return NextResponse.json({ ok: true, row: data });

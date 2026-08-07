@@ -33,16 +33,25 @@ export const LOCANTO_PLAN_INFO: Record<
 
 const PLAN_ORDER: LocantoPlan[] = ["TOP", "GALERIA", "TOP_GALERIA"];
 
-export function planesLocanto() {
+export function planesLocanto(preciosAdmin?: Record<string, number> | null) {
   return PLAN_ORDER.map((plan) => ({
     plan,
-    precio: LOCANTO_PRECIOS[plan],
+    precio: precioLocantoEfectivo(plan, preciosAdmin),
     ...LOCANTO_PLAN_INFO[plan],
   }));
 }
 
 export function precioLocanto(plan: LocantoPlan): number {
   return LOCANTO_PRECIOS[plan];
+}
+
+export function precioLocantoEfectivo(
+  plan: LocantoPlan,
+  preciosAdmin?: Record<string, number> | null
+): number {
+  const admin = preciosAdmin?.[`general|${plan}|x|${LOCANTO_DIAS}`];
+  if (admin != null && admin > 0) return admin;
+  return precioLocanto(plan);
 }
 
 export function iterarOfertasLocanto() {

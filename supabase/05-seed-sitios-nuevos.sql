@@ -80,7 +80,8 @@ select * from (values
   ('gemidos', 'general', 'DIAMOND',     null, 30, 'Diamond · 30 días',     null, null, 0, 121000, 506),
   ('gemidos', 'general', 'DIAMOND_VIP', null, 7,  'Diamond VIP · 7 días',  null, null, 0, 120000, 507),
   ('gemidos', 'general', 'DIAMOND_VIP', null, 30, 'Diamond VIP · 30 días', null, null, 0, 205000, 508),
-  ('gemidos', 'general', 'BLACK_ROSE',  null, 7,  'Black Rose · 7 días',   null, null, 0, 330000, 509)
+  ('gemidos', 'general', 'BLACK_ROSE',  null, 3,  'Black Rose · 3 días',   null, null, 0, 220000, 509),
+  ('gemidos', 'general', 'BLACK_ROSE',  null, 7,  'Black Rose · 7 días',   null, null, 0, 330000, 510)
 ) as v(sitio, categoria, plan, subidas, dias, etiqueta, valor_plataforma, creditos, costo_agencia, precio_venta, orden)
 where not exists (
   select 1 from public.anuncio_costos c

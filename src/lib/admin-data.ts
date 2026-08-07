@@ -5,7 +5,14 @@ import {
   type SkokkaCreditosConfig,
   normalizarCosto,
 } from "@/lib/admin-costos";
-import { claveCosto, esWenasVipCanonico, filasSeedSitiosNuevos, filasSeedWenas } from "@/lib/admin-seed-sitios";
+import {
+  claveCosto,
+  esGemidosCanonico,
+  esWenasVipCanonico,
+  filasSeedGemidos,
+  filasSeedSitiosNuevos,
+  filasSeedWenas,
+} from "@/lib/admin-seed-sitios";
 import { aplicarPreciosVentaWeb } from "@/lib/precio-venta-web";
 import { obtenerSitio } from "@/lib/sitios";
 import { createClient } from "@/lib/supabase/server";
@@ -15,6 +22,8 @@ const SIMPLEESCORT_CREDITOS_DEFAULT: SimpleEscortCreditosConfig = {
   cantidad_creditos: 1000,
   valor_credito_clp: 100,
 };
+
+const GEMIDOS_FILAS_ESPERADAS = filasSeedGemidos().length;
 
 /** Wenas debe quedar en exactamente 3 filas VIP (7 / 15 / 30). */
 async function sincronizarWenasVip(
@@ -73,25 +82,103 @@ async function sincronizarWenasVip(
   return true;
 }
 
+/**
+ * Gemidos: exactamente las ofertas canónicas (sin duplicados).
+ * Conserva costo_agencia / precio_venta ya editados cuando existían.
+ */
+async function sincronizarGemidos(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  existentes: AnuncioCosto[]
+): Promise<boolean> {
+  const gemidos = existentes.filter((c) => c.sitio === "gemidos");
+  const seed = filasSeedGemidos();
+  const porClave = new Map<string, AnuncioCosto[]>();
+  for (const c of gemidos) {
+    const k = claveCosto(c);
+    const arr = porClave.get(k) ?? [];
+    arr.push(c);
+    porClave.set(k, arr);
+  }
+
+  const canon = gemidos.filter(esGemidosCanonico);
+  const clavesCanonUnicas = new Set(canon.map((c) => claveCosto(c)));
+  const hayDup = [...porClave.values()].some((arr) => arr.length > 1);
+  const faltan = seed.some((f) => !clavesCanonUnicas.has(claveCosto(f)));
+  const sobran =
+    hayDup ||
+    faltan ||
+    gemidos.length !== GEMIDOS_FILAS_ESPERADAS ||
+    clavesCanonUnicas.size !== GEMIDOS_FILAS_ESPERADAS ||
+    gemidos.some((c) => !esGemidosCanonico(c));
+
+  if (!sobran) return false;
+
+  const { error: delErr } = await supabase.from("anuncio_costos").delete().eq("sitio", "gemidos");
+  if (delErr) {
+    console.error("No se pudo limpiar Gemidos:", delErr.message);
+    return false;
+  }
+
+  const { data: quedan, error: checkErr } = await supabase
+    .from("anuncio_costos")
+    .select("id")
+    .eq("sitio", "gemidos");
+  if (checkErr || (quedan && quedan.length > 0)) {
+    console.error(
+      "Gemidos sigue con filas tras DELETE. Ejecuta supabase/11-gemidos-dedupe.sql en el SQL Editor."
+    );
+    return false;
+  }
+
+  const filas = seed.map((f) => {
+    const prev = porClave.get(claveCosto(f))?.[0];
+    return {
+      sitio: f.sitio,
+      categoria: f.categoria,
+      plan: f.plan,
+      subidas: f.subidas,
+      dias: f.dias,
+      etiqueta: f.etiqueta,
+      valor_plataforma: f.valor_plataforma,
+      creditos: f.creditos,
+      costo_agencia: prev?.costo_agencia ?? f.costo_agencia,
+      precio_venta: prev?.precio_venta ?? f.precio_venta,
+      orden: f.orden,
+      activo: true,
+    };
+  });
+
+  const { error: insErr } = await supabase.from("anuncio_costos").insert(filas);
+  if (insErr) {
+    console.error("No se pudieron insertar planes de Gemidos:", insErr.message);
+    return false;
+  }
+
+  return true;
+}
+
 /** Inserta SimpleEscort / Escorcitas / Wenas / Gemidos si aún no existen filas. */
 async function asegurarCostosSitiosNuevos(
   supabase: Awaited<ReturnType<typeof createClient>>,
   existentes: AnuncioCosto[]
 ): Promise<boolean> {
   let cambio = await sincronizarWenasVip(supabase, existentes);
+  cambio = (await sincronizarGemidos(supabase, existentes)) || cambio;
 
   const vigentes = existentes.filter(
-    (c) => c.sitio !== "wenas" || esWenasVipCanonico(c)
+    (c) =>
+      (c.sitio !== "wenas" || esWenasVipCanonico(c)) &&
+      (c.sitio !== "gemidos" || esGemidosCanonico(c))
   );
-  // Tras sync Wenas, no volver a insertar VIP desde el seed genérico
   const claves = new Set(
     (cambio
-      ? vigentes.filter((c) => c.sitio !== "wenas")
+      ? vigentes.filter((c) => c.sitio !== "wenas" && c.sitio !== "gemidos")
       : vigentes
     ).map((c) => claveCosto(c))
   );
   if (cambio) {
     for (const f of filasSeedWenas()) claves.add(claveCosto(f));
+    for (const f of filasSeedGemidos()) claves.add(claveCosto(f));
   }
 
   const faltantes = filasSeedSitiosNuevos().filter((f) => !claves.has(claveCosto(f)));
@@ -177,7 +264,9 @@ export async function cargarCostosAdmin() {
   ]);
 
   const costosWeb = aplicarPreciosVentaWeb(lista, { skokka }).filter(
-    (c) => c.sitio !== "wenas" || esWenasVipCanonico(c)
+    (c) =>
+      (c.sitio !== "wenas" || esWenasVipCanonico(c)) &&
+      (c.sitio !== "gemidos" || esGemidosCanonico(c))
   );
 
   return {

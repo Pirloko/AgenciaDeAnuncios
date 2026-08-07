@@ -9,7 +9,7 @@ import {
   ESCORCITAS_TIPO_LABEL,
   ESCORCITAS_PLAN_INFO,
   planesEscorcitas,
-  precioEscorcitas,
+  precioEscorcitasEfectivo,
   clp,
 } from "@/lib/escorcitas";
 import { enlaceWhatsApp } from "@/lib/whatsapp";
@@ -32,7 +32,13 @@ const DIAS_OPTS: { d: EscorcitasDias; desc: string }[] = [
   { d: 7, desc: "Una semana completa" },
 ];
 
-export default function CotizadorEscorcitas({ sitio }: { sitio: Sitio }) {
+export default function CotizadorEscorcitas({
+  sitio,
+  preciosAdmin = null,
+}: {
+  sitio: Sitio;
+  preciosAdmin?: Record<string, number> | null;
+}) {
   const [step, setStep] = useState(0);
   const [tipo, setTipo] = useState<EscorcitasTipo | null>(null);
   const [dias, setDias] = useState<EscorcitasDias | null>(null);
@@ -66,7 +72,7 @@ export default function CotizadorEscorcitas({ sitio }: { sitio: Sitio }) {
 
   if (cur === "resultado" && tipo && dias && plan) {
     const info = ESCORCITAS_PLAN_INFO[plan];
-    const total = precioEscorcitas(dias, plan);
+    const total = precioEscorcitasEfectivo(dias, plan, preciosAdmin);
 
     const msg = encodeURIComponent(
       `¡Hola! Quiero publicar en ${sitio.nombre} (${sitio.dominio}):\n` +
@@ -179,7 +185,7 @@ export default function CotizadorEscorcitas({ sitio }: { sitio: Sitio }) {
               Los anuncios rotan dentro de <b>su propia categoría</b>: TOP abajo, PREMIUM más arriba
               y GOLD en la parte más alta del listado.
             </p>
-            {planesEscorcitas(dias).map(({ plan: p, precio, nombre, beneficio, detalle, icon }) => (
+            {planesEscorcitas(dias, preciosAdmin).map(({ plan: p, precio, nombre, beneficio, detalle, icon }) => (
               <button
                 key={p}
                 className={"opt opt--plan" + (plan === p ? " on" : "")}

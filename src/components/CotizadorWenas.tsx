@@ -6,7 +6,7 @@ import {
   type WenasDias,
   WENAS_PLAN_INFO,
   planesWenas,
-  precioWenas,
+  precioWenasEfectivo,
   clp,
 } from "@/lib/wenas";
 import { enlaceWhatsApp } from "@/lib/whatsapp";
@@ -21,7 +21,13 @@ const DIAS_DESC: Record<WenasDias, string> = {
   30: "Un mes completo como VIP",
 };
 
-export default function CotizadorWenas({ sitio }: { sitio: Sitio }) {
+export default function CotizadorWenas({
+  sitio,
+  preciosAdmin = null,
+}: {
+  sitio: Sitio;
+  preciosAdmin?: Record<string, number> | null;
+}) {
   const [step, setStep] = useState(0);
   const [dias, setDias] = useState<WenasDias | null>(null);
 
@@ -32,7 +38,7 @@ export default function CotizadorWenas({ sitio }: { sitio: Sitio }) {
   } as unknown as React.CSSProperties;
 
   const cur = STEPS[step];
-  const opciones = planesWenas();
+  const opciones = planesWenas(preciosAdmin);
 
   function next() {
     setStep((s) => Math.min(s + 1, STEPS.length - 1));
@@ -48,7 +54,7 @@ export default function CotizadorWenas({ sitio }: { sitio: Sitio }) {
   }
 
   if (cur === "resultado" && dias) {
-    const total = precioWenas(dias);
+    const total = precioWenasEfectivo(dias, preciosAdmin);
     const info = WENAS_PLAN_INFO.VIP;
 
     const msg = encodeURIComponent(

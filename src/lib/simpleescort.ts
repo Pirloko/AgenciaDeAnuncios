@@ -56,6 +56,23 @@ export function calcularTotalSimpleEscort(dias: SimpleEscortDias, cantidadHorari
   return PRECIOS_POR_HORARIO[dias] * cantidadHorarios;
 }
 
+export function calcularTotalSimpleEscortEfectivo(
+  dias: SimpleEscortDias,
+  cantidadHorarios: number,
+  preciosAdmin?: Record<string, number> | null
+): number {
+  if (cantidadHorarios >= SIMPLEESCORT_HORARIOS_TOTAL) {
+    const admin = preciosAdmin?.[`general|SUPER_TURBO_FULL|20|${dias}`];
+    if (admin != null && admin > 0) return admin;
+    return PRECIOS_FULL[dias];
+  }
+  const plan = `SUPER_TURBO_${cantidadHorarios}H`;
+  const subidas = 5 * cantidadHorarios;
+  const admin = preciosAdmin?.[`general|${plan}|${subidas}|${dias}`];
+  if (admin != null && admin > 0) return admin;
+  return PRECIOS_POR_HORARIO[dias] * cantidadHorarios;
+}
+
 export function iterarOfertasSimpleEscort() {
   const out: { dias: SimpleEscortDias; tipo: string; precio: number }[] = [];
   for (const dias of SIMPLEESCORT_DIAS) {

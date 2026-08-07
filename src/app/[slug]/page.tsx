@@ -11,24 +11,32 @@ import CatalogoSEO from "@/components/CatalogoSEO";
 import JsonLd from "@/components/JsonLd";
 import { obtenerSitio, listarSlugs } from "@/lib/sitios";
 import { planLabel } from "@/lib/precios";
+import { iterarOfertasWenas, WENAS_PLAN_INFO, precioWenasEfectivo, type WenasDias } from "@/lib/wenas";
+import { ofertasGemidosEfectivas, GEMIDOS_PLAN_INFO } from "@/lib/gemidos";
+import { precioLocantoEfectivo, LOCANTO_DIAS, LOCANTO_PLAN_INFO, type LocantoPlan } from "@/lib/locanto";
+import { precioEscorcitasEfectivo, ESCORCITAS_PLAN_INFO, type EscorcitasDias, type EscorcitasPlan } from "@/lib/escorcitas";
+import {
+  calcularTotalSimpleEscortEfectivo,
+  SIMPLEESCORT_DIAS,
+  SIMPLEESCORT_HORARIOS_TOTAL,
+  type SimpleEscortDias,
+} from "@/lib/simpleescort";
 import {
   iterarOfertasChimbis,
   CHIMBIS_REGION_LABEL,
   nombrePlanChimbis,
+  precioChimbisEfectivo,
 } from "@/lib/chimbis";
-import { iterarOfertasLocanto, LOCANTO_DIAS } from "@/lib/locanto";
-import { iterarOfertasSimpleEscort } from "@/lib/simpleescort";
-import {
-  iterarOfertasEscorcitas,
-  ESCORCITAS_PLAN_INFO,
-} from "@/lib/escorcitas";
-import { iterarOfertasWenas, WENAS_PLAN_INFO } from "@/lib/wenas";
-import { iterarOfertasGemidos, GEMIDOS_PLAN_INFO } from "@/lib/gemidos";
 import { SITE_NAME, SITE_URL, getKeywords, SEO_OVERRIDES } from "@/lib/seo";
 import Link from "next/link";
 import { esValoresSitio, rutaValores } from "@/lib/valores-seo";
+import {
+  aplicarPreciosAdminSkokka,
+  cargarPreciosPublicos,
+  mapaPreciosPorSitio,
+} from "@/lib/precios-publicos";
 
-export const revalidate = 3600; // refresca precios desde Supabase cada hora
+export const revalidate = 60; // precios admin → público (también se revalida al guardar en admin)
 
 export async function generateStaticParams() {
   const slugs = await listarSlugs();
@@ -74,8 +82,13 @@ export default async function SitioPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const sitio = await obtenerSitio(slug);
-  if (!sitio || !sitio.disponible) notFound();
+  const sitioBase = await obtenerSitio(slug);
+  if (!sitioBase || !sitioBase.disponible) notFound();
+
+  const preciosRows = await cargarPreciosPublicos();
+  const preciosAdmin = mapaPreciosPorSitio(preciosRows, slug);
+  const sitio =
+    slug === "skokka" ? aplicarPreciosAdminSkokka(sitioBase, preciosRows) : sitioBase;
 
   // ---- Offers para JSON-LD ----
   const offers =
@@ -83,44 +96,62 @@ export default async function SitioPage({
       ? iterarOfertasChimbis().map((o) => ({
           "@type": "Offer" as const,
           name: `${nombrePlanChimbis(o.plan, o.subidas)} · ${o.dias} día${o.dias > 1 ? "s" : ""} · ${CHIMBIS_REGION_LABEL[o.region]}`,
-          price: String(o.precio),
+          price: String(
+            precioChimbisEfectivo(o.region, o.dias, o.subidas, o.plan, preciosAdmin) ?? o.precio
+          ),
           priceCurrency: "CLP",
           availability: "https://schema.org/InStock",
         }))
       : slug === "locanto"
-        ? iterarOfertasLocanto().map((o) => ({
+        ? (["TOP", "GALERIA", "TOP_GALERIA"] as LocantoPlan[]).map((plan) => ({
             "@type": "Offer" as const,
-            name: `${o.nombre} · ${LOCANTO_DIAS} días`,
-            price: String(o.precio),
+            name: `${LOCANTO_PLAN_INFO[plan].nombre} · ${LOCANTO_DIAS} días`,
+            price: String(precioLocantoEfectivo(plan, preciosAdmin)),
             priceCurrency: "CLP",
             availability: "https://schema.org/InStock",
           }))
         : slug === "simpleescort"
-          ? iterarOfertasSimpleEscort().map((o) => ({
-              "@type": "Offer" as const,
-              name: `${o.tipo} · ${o.dias} día${o.dias > 1 ? "s" : ""}`,
-              price: String(o.precio),
-              priceCurrency: "CLP",
-              availability: "https://schema.org/InStock",
-            }))
+          ? SIMPLEESCORT_DIAS.flatMap((dias) => {
+              const d = dias as SimpleEscortDias;
+              return [
+                {
+                  "@type": "Offer" as const,
+                  name: `Super Turbo 5X · 4 horarios (full) · ${d} día${d > 1 ? "s" : ""}`,
+                  price: String(
+                    calcularTotalSimpleEscortEfectivo(d, SIMPLEESCORT_HORARIOS_TOTAL, preciosAdmin)
+                  ),
+                  priceCurrency: "CLP",
+                  availability: "https://schema.org/InStock",
+                },
+                {
+                  "@type": "Offer" as const,
+                  name: `Super Turbo 5X · por horario · ${d} día${d > 1 ? "s" : ""}`,
+                  price: String(calcularTotalSimpleEscortEfectivo(d, 1, preciosAdmin)),
+                  priceCurrency: "CLP",
+                  availability: "https://schema.org/InStock",
+                },
+              ];
+            })
           : slug === "escorcitas"
-            ? iterarOfertasEscorcitas().map((o) => ({
-                "@type": "Offer" as const,
-                name: `${ESCORCITAS_PLAN_INFO[o.plan].nombre} · ${o.dias} día${o.dias > 1 ? "s" : ""}`,
-                price: String(o.precio),
-                priceCurrency: "CLP",
-                availability: "https://schema.org/InStock",
-              }))
+            ? ([1, 3, 7] as EscorcitasDias[]).flatMap((dias) =>
+                (["TOP", "PREMIUM", "GOLD"] as EscorcitasPlan[]).map((plan) => ({
+                  "@type": "Offer" as const,
+                  name: `${ESCORCITAS_PLAN_INFO[plan].nombre} · ${dias} día${dias > 1 ? "s" : ""}`,
+                  price: String(precioEscorcitasEfectivo(dias, plan, preciosAdmin)),
+                  priceCurrency: "CLP",
+                  availability: "https://schema.org/InStock",
+                }))
+              )
             : slug === "wenas"
               ? iterarOfertasWenas().map((o) => ({
                   "@type": "Offer" as const,
                   name: `${WENAS_PLAN_INFO.VIP.nombre} · ${o.dias} días`,
-                  price: String(o.precio),
+                  price: String(precioWenasEfectivo(o.dias as WenasDias, preciosAdmin)),
                   priceCurrency: "CLP",
                   availability: "https://schema.org/InStock",
                 }))
               : slug === "gemidos"
-                ? iterarOfertasGemidos().map((o) => ({
+                ? ofertasGemidosEfectivas(preciosAdmin).map((o) => ({
                     "@type": "Offer" as const,
                     name: `${GEMIDOS_PLAN_INFO[o.plan].nombre} · ${o.dias} día${o.dias > 1 ? "s" : ""}`,
                     price: String(o.precio),
@@ -180,6 +211,8 @@ export default async function SitioPage({
     ],
   };
 
+  const hasAdmin = Object.keys(preciosAdmin).length > 0;
+
   return (
     <main className="app page-sitio">
       <JsonLd data={serviceLd} />
@@ -187,17 +220,17 @@ export default async function SitioPage({
       <JsonLd data={breadcrumbLd} />
 
       {slug === "chimbis" ? (
-        <CotizadorChimbis sitio={sitio} />
+        <CotizadorChimbis sitio={sitio} preciosAdmin={hasAdmin ? preciosAdmin : null} />
       ) : slug === "locanto" ? (
-        <CotizadorLocanto sitio={sitio} />
+        <CotizadorLocanto sitio={sitio} preciosAdmin={hasAdmin ? preciosAdmin : null} />
       ) : slug === "simpleescort" ? (
-        <CotizadorSimpleEscort sitio={sitio} />
+        <CotizadorSimpleEscort sitio={sitio} preciosAdmin={hasAdmin ? preciosAdmin : null} />
       ) : slug === "escorcitas" ? (
-        <CotizadorEscorcitas sitio={sitio} />
+        <CotizadorEscorcitas sitio={sitio} preciosAdmin={hasAdmin ? preciosAdmin : null} />
       ) : slug === "wenas" ? (
-        <CotizadorWenas sitio={sitio} />
+        <CotizadorWenas sitio={sitio} preciosAdmin={hasAdmin ? preciosAdmin : null} />
       ) : slug === "gemidos" ? (
-        <CotizadorGemidos sitio={sitio} />
+        <CotizadorGemidos sitio={sitio} preciosAdmin={hasAdmin ? preciosAdmin : null} />
       ) : (
         <Cotizador sitio={sitio} />
       )}

@@ -148,7 +148,13 @@ export function filtrarCostosSitio(items: AnuncioCosto[], sitio: SitioAdmin): An
   }
   if (sitio === "gemidos") {
     const claves = new Set(GEMIDOS_OFERTAS.map((o) => `${o.plan}|${o.dias}`));
-    return items.filter((i) => claves.has(`${i.plan}|${i.dias}`));
+    const vistos = new Set<string>();
+    return items.filter((i) => {
+      const k = `${i.plan}|${i.dias}`;
+      if (!claves.has(k) || vistos.has(k)) return false;
+      vistos.add(k);
+      return true;
+    });
   }
   if (sitio !== "skokka") return items;
   return items.filter(

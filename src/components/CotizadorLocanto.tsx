@@ -7,7 +7,7 @@ import {
   LOCANTO_DIAS,
   LOCANTO_PLAN_INFO,
   planesLocanto,
-  precioLocanto,
+  precioLocantoEfectivo,
   clp,
 } from "@/lib/locanto";
 import { ejemplosLocanto } from "@/lib/locanto-ejemplos";
@@ -18,7 +18,13 @@ type Step = "plan" | "resultado";
 
 const STEPS: Step[] = ["plan", "resultado"];
 
-export default function CotizadorLocanto({ sitio }: { sitio: Sitio }) {
+export default function CotizadorLocanto({
+  sitio,
+  preciosAdmin = null,
+}: {
+  sitio: Sitio;
+  preciosAdmin?: Record<string, number> | null;
+}) {
   const [step, setStep] = useState(0);
   const [plan, setPlan] = useState<LocantoPlan | null>(null);
 
@@ -29,7 +35,7 @@ export default function CotizadorLocanto({ sitio }: { sitio: Sitio }) {
   } as unknown as React.CSSProperties;
 
   const cur = STEPS[step];
-  const opciones = planesLocanto();
+  const opciones = planesLocanto(preciosAdmin);
 
   function next() {
     setStep((s) => Math.min(s + 1, STEPS.length - 1));
@@ -47,7 +53,7 @@ export default function CotizadorLocanto({ sitio }: { sitio: Sitio }) {
   // ---------- RESULTADO ----------
   if (cur === "resultado" && plan) {
     const info = LOCANTO_PLAN_INFO[plan];
-    const total = precioLocanto(plan);
+    const total = precioLocantoEfectivo(plan, preciosAdmin);
 
     const msg = encodeURIComponent(
       `¡Hola! Quiero un aviso destacado en ${sitio.nombre} (${sitio.dominio}):\n` +

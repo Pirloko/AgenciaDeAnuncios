@@ -243,7 +243,7 @@ export const FALLBACK: Record<string, Sitio> = {
       { id: "PLATINUM", nombre: "Platinum", beneficio: "Posicionamiento alto." },
       { id: "DIAMOND", nombre: "Diamond", beneficio: "Alta prioridad." },
       { id: "DIAMOND_VIP", nombre: "Diamond VIP", beneficio: "Diamond exclusivo." },
-      { id: "BLACK_ROSE", nombre: "Black Rose", beneficio: "Máxima exposición." },
+      { id: "BLACK_ROSE", nombre: "Black Rose", beneficio: "Máxima exposición (3 o 7 días)." },
     ],
     horarios: [],
     diurno: {},

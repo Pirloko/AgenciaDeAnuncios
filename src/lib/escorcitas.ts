@@ -44,16 +44,29 @@ export const ESCORCITAS_PLAN_INFO: Record<
 const PLAN_ORDER: EscorcitasPlan[] = ["TOP", "PREMIUM", "GOLD"];
 const DIAS_ORDER: EscorcitasDias[] = [1, 3, 7];
 
-export function planesEscorcitas(dias: EscorcitasDias) {
+export function planesEscorcitas(
+  dias: EscorcitasDias,
+  preciosAdmin?: Record<string, number> | null
+) {
   return PLAN_ORDER.map((plan) => ({
     plan,
-    precio: ESCORCITAS_PRECIOS[dias][plan],
+    precio: precioEscorcitasEfectivo(dias, plan, preciosAdmin),
     ...ESCORCITAS_PLAN_INFO[plan],
   }));
 }
 
 export function precioEscorcitas(dias: EscorcitasDias, plan: EscorcitasPlan): number {
   return ESCORCITAS_PRECIOS[dias][plan];
+}
+
+export function precioEscorcitasEfectivo(
+  dias: EscorcitasDias,
+  plan: EscorcitasPlan,
+  preciosAdmin?: Record<string, number> | null
+): number {
+  const admin = preciosAdmin?.[`general|${plan}|x|${dias}`];
+  if (admin != null && admin > 0) return admin;
+  return precioEscorcitas(dias, plan);
 }
 
 export function iterarOfertasEscorcitas() {

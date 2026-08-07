@@ -3,10 +3,10 @@ import { clp } from "@/lib/precios";
 import { FRANJAS_DIURNAS, franjaDiurnaPorEtiqueta } from "@/lib/horarios";
 import ChimbisValoresRegiones from "@/components/ChimbisValoresRegiones";
 import ValoresTabla from "@/components/ValoresTabla";
-import { LOCANTO_DIAS, LOCANTO_PLAN_INFO, LOCANTO_PRECIOS, type LocantoPlan } from "@/lib/locanto";
+import { LOCANTO_DIAS, LOCANTO_PLAN_INFO, precioLocantoEfectivo, type LocantoPlan } from "@/lib/locanto";
 import {
   ESCORCITAS_PLAN_INFO,
-  ESCORCITAS_PRECIOS,
+  precioEscorcitasEfectivo,
   type EscorcitasDias,
   type EscorcitasPlan,
 } from "@/lib/escorcitas";
@@ -14,12 +14,12 @@ import {
   FRANJAS_SIMPLEESCORT,
   SIMPLEESCORT_DIAS,
   SIMPLEESCORT_HORARIOS_TOTAL,
-  calcularTotalSimpleEscort,
+  calcularTotalSimpleEscortEfectivo,
 } from "@/lib/simpleescort";
 import {
   WENAS_DIAS_ORDER,
   WENAS_PLAN_INFO,
-  WENAS_PRECIOS,
+  precioWenasEfectivo,
 } from "@/lib/wenas";
 import {
   GEMIDOS_DIAS_TABLA,
@@ -28,7 +28,7 @@ import {
   GEMIDOS_PLAN_ORDER,
   GEMIDOS_VACACIONES,
   GEMIDOS_VERIFICACION,
-  precioGemidos,
+  precioGemidosEfectivo,
 } from "@/lib/gemidos";
 
 const LOCANTO_ORDER: LocantoPlan[] = ["TOP", "GALERIA", "TOP_GALERIA"];
@@ -148,19 +148,29 @@ export function TablaValoresSkokka({ sitio }: { sitio: Sitio }) {
   );
 }
 
-export function TablaValoresChimbis({ expandirTodo = false }: { expandirTodo?: boolean }) {
+export function TablaValoresChimbis({
+  expandirTodo = false,
+  preciosAdmin = null,
+}: {
+  expandirTodo?: boolean;
+  preciosAdmin?: Record<string, number> | null;
+}) {
   return (
     <section className="valores-block valores-block--chimbis">
       <p className="valores-note valores-note--lead">
         Las <b>subidas</b> son cuántas veces tu aviso vuelve a los primeros lugares durante los días
         que contrates. El precio cambia según zona, días, subidas y plan.
       </p>
-      <ChimbisValoresRegiones expandirTodo={expandirTodo} />
+      <ChimbisValoresRegiones expandirTodo={expandirTodo} preciosAdmin={preciosAdmin} />
     </section>
   );
 }
 
-export function TablaValoresLocanto() {
+export function TablaValoresLocanto({
+  preciosAdmin = null,
+}: {
+  preciosAdmin?: Record<string, number> | null;
+}) {
   return (
     <section className="valores-block">
       <h2 className="valores-h2">Precios por 7 días</h2>
@@ -173,14 +183,18 @@ export function TablaValoresLocanto() {
         filas={LOCANTO_ORDER.map((plan) => ({
           id: plan,
           etiqueta: LOCANTO_PLAN_INFO[plan].nombre,
-          valores: [`${LOCANTO_DIAS} días`, clp(LOCANTO_PRECIOS[plan])],
+          valores: [`${LOCANTO_DIAS} días`, clp(precioLocantoEfectivo(plan, preciosAdmin))],
         }))}
       />
     </section>
   );
 }
 
-export function TablaValoresSimpleEscort() {
+export function TablaValoresSimpleEscort({
+  preciosAdmin = null,
+}: {
+  preciosAdmin?: Record<string, number> | null;
+}) {
   return (
     <section className="valores-block valores-block--simpleescort">
       <h2 className="valores-h2">Super Turbo 5X</h2>
@@ -212,9 +226,9 @@ export function TablaValoresSimpleEscort() {
             id: String(dias),
             etiqueta: `${dias} día${dias > 1 ? "s" : ""}`,
             valores: [
-              clp(calcularTotalSimpleEscort(dias, SIMPLEESCORT_HORARIOS_TOTAL)),
-              clp(calcularTotalSimpleEscort(dias, 1)),
-              clp(calcularTotalSimpleEscort(dias, 2)),
+              clp(calcularTotalSimpleEscortEfectivo(dias, SIMPLEESCORT_HORARIOS_TOTAL, preciosAdmin)),
+              clp(calcularTotalSimpleEscortEfectivo(dias, 1, preciosAdmin)),
+              clp(calcularTotalSimpleEscortEfectivo(dias, 2, preciosAdmin)),
             ],
           }))}
         />
@@ -223,7 +237,11 @@ export function TablaValoresSimpleEscort() {
   );
 }
 
-export function TablaValoresEscorcitas() {
+export function TablaValoresEscorcitas({
+  preciosAdmin = null,
+}: {
+  preciosAdmin?: Record<string, number> | null;
+}) {
   return (
     <section className="valores-block">
       <h2 className="valores-h2">TOP, PREMIUM y GOLD</h2>
@@ -239,7 +257,9 @@ export function TablaValoresEscorcitas() {
         filas={ESCORCITAS_DIAS_ORDER.map((dias) => ({
           id: String(dias),
           etiqueta: `${dias} día${dias > 1 ? "s" : ""}`,
-          valores: ESCORCITAS_PLAN_ORDER.map((plan) => clp(ESCORCITAS_PRECIOS[dias][plan])),
+          valores: ESCORCITAS_PLAN_ORDER.map((plan) =>
+            clp(precioEscorcitasEfectivo(dias, plan, preciosAdmin))
+          ),
         }))}
       />
       <div className="valores-planes-detalle">
@@ -253,7 +273,11 @@ export function TablaValoresEscorcitas() {
   );
 }
 
-export function TablaValoresWenas() {
+export function TablaValoresWenas({
+  preciosAdmin = null,
+}: {
+  preciosAdmin?: Record<string, number> | null;
+}) {
   return (
     <section className="valores-block">
       <h2 className="valores-h2">Plan VIP</h2>
@@ -265,7 +289,7 @@ export function TablaValoresWenas() {
         filas={WENAS_DIAS_ORDER.map((dias) => ({
           id: String(dias),
           etiqueta: `${dias} días`,
-          valores: [clp(WENAS_PRECIOS[dias])],
+          valores: [clp(precioWenasEfectivo(dias, preciosAdmin))],
         }))}
       />
       <p className="valores-note valores-note--inline">
@@ -275,13 +299,18 @@ export function TablaValoresWenas() {
   );
 }
 
-export function TablaValoresGemidos() {
+export function TablaValoresGemidos({
+  preciosAdmin = null,
+}: {
+  preciosAdmin?: Record<string, number> | null;
+}) {
   return (
     <>
       <section className="valores-block">
         <h2 className="valores-h2">Planes y duraciones</h2>
         <p className="valores-note">
-          Cada plan tiene duraciones distintas. Si una celda está vacía, esa combinación no se ofrece.
+          Cada plan tiene duraciones distintas. La fila de 3 días solo aplica a Black Rose; en el
+          resto aparece como no disponible.
         </p>
         <ValoresTabla
           columnas={["Duración", ...GEMIDOS_PLAN_ORDER.map((p) => GEMIDOS_PLAN_INFO[p].nombre)]}
@@ -289,7 +318,7 @@ export function TablaValoresGemidos() {
             id: String(dias),
             etiqueta: `${dias} días`,
             valores: GEMIDOS_PLAN_ORDER.map((plan) => {
-              const precio = precioGemidos(plan, dias);
+              const precio = precioGemidosEfectivo(plan, dias, preciosAdmin);
               return precio != null ? clp(precio) : "—";
             }),
           }))}
@@ -339,26 +368,28 @@ export function TablaValoresPorSitio({
   slug,
   sitio,
   expandirChimbis = false,
+  preciosAdmin = null,
 }: {
   slug: string;
   sitio: Sitio;
   expandirChimbis?: boolean;
+  preciosAdmin?: Record<string, number> | null;
 }) {
   switch (slug) {
     case "skokka":
       return <TablaValoresSkokka sitio={sitio} />;
     case "chimbis":
-      return <TablaValoresChimbis expandirTodo={expandirChimbis} />;
+      return <TablaValoresChimbis expandirTodo={expandirChimbis} preciosAdmin={preciosAdmin} />;
     case "locanto":
-      return <TablaValoresLocanto />;
+      return <TablaValoresLocanto preciosAdmin={preciosAdmin} />;
     case "simpleescort":
-      return <TablaValoresSimpleEscort />;
+      return <TablaValoresSimpleEscort preciosAdmin={preciosAdmin} />;
     case "escorcitas":
-      return <TablaValoresEscorcitas />;
+      return <TablaValoresEscorcitas preciosAdmin={preciosAdmin} />;
     case "wenas":
-      return <TablaValoresWenas />;
+      return <TablaValoresWenas preciosAdmin={preciosAdmin} />;
     case "gemidos":
-      return <TablaValoresGemidos />;
+      return <TablaValoresGemidos preciosAdmin={preciosAdmin} />;
     default:
       return null;
   }

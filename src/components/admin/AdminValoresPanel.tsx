@@ -16,6 +16,7 @@ import type { Sitio } from "@/types/sitio";
 export interface SitioValoresAdmin {
   slug: ValoresSitioSlug;
   sitio: Sitio;
+  preciosAdmin?: Record<string, number> | null;
 }
 
 interface Props {
@@ -195,7 +196,12 @@ export default function AdminValoresPanel({ sitios }: Props) {
         <article className="valores-article admin-valores__capture-body">
           <h2 className="valores-title">Valores en {sitio.nombre}</h2>
           <p className="valores-intro admin-valores__intro-corta">{VALORES_INTRO[slug]}</p>
-          <TablaValoresPorSitio slug={slug} sitio={sitio} expandirChimbis={expandirChimbis} />
+          <TablaValoresPorSitio
+            slug={slug}
+            sitio={sitio}
+            expandirChimbis={expandirChimbis}
+            preciosAdmin={actual.preciosAdmin ?? null}
+          />
           <p className="admin-valores__capture-url">{urlPublica}</p>
         </article>
       </div>

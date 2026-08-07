@@ -1,8 +1,12 @@
 import type { Metadata } from "next";
 import PromocionesPublicas from "@/components/PromocionesPublicas";
 import { SITE_NAME, SITE_URL, getKeywords } from "@/lib/seo";
+import {
+  cargarPreciosPublicos,
+  preciosPublicosComoCostos,
+} from "@/lib/precios-publicos";
 
-export const revalidate = 3600;
+export const revalidate = 60;
 
 const title = "Armar promoción — presupuesto y paquetes de avisos";
 const description =
@@ -23,6 +27,8 @@ export const metadata: Metadata = {
   },
 };
 
-export default function PromocionesPage() {
-  return <PromocionesPublicas />;
+export default async function PromocionesPage() {
+  const rows = await cargarPreciosPublicos();
+  const costos = preciosPublicosComoCostos(rows);
+  return <PromocionesPublicas costos={costos} />;
 }

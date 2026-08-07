@@ -8,7 +8,7 @@ export type GemidosPlan =
   | "DIAMOND_VIP"
   | "BLACK_ROSE";
 
-export type GemidosDias = 7 | 30;
+export type GemidosDias = 3 | 7 | 30;
 
 export interface GemidosOferta {
   plan: GemidosPlan;
@@ -42,7 +42,7 @@ export const GEMIDOS_PLAN_INFO: Record<
   },
   BLACK_ROSE: {
     nombre: "Black Rose",
-    beneficio: "Plan premium de máxima exposición.",
+    beneficio: "Plan premium de máxima exposición (3 o 7 días).",
   },
 };
 
@@ -57,6 +57,7 @@ export const GEMIDOS_OFERTAS: GemidosOferta[] = [
   { plan: "DIAMOND", dias: 30, precio: 121000 },
   { plan: "DIAMOND_VIP", dias: 7, precio: 120000 },
   { plan: "DIAMOND_VIP", dias: 30, precio: 205000 },
+  { plan: "BLACK_ROSE", dias: 3, precio: 220000 },
   { plan: "BLACK_ROSE", dias: 7, precio: 330000 },
 ];
 
@@ -69,15 +70,38 @@ export const GEMIDOS_PLAN_ORDER: GemidosPlan[] = [
   "BLACK_ROSE",
 ];
 
-/** Días que aparecen en la tabla de valores (filas). */
-export const GEMIDOS_DIAS_TABLA: GemidosDias[] = [7, 30];
-
-export function ofertasGemidosPorPlan(plan: GemidosPlan): GemidosOferta[] {
-  return GEMIDOS_OFERTAS.filter((o) => o.plan === plan);
-}
+/** Días en la tabla de valores. 3 días solo aplica a Black Rose. */
+export const GEMIDOS_DIAS_TABLA: GemidosDias[] = [3, 7, 30];
 
 export function precioGemidos(plan: GemidosPlan, dias: GemidosDias): number | null {
   return GEMIDOS_OFERTAS.find((o) => o.plan === plan && o.dias === dias)?.precio ?? null;
+}
+
+/** Precio efectivo: admin (mapa) gana sobre el fallback local. */
+export function precioGemidosEfectivo(
+  plan: GemidosPlan,
+  dias: GemidosDias,
+  preciosAdmin?: Record<string, number> | null
+): number | null {
+  const admin = preciosAdmin?.[`general|${plan}|x|${dias}`];
+  if (admin != null && admin > 0) return admin;
+  return precioGemidos(plan, dias);
+}
+
+export function ofertasGemidosEfectivas(
+  preciosAdmin?: Record<string, number> | null
+): GemidosOferta[] {
+  return GEMIDOS_OFERTAS.map((o) => ({
+    ...o,
+    precio: precioGemidosEfectivo(o.plan, o.dias, preciosAdmin) ?? o.precio,
+  }));
+}
+
+export function ofertasGemidosPorPlan(
+  plan: GemidosPlan,
+  preciosAdmin?: Record<string, number> | null
+): GemidosOferta[] {
+  return ofertasGemidosEfectivas(preciosAdmin).filter((o) => o.plan === plan);
 }
 
 export function iterarOfertasGemidos() {

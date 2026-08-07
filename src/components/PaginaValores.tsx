@@ -6,6 +6,11 @@ import { TablaValoresPorSitio } from "@/components/TablasValores";
 import { obtenerSitio } from "@/lib/sitios";
 import { SITE_NAME, SITE_URL, getKeywords } from "@/lib/seo";
 import { esValoresSitio, rutaValores, VALORES_INTRO, type ValoresSitioSlug } from "@/lib/valores-seo";
+import {
+  aplicarPreciosAdminSkokka,
+  cargarPreciosPublicos,
+  mapaPreciosPorSitio,
+} from "@/lib/precios-publicos";
 
 export async function metadataValores(sitioSlug: ValoresSitioSlug): Promise<Metadata> {
   const sitio = await obtenerSitio(sitioSlug);
@@ -41,8 +46,16 @@ export default async function PaginaValores({
 }) {
   if (!esValoresSitio(sitioSlug)) notFound();
 
-  const sitio = await obtenerSitio(sitioSlug);
-  if (!sitio || !sitio.disponible) notFound();
+  const sitioBase = await obtenerSitio(sitioSlug);
+  if (!sitioBase || !sitioBase.disponible) notFound();
+
+  const preciosRows = await cargarPreciosPublicos();
+  const preciosAdmin = mapaPreciosPorSitio(preciosRows, sitioSlug);
+  const sitio =
+    sitioSlug === "skokka"
+      ? aplicarPreciosAdminSkokka(sitioBase, preciosRows)
+      : sitioBase;
+  const hasAdmin = Object.keys(preciosAdmin).length > 0;
 
   const brandStyle = {
     "--brand": sitio.color,
@@ -86,7 +99,11 @@ export default async function PaginaValores({
           <Link href={`/${sitioSlug}`}>cotizador</Link> te da el precio exacto al tiro.
         </p>
 
-        <TablaValoresPorSitio slug={sitioSlug} sitio={sitio} />
+        <TablaValoresPorSitio
+          slug={sitioSlug}
+          sitio={sitio}
+          preciosAdmin={hasAdmin ? preciosAdmin : null}
+        />
 
         <p className="valores-cta">
           <Link href={`/${sitioSlug}`} className="valores-cta__btn">

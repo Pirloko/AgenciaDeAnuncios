@@ -25,7 +25,11 @@ type Step = "intro" | "presupuesto" | "dias" | "zona" | "paginas" | "resultado";
 /** Costos vacíos: el catálogo se arma solo con precios públicos. */
 const COSTOS_PUBLICOS: [] = [];
 
-export default function PromocionesPublicas() {
+export default function PromocionesPublicas({
+  costos = COSTOS_PUBLICOS,
+}: {
+  costos?: import("@/lib/admin-costos").AnuncioCosto[];
+}) {
   const [step, setStep] = useState<Step>("intro");
   const [presupuestoRaw, setPresupuestoRaw] = useState("");
   const [dias, setDias] = useState<number | null>(null);
@@ -33,12 +37,12 @@ export default function PromocionesPublicas() {
   const [sitiosSel, setSitiosSel] = useState<SitioAdmin[]>([]);
 
   const presupuesto = parsePresupuestoCLP(presupuestoRaw) ?? 0;
-  const diasOpts = useMemo(() => diasDisponiblesPromo(COSTOS_PUBLICOS), []);
+  const diasOpts = useMemo(() => diasDisponiblesPromo(costos), [costos]);
 
   const sitiosPosibles = useMemo(() => {
     if (presupuesto <= 0 || dias == null || zona == null) return [];
-    return sitiosAlcanzables(COSTOS_PUBLICOS, presupuesto, dias, zona);
-  }, [presupuesto, dias, zona]);
+    return sitiosAlcanzables(costos, presupuesto, dias, zona);
+  }, [presupuesto, dias, zona, costos]);
 
   const puedeContinuarPaginas = sitiosSel.length >= MIN_SITIOS_PROMO;
 
@@ -52,13 +56,13 @@ export default function PromocionesPublicas() {
     ) {
       return [];
     }
-    return generarPromociones(COSTOS_PUBLICOS, {
+    return generarPromociones(costos, {
       presupuesto,
       dias,
       zona,
       sitios: sitiosSel,
     });
-  }, [step, presupuesto, dias, zona, sitiosSel]);
+  }, [step, presupuesto, dias, zona, sitiosSel, costos]);
 
   function reiniciar() {
     setStep("intro");

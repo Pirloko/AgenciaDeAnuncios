@@ -210,13 +210,14 @@ export function subidasChimbis(region: ChimbisRegion, dias: number): number[] {
 export function planesChimbis(
   region: ChimbisRegion,
   dias: number,
-  subidas: number
+  subidas: number,
+  preciosAdmin?: Record<string, number> | null
 ): { plan: ChimbisPlan; precio: number }[] {
   const fila = CHIMBIS_PRECIOS[region][dias]?.[subidas];
   if (!fila) return [];
   return PLAN_ORDER.filter((p) => fila[p] != null).map((plan) => ({
     plan,
-    precio: fila[plan]!,
+    precio: precioChimbisEfectivo(region, dias, subidas, plan, preciosAdmin) ?? fila[plan]!,
   }));
 }
 
@@ -227,6 +228,19 @@ export function precioChimbis(
   plan: ChimbisPlan
 ): number | null {
   return CHIMBIS_PRECIOS[region][dias]?.[subidas]?.[plan] ?? null;
+}
+
+export function precioChimbisEfectivo(
+  region: ChimbisRegion,
+  dias: number,
+  subidas: number,
+  plan: ChimbisPlan,
+  preciosAdmin?: Record<string, number> | null
+): number | null {
+  const categoria = region === "santiago" ? "santiago" : "regiones";
+  const admin = preciosAdmin?.[`${categoria}|${plan}|${subidas}|${dias}`];
+  if (admin != null && admin > 0) return admin;
+  return precioChimbis(region, dias, subidas, plan);
 }
 
 export function nombrePlanChimbis(plan: ChimbisPlan, subidas: number): string {

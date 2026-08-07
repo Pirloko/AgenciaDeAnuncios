@@ -11,7 +11,7 @@ import {
   subidasChimbis,
   planesChimbis,
   nombrePlanChimbis,
-  precioChimbis,
+  precioChimbisEfectivo,
   clp,
 } from "@/lib/chimbis";
 import { enlaceWhatsApp } from "@/lib/whatsapp";
@@ -22,7 +22,13 @@ type Step = "region" | "dias" | "subidas" | "plan" | "resultado";
 
 const STEPS: Step[] = ["region", "dias", "subidas", "plan", "resultado"];
 
-export default function CotizadorChimbis({ sitio }: { sitio: Sitio }) {
+export default function CotizadorChimbis({
+  sitio,
+  preciosAdmin = null,
+}: {
+  sitio: Sitio;
+  preciosAdmin?: Record<string, number> | null;
+}) {
   const [step, setStep] = useState(0);
   const [region, setRegion] = useState<ChimbisRegion | null>(null);
   const [dias, setDias] = useState<number | null>(null);
@@ -65,13 +71,13 @@ export default function CotizadorChimbis({ sitio }: { sitio: Sitio }) {
     [region, dias]
   );
   const planesOpciones = useMemo(
-    () => (region && dias && subidas ? planesChimbis(region, dias, subidas) : []),
-    [region, dias, subidas]
+    () => (region && dias && subidas ? planesChimbis(region, dias, subidas, preciosAdmin) : []),
+    [region, dias, subidas, preciosAdmin]
   );
 
   // ---------- RESULTADO ----------
   if (cur === "resultado" && region && dias && subidas && plan) {
-    const total = precioChimbis(region, dias, subidas, plan) ?? 0;
+    const total = precioChimbisEfectivo(region, dias, subidas, plan, preciosAdmin) ?? 0;
     const planNombre = nombrePlanChimbis(plan, subidas);
 
     const msg = encodeURIComponent(

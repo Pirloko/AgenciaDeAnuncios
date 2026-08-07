@@ -6,6 +6,7 @@ import {
   CHIMBIS_PLAN_INFO,
   CHIMBIS_REGION_LABEL,
   clp,
+  precioChimbisEfectivo,
   type ChimbisPlan,
   type ChimbisRegion,
 } from "@/lib/chimbis";
@@ -20,7 +21,13 @@ const CHIMBIS_PLAN_ORDER: ChimbisPlan[] = [
 
 const REGIONES: ChimbisRegion[] = ["santiago", "ciudades"];
 
-function TablasRegionChimbis({ region }: { region: ChimbisRegion }) {
+function TablasRegionChimbis({
+  region,
+  preciosAdmin,
+}: {
+  region: ChimbisRegion;
+  preciosAdmin?: Record<string, number> | null;
+}) {
   return (
     <>
       {Object.keys(CHIMBIS_PRECIOS[region])
@@ -39,7 +46,7 @@ function TablasRegionChimbis({ region }: { region: ChimbisRegion }) {
             id: `${dias}-${subidas}`,
             etiqueta: `${subidas} subidas`,
             valores: planesDisp.map((p) => {
-              const precio = CHIMBIS_PRECIOS[region][dias][subidas]?.[p];
+              const precio = precioChimbisEfectivo(region, dias, subidas, p, preciosAdmin);
               return precio != null ? clp(precio) : "—";
             }),
           }));
@@ -57,7 +64,13 @@ function TablasRegionChimbis({ region }: { region: ChimbisRegion }) {
   );
 }
 
-export default function ChimbisValoresRegiones({ expandirTodo = false }: { expandirTodo?: boolean }) {
+export default function ChimbisValoresRegiones({
+  expandirTodo = false,
+  preciosAdmin = null,
+}: {
+  expandirTodo?: boolean;
+  preciosAdmin?: Record<string, number> | null;
+}) {
   const [abiertas, setAbiertas] = useState<Record<ChimbisRegion, boolean>>({
     santiago: expandirTodo,
     ciudades: expandirTodo,
@@ -95,7 +108,7 @@ export default function ChimbisValoresRegiones({ expandirTodo = false }: { expan
             </button>
             {open && (
               <div id={panelId} className="valores-acordeon__panel valores-block valores-block--inner">
-                <TablasRegionChimbis region={region} />
+                <TablasRegionChimbis region={region} preciosAdmin={preciosAdmin} />
               </div>
             )}
           </div>

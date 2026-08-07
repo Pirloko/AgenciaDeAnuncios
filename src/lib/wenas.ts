@@ -32,11 +32,21 @@ export function precioWenas(dias: WenasDias): number {
   return WENAS_PRECIOS[dias];
 }
 
-export function planesWenas() {
+/** Precio efectivo: admin gana sobre el fallback local. */
+export function precioWenasEfectivo(
+  dias: WenasDias,
+  preciosAdmin?: Record<string, number> | null
+): number {
+  const admin = preciosAdmin?.[`general|VIP|x|${dias}`];
+  if (admin != null && admin > 0) return admin;
+  return precioWenas(dias);
+}
+
+export function planesWenas(preciosAdmin?: Record<string, number> | null) {
   return WENAS_DIAS_ORDER.map((dias) => ({
     dias,
     plan: "VIP" as const,
-    precio: WENAS_PRECIOS[dias],
+    precio: precioWenasEfectivo(dias, preciosAdmin),
     ...WENAS_PLAN_INFO.VIP,
   }));
 }
