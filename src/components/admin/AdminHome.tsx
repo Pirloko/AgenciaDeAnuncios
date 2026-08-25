@@ -23,6 +23,16 @@ export default function AdminHome() {
           </span>
         </Link>
 
+        <Link href="/admin/promos-pagina" className="admin-hub__card">
+          <span className="admin-hub__icon" aria-hidden="true">
+            ◈
+          </span>
+          <span className="admin-hub__name">Promociones por páginas</span>
+          <span className="admin-hub__desc">
+            Promos exclusivas de una página (Skokka, etc.) e imagen flyer.
+          </span>
+        </Link>
+
         <Link href="/admin/textos" className="admin-hub__card">
           <span className="admin-hub__icon" aria-hidden="true">
             ✎
