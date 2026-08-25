@@ -1,7 +1,9 @@
 import { FALLBACK } from "@/lib/sitios";
 import { planKey } from "@/lib/precios";
+import { getSupabase } from "@/lib/supabase";
 import type { AnuncioCosto } from "@/lib/admin-costos";
 import { SKOKKA_PLANES_WEB } from "@/lib/admin-costos";
+import type { NivelId, PreciosPorNivel, Sitio, TablaPrecios } from "@/types/sitio";
 
 export type SkokkaPromoModalidad = "diurno" | "madrugada";
 export type SkokkaPromoPlan = (typeof SKOKKA_PLANES_WEB)[number];
@@ -203,4 +205,133 @@ export function combosFiltrados(opts: {
     if (opts.subidas !== "all" && c.subidas !== opts.subidas) return false;
     return true;
   });
+}
+
+/** Nivel público (TOP / SUPER TOP / …) → plan admin de promos. */
+export function planDesdeNivelPublico(nivelId: string): SkokkaPromoPlan | null {
+  for (const plan of SKOKKA_PROMO_PLANES) {
+    if (SKOKKA_PROMO_PLAN_A_NIVEL[plan] === nivelId) return plan;
+  }
+  return null;
+}
+
+/**
+ * Lee la config de promos Skokka para el sitio público.
+ * Requiere política RLS de lectura anónima sobre esa key (ver supabase/13-…).
+ */
+export async function cargarPromosSkokkaPublicas(): Promise<SkokkaPromosConfig> {
+  const sb = getSupabase();
+  if (!sb) return seedSkokkaPromosConfig();
+
+  const { data, error } = await sb
+    .from("admin_config")
+    .select("value")
+    .eq("key", ADMIN_CONFIG_KEY_PROMOS_SKOKKA)
+    .maybeSingle();
+
+  if (error) {
+    console.error("promos_skokka public:", error.message);
+    return seedSkokkaPromosConfig();
+  }
+  if (!data?.value) return seedSkokkaPromosConfig();
+  return normalizarSkokkaPromosConfig(data.value);
+}
+
+/**
+ * Reemplaza las tablas públicas de Skokka con los precios promo (1 horario / bloque).
+ * Esas son las únicas filas que ve el cotizador y la tabla de valores.
+ */
+export function aplicarPromosSkokkaASitio(
+  sitio: Sitio,
+  config: SkokkaPromosConfig
+): Sitio {
+  const diurno: TablaPrecios = {};
+  const madrugada: TablaPrecios = {};
+
+  for (const c of SKOKKA_PROMO_COMBOS) {
+    const key = planKey(c.subidas, c.dias);
+    const precios: PreciosPorNivel = {} as PreciosPorNivel;
+    for (const plan of SKOKKA_PROMO_PLANES) {
+      const nivel = SKOKKA_PROMO_PLAN_A_NIVEL[plan] as NivelId;
+      const p = ventaPromoSkokka(config, c.modalidad, c.subidas, c.dias, plan, 1);
+      if (p != null) precios[nivel] = p;
+    }
+    if (Object.keys(precios).length === 0) continue;
+    if (c.modalidad === "diurno") diurno[key] = precios;
+    else madrugada[key] = precios;
+  }
+
+  return { ...sitio, diurno, madrugada };
+}
+
+/** Precio unitario (1 horario / bloque madrugada) desde promos. */
+export function precioUnitarioPromoSkokka(
+  config: SkokkaPromosConfig,
+  modalidad: SkokkaPromoModalidad,
+  subidas: number,
+  dias: number,
+  nivelId: string
+): number | null {
+  const plan = planDesdeNivelPublico(nivelId);
+  if (!plan) return null;
+  return ventaPromoSkokka(config, modalidad, subidas, dias, plan, 1);
+}
+
+/** Total exacto según N horarios (respeta descuentos por pack del admin). */
+export function totalPromoSkokka(
+  config: SkokkaPromosConfig,
+  modalidad: SkokkaPromoModalidad,
+  subidas: number,
+  dias: number,
+  nivelId: string,
+  cantidadHorarios: number
+): number | null {
+  const plan = planDesdeNivelPublico(nivelId);
+  if (!plan) return null;
+  const h = modalidad === "madrugada" ? 1 : Math.max(1, cantidadHorarios);
+  return ventaPromoSkokka(config, modalidad, subidas, dias, plan, h);
+}
+
+/**
+ * Filas de Skokka para Armar promoción / catálogo público.
+ * Usa precio de 1 horario (día) o bloque madrugada — mismos valores del panel de promos.
+ */
+export function costosSkokkaDesdePromos(config: SkokkaPromosConfig): AnuncioCosto[] {
+  const out: AnuncioCosto[] = [];
+  let orden = 0;
+  for (const c of SKOKKA_PROMO_COMBOS) {
+    for (const plan of SKOKKA_PROMO_PLANES) {
+      const precio = ventaPromoSkokka(config, c.modalidad, c.subidas, c.dias, plan, 1);
+      if (precio == null || precio <= 0) continue;
+      const planLabel = SKOKKA_PROMO_PLAN_LABEL[plan];
+      const modLabel = c.modalidad === "madrugada" ? "Madrugada" : "Diurno";
+      out.push({
+        id: `promo-skokka-${c.modalidad}-${plan}-${c.subidas}-${c.dias}`,
+        sitio: "skokka",
+        categoria: c.modalidad,
+        plan,
+        subidas: c.subidas,
+        dias: c.dias,
+        etiqueta: `${planLabel} · ${modLabel} · ${c.subidas} sub · ${c.dias}d`,
+        valor_plataforma: null,
+        creditos: null,
+        costo_agencia: 0,
+        precio_venta: precio,
+        ganancia: null,
+        margen_pct: null,
+        orden: orden++,
+        activo: true,
+        updated_at: "",
+      });
+    }
+  }
+  return out;
+}
+
+/** Quita Skokka viejo del catálogo y pone los precios del panel Promociones Skokka. */
+export function fusionarCostosConPromosSkokka(
+  costos: AnuncioCosto[],
+  config: SkokkaPromosConfig
+): AnuncioCosto[] {
+  return [...costos.filter((c) => c.sitio !== "skokka"), ...costosSkokkaDesdePromos(config)];
 }

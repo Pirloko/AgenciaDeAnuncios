@@ -1,11 +1,21 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { rutaValores } from "@/lib/valores-seo";
 import {
   ADMIN_CONFIG_KEY_PROMOS_SKOKKA,
   normalizarSkokkaPromosConfig,
   seedSkokkaPromosConfig,
   type SkokkaPromosConfig,
 } from "@/lib/promos-pagina-skokka";
+
+function revalidarSkokkaPublico() {
+  revalidatePath("/skokka");
+  revalidatePath("/skokka-valores");
+  revalidatePath(rutaValores("skokka"));
+  revalidatePath("/promociones");
+  revalidatePath("/");
+}
 
 async function requireAdmin() {
   const supabase = await createClient();
@@ -80,6 +90,7 @@ export async function PATCH(request: Request) {
     if (insErr) {
       return NextResponse.json({ error: insErr.message }, { status: 500 });
     }
+    revalidarSkokkaPublico();
     return NextResponse.json({ ok: true, config: normalizarSkokkaPromosConfig(data?.value) });
   }
 
@@ -94,5 +105,6 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ error: saveErr.message }, { status: 500 });
   }
 
+  revalidarSkokkaPublico();
   return NextResponse.json({ ok: true, config: normalizarSkokkaPromosConfig(data?.value) });
 }

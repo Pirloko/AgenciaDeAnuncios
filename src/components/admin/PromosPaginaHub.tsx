@@ -16,8 +16,8 @@ export default function PromosPaginaHub() {
       </header>
 
       <p className="admin-note">
-        Aquí defines valores de venta promo y generas imágenes por página. Esos valores no
-        afectan Costos y márgenes ni el cotizador público.
+        Aquí defines los valores de venta de Skokka que ve el público en el cotizador y en la
+        tabla de valores. No cambian Costos y márgenes.
       </p>
 
       <nav className="admin-hub__nav" aria-label="Páginas con promociones">

@@ -1,8 +1,8 @@
 import type { Sitio } from "@/types/sitio";
 import { clp } from "@/lib/precios";
-import { FRANJAS_DIURNAS, franjaDiurnaPorEtiqueta } from "@/lib/horarios";
 import ChimbisValoresRegiones from "@/components/ChimbisValoresRegiones";
 import ValoresTabla from "@/components/ValoresTabla";
+import SkokkaValoresFlyers from "@/components/SkokkaValoresFlyers";
 import { LOCANTO_DIAS, LOCANTO_PLAN_INFO, precioLocantoEfectivo, type LocantoPlan } from "@/lib/locanto";
 import {
   ESCORCITAS_PLAN_INFO,
@@ -35,117 +35,8 @@ const LOCANTO_ORDER: LocantoPlan[] = ["TOP", "GALERIA", "TOP_GALERIA"];
 const ESCORCITAS_DIAS_ORDER: EscorcitasDias[] = [1, 3, 7];
 const ESCORCITAS_PLAN_ORDER: EscorcitasPlan[] = ["TOP", "PREMIUM", "GOLD"];
 
-interface GrupoValoresDias {
-  dias: number;
-  filas: { id: string; etiqueta: string; valores: string[] }[];
-}
-
-function agruparSkokkaPorDias(
-  tabla: Record<string, Record<string, number>>,
-  nivelIds: string[]
-): GrupoValoresDias[] {
-  const porDias = new Map<number, { subidas: number; key: string }[]>();
-
-  for (const key of Object.keys(tabla)) {
-    const [subidas, dias] = key.split("-").map(Number);
-    if (!porDias.has(dias)) porDias.set(dias, []);
-    porDias.get(dias)!.push({ subidas, key });
-  }
-
-  return [...porDias.entries()]
-    .sort(([a], [b]) => a - b)
-    .map(([dias, items]) => ({
-      dias,
-      filas: items
-        .sort((a, b) => a.subidas - b.subidas)
-        .map(({ subidas, key }) => ({
-          id: key,
-          etiqueta: `${subidas} subidas`,
-          valores: nivelIds.map((id) => clp(tabla[key][id])),
-        })),
-    }));
-}
-
-function TablasSkokkaPorDias({
-  grupos,
-  columnas,
-}: {
-  grupos: GrupoValoresDias[];
-  columnas: string[];
-}) {
-  return (
-    <>
-      {grupos.map(({ dias, filas }) => (
-        <div key={dias} className="valores-sub">
-          <h3 className="valores-h3">
-            Publicación por {dias} día{dias > 1 ? "s" : ""}
-          </h3>
-          <ValoresTabla columnas={columnas} filas={filas} />
-        </div>
-      ))}
-    </>
-  );
-}
-
-export function TablaValoresSkokka({ sitio }: { sitio: Sitio }) {
-  const niveles = sitio.niveles.map((n) => n.nombre);
-  const nivelIds = sitio.niveles.map((n) => n.id);
-  const columnas = ["Subidas", ...niveles];
-
-  const gruposDiurno = agruparSkokkaPorDias(sitio.diurno, nivelIds);
-  const gruposMadrugada = agruparSkokkaPorDias(sitio.madrugada, nivelIds);
-
-  return (
-    <>
-      <section className="valores-block valores-block--skokka">
-        <h2 className="valores-h2">De día (06:00 a 00:00)</h2>
-        <p className="valores-note">
-          Elige <b>una o más franjas</b> de la lista. Cada franja tiene el precio de la tabla. Si
-          marcas 2 franjas, pagas el doble; si marcas las 6, pagas ×6.
-        </p>
-        <div className="valores-franjas valores-franjas--skokka">
-          <p className="valores-note">
-            <b>Las 6 franjas que puedes elegir:</b>
-          </p>
-          <ol className="valores-franjas__lista">
-            {(sitio.horarios.length ? sitio.horarios : FRANJAS_DIURNAS.map((f) => f.corto)).map(
-              (etiqueta, i) => {
-                const f = franjaDiurnaPorEtiqueta(etiqueta);
-                return (
-                  <li key={etiqueta}>
-                    <span className="valores-franja__n">{i + 1}</span>
-                    <span>
-                      <b>{f.reloj}</b>
-                      <span className="valores-franja__sub"> — {f.texto}</span>
-                    </span>
-                  </li>
-                );
-              }
-            )}
-          </ol>
-        </div>
-        <p className="valores-note valores-note--inline">
-          Precio de la tabla = <b>por cada franja</b> que actives.
-        </p>
-        <TablasSkokkaPorDias grupos={gruposDiurno} columnas={columnas} />
-        {sitio.diurno["3-1"]?.TOP != null && (
-          <p className="valores-ejemplo">
-            Ejemplo: TOP · 3 subidas · 1 día · marcas mañana (06–09) y mediodía (09–12) ={" "}
-            <b>{clp(sitio.diurno["3-1"].TOP * 2)}</b>
-          </p>
-        )}
-      </section>
-
-      <section className="valores-block valores-block--skokka">
-        <h2 className="valores-h2">Madrugada (00:00 a 06:00)</h2>
-        <p className="valores-note">
-          Un solo bloque nocturno con <b>6 subidas incluidas</b>. Pagas el valor de la tabla una sola
-          vez — no se multiplica por franjas.
-        </p>
-        <TablasSkokkaPorDias grupos={gruposMadrugada} columnas={columnas} />
-      </section>
-    </>
-  );
+export function TablaValoresSkokka({ sitio: _sitio }: { sitio: Sitio }) {
+  return <SkokkaValoresFlyers />;
 }
 
 export function TablaValoresChimbis({

@@ -3,7 +3,10 @@ import AdminValoresPanel, { type SitioValoresAdmin } from "@/components/admin/Ad
 import { obtenerSitio } from "@/lib/sitios";
 import { VALORES_SITIOS } from "@/lib/valores-seo";
 import {
-  aplicarPreciosAdminSkokka,
+  aplicarPromosSkokkaASitio,
+  cargarPromosSkokkaPublicas,
+} from "@/lib/promos-pagina-skokka";
+import {
   cargarPreciosPublicos,
   mapaPreciosPorSitio,
 } from "@/lib/precios-publicos";
@@ -24,7 +27,9 @@ export default async function AdminValoresPage() {
     if (!sitioBase?.disponible) continue;
     const preciosAdmin = mapaPreciosPorSitio(preciosRows, slug);
     const sitio =
-      slug === "skokka" ? aplicarPreciosAdminSkokka(sitioBase, preciosRows) : sitioBase;
+      slug === "skokka"
+        ? aplicarPromosSkokkaASitio(sitioBase, await cargarPromosSkokkaPublicas())
+        : sitioBase;
     sitios.push({
       slug,
       sitio,

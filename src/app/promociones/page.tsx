@@ -5,12 +5,16 @@ import {
   cargarPreciosPublicos,
   preciosPublicosComoCostos,
 } from "@/lib/precios-publicos";
+import {
+  cargarPromosSkokkaPublicas,
+  fusionarCostosConPromosSkokka,
+} from "@/lib/promos-pagina-skokka";
 
 export const revalidate = 60;
 
-const title = "Armar promoción — presupuesto y paquetes de avisos";
+const title = "Armar promoción escort Chile — packs por presupuesto";
 const description =
-  "Di cuánta plata tienes y por cuántos días quieres publicar. Te armamos opciones de avisos destacados en Skokka, Chimbis, Locanto y más, listas para pedir por WhatsApp.";
+  "Arma tu promoción de publicaciones escort en Chile según tu presupuesto. Packs en Skokka, Chimbis, Locanto, Escorcitas y más, listos para pedir por WhatsApp.";
 
 export const metadata: Metadata = {
   title,
@@ -29,6 +33,8 @@ export const metadata: Metadata = {
 
 export default async function PromocionesPage() {
   const rows = await cargarPreciosPublicos();
-  const costos = preciosPublicosComoCostos(rows);
+  const costosBase = preciosPublicosComoCostos(rows);
+  const promosSkokka = await cargarPromosSkokkaPublicas();
+  const costos = fusionarCostosConPromosSkokka(costosBase, promosSkokka);
   return <PromocionesPublicas costos={costos} />;
 }

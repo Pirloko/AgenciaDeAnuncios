@@ -6,8 +6,12 @@ import { TablaValoresPorSitio } from "@/components/TablasValores";
 import { obtenerSitio } from "@/lib/sitios";
 import { SITE_NAME, SITE_URL, getKeywords } from "@/lib/seo";
 import { esValoresSitio, rutaValores, VALORES_INTRO, type ValoresSitioSlug } from "@/lib/valores-seo";
+import { esAnunciosSitio, rutaAnuncios } from "@/lib/anuncios-seo";
 import {
-  aplicarPreciosAdminSkokka,
+  aplicarPromosSkokkaASitio,
+  cargarPromosSkokkaPublicas,
+} from "@/lib/promos-pagina-skokka";
+import {
   cargarPreciosPublicos,
   mapaPreciosPorSitio,
 } from "@/lib/precios-publicos";
@@ -53,7 +57,7 @@ export default async function PaginaValores({
   const preciosAdmin = mapaPreciosPorSitio(preciosRows, sitioSlug);
   const sitio =
     sitioSlug === "skokka"
-      ? aplicarPreciosAdminSkokka(sitioBase, preciosRows)
+      ? aplicarPromosSkokkaASitio(sitioBase, await cargarPromosSkokkaPublicas())
       : sitioBase;
   const hasAdmin = Object.keys(preciosAdmin).length > 0;
 
@@ -104,6 +108,14 @@ export default async function PaginaValores({
           sitio={sitio}
           preciosAdmin={hasAdmin ? preciosAdmin : null}
         />
+
+        {esAnunciosSitio(sitioSlug) && (
+          <p className="guia-completa guia-completa--valores">
+            <Link href={rutaAnuncios(sitioSlug)}>
+              Ver guía completa de cómo funciona {sitio.nombre}
+            </Link>
+          </p>
+        )}
 
         <p className="valores-cta">
           <Link href={`/${sitioSlug}`} className="valores-cta__btn">

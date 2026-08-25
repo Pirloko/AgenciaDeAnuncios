@@ -1,153 +1,166 @@
 // ============================================================
 //  SEO — CONFIGURACIÓN CENTRAL
-//  Este es EL lugar para editar palabras clave y textos de SEO.
+//  Dominio: https://publicacionesescort.cl
 // ============================================================
 
-export const SITE_NAME = "Agencia de Publicaciones para Escort";
+export const SITE_NAME = "Publicaciones Escort Chile";
 export const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ?? "https://tudominio.cl";
+  process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ??
+  "https://publicacionesescort.cl";
 
-// Descripción general del sitio (home / fallback)
 export const SITE_DESCRIPTION =
-  "Agencia de publicaciones para escort en Chile. Escort anuncios y anuncios escort en Skokka, Chimbis, Locanto, SimpleEscorts, Escorcitas y Wenas. Desde 2015: títulos que venden, difuminado de rostro y cobertura de tatuajes. Cotiza tu aviso destacado al instante.";
+  "Publicaciones escort y anuncios escort en Chile. Agencia desde 2015: cotiza avisos destacados en Skokka, Locanto, Chimbis, Escorcitas, SimpleEscorts, Wenas y Gemidos. Textos que venden, difuminado de rostro y packs por presupuesto.";
 
-// ============================================================
-//  PALABRAS CLAVE GLOBALES  ←  EDITÁ ACÁ
-//  Se usan en home, layout y como base en todas las páginas.
-// ============================================================
+/** Keywords globales (home + base). La meta keywords es secundaria; el contenido manda. */
 export const SITE_KEYWORDS: string[] = [
-  "escort anuncios",
-  "anuncios escort",
-  "scort anuncios",
-  "publicaciones para escort",
   "publicaciones escort",
+  "publiescort",
+  "anuncios escort",
+  "escort chile",
+  "publicaciones escort chile",
+  "anuncios escort chile",
+  "agencia publicaciones escort",
+  "avisos destacados escort chile",
+  "cotizar aviso escort",
+  "publicar escort chile",
+  "skokka",
+  "locanto",
+  "chimbis",
+  "escorcitas",
+  "simpleescort",
+  "wenas",
+  "gemidos",
+  // Búsquedas relacionadas (no ofrecemos arriendo de piezas; solo publicaciones)
   "habitaciones para escort",
   "piezas para escort",
-  "habitaciones escort",
-  "sexosur",
-  "avisos destacados escort chile",
-  "agencia publicaciones escort",
-  "cotizar aviso escort",
+  "alcoba",
+  "alcoba.cl",
+  "comunidad escort",
+  "comunidadescort.cl",
 ];
 
-// ============================================================
-//  PALABRAS CLAVE POR SITIO  ←  EDITÁ ACÁ
-//  Se suman a SITE_KEYWORDS en cotizador, guías y valores.
-// ============================================================
 export const KEYWORDS: Record<string, string[]> = {
   skokka: [
-    "skokka",
-    "destacar aviso en skokka",
-    "publicar en skokka chile",
+    "skokka chile",
+    "publicar en skokka",
+    "precios skokka chile",
     "anuncio destacado skokka",
     "escort anuncios skokka",
-    "precios skokka top super top",
-    "subir aviso skokka primeros lugares",
+    "top super top skokka",
     "publicaciones escort skokka",
   ],
   chimbis: [
-    "chimbis",
-    "destacar aviso en chimbis",
-    "publicar en chimbis chile",
+    "chimbis chile",
+    "publicar en chimbis",
+    "precios chimbis chile",
     "anuncio destacado chimbis",
     "escort anuncios chimbis",
-    "precios chimbis top destacado historias",
-    "subir aviso chimbis primeros lugares",
-    "publicaciones para escort chimbis",
+    "publicaciones escort chimbis",
   ],
   locanto: [
-    "locanto",
-    "destacar aviso en locanto",
-    "publicar en locanto chile",
+    "locanto chile",
+    "publicar en locanto",
+    "precios locanto chile",
     "anuncio destacado locanto",
     "escort anuncios locanto",
-    "precios locanto top galeria",
-    "aviso top locanto 7 dias",
     "publicaciones escort locanto",
   ],
   simpleescort: [
-    "simpleescorts",
-    "simple escorts",
+    "simpleescort",
+    "simpleescorts chile",
     "super turbo simpleescorts",
-    "super turbo 5x simpleescorts",
-    "destacar aviso simpleescorts",
-    "anuncio super turbo simpleescorts chile",
-    "escort anuncios simpleescorts",
-    "precios simpleescorts por horario",
-    "publicaciones para escort simpleescorts",
+    "publicar en simpleescorts",
+    "precios simpleescorts chile",
+    "publicaciones escort simpleescorts",
   ],
   escorcitas: [
-    "escorcitas",
+    "escorcitas chile",
     "publicar en escorcitas",
-    "anuncio escort escorcitas chile",
-    "escort anuncios escorcitas",
-    "precios escorcitas top premium gold",
-    "publicacion escort mujer trans masculino",
-    "avisos destacados escorcitas",
+    "precios escorcitas chile",
+    "anuncios escort escorcitas",
     "publicaciones escort escorcitas",
   ],
   wenas: [
+    "wenas chile",
     "wenas.cl",
-    "wenas escort",
-    "publicar en wenas chile",
-    "anuncios escort wenas",
-    "publicaciones para escort wenas",
+    "publicar en wenas",
     "precios wenas vip",
-    "aviso vip wenas",
+    "anuncios escort wenas",
   ],
   gemidos: [
+    "gemidos chile",
     "gemidos.tv",
-    "gemidos escort",
-    "publicar en gemidos chile",
+    "publicar en gemidos",
+    "precios gemidos.tv",
     "anuncios escort gemidos",
-    "precios gemidos classic gold platinum",
-    "diamond vip gemidos",
-    "black rose gemidos",
-    "verificacion perfil gemidos",
   ],
 };
 
-// Título/description por sitio (opcional; si no, se generan automáticamente)
 export const SEO_OVERRIDES: Record<
   string,
   { title?: string; description?: string }
 > = {
   skokka: {
-    title: "Precios de avisos destacados en Skokka (TOP, Súper Top, All in One)",
+    title: "Skokka Chile: precios de avisos destacados (TOP, Súper Top, All in One)",
     description:
-      "Cotiza tu aviso destacado en Skokka al tiro: escort anuncios con TOP, Súper Top y Top All in One por horario, subidas y días. Publicaciones para escort con precio al instante.",
+      "Cotiza publicaciones escort en Skokka Chile: TOP, Súper Top y Top All in One por horarios, subidas y días. Precio al instante y packs con madrugada.",
   },
   chimbis: {
-    title: "Precios de avisos destacados en Chimbis (TOP, Destacado, Historias)",
+    title: "Chimbis Chile: precios de avisos destacados (TOP, Destacado, Historias)",
     description:
-      "Cotiza tu anuncio escort en Chimbis: Santiago/RM u otras ciudades. Planes TOP, Destacado e Historias por días y subidas. Publicaciones escort con fotos reales comprobables.",
+      "Cotiza anuncios escort en Chimbis Chile: Santiago/RM o regiones. Planes TOP, Destacado e Historias por días y subidas.",
   },
   locanto: {
-    title: "Precios de avisos destacados en Locanto (TOP, Galería, 7 días)",
+    title: "Locanto Chile: precios TOP y Galería (7 días)",
     description:
-      "Cotiza tu aviso destacado en Locanto: TOP, Galería o ambos por 7 días. Anuncios escort visibles 24 hrs, rotación dentro de cada categoría.",
+      "Cotiza anuncios escort en Locanto Chile: TOP, Galería o ambos por 7 días, visibles 24 hrs.",
   },
   simpleescort: {
-    title: "Super Turbo en SimpleEscorts — precios por horario",
+    title: "SimpleEscorts Chile: Super Turbo 5X — precios por horario",
     description:
-      "Cotiza Super Turbo en SimpleEscorts: publicaciones para escort con foto 2,5× más grande, etiqueta y color distintivo. 5 subidas por horario.",
+      "Cotiza Super Turbo en SimpleEscorts Chile: foto más grande, etiqueta y 5 subidas por horario. Precio al instante.",
   },
   escorcitas: {
-    title: "Precios de publicación en Escorcitas (TOP, PREMIUM, GOLD)",
+    title: "Escorcitas Chile: precios TOP, PREMIUM y GOLD",
     description:
-      "Cotiza tu publicación escort en Escorcitas: mujer, trans o masculino. Planes TOP, PREMIUM y GOLD por 1, 3 o 7 días. Anuncios escort con rotación por categoría.",
+      "Cotiza publicaciones escort en Escorcitas Chile: TOP, PREMIUM y GOLD por 1, 3 o 7 días.",
   },
   wenas: {
-    title: "Precios VIP en Wenas (7, 15 y 30 días)",
+    title: "Wenas Chile: precios VIP (7, 15 y 30 días)",
     description:
-      "Cotiza tu publicación VIP en Wenas: 7, 15 o 30 días en wenas.cl. Anuncios escort destacados con precio al instante.",
+      "Cotiza tu aviso VIP en Wenas Chile (wenas.cl): 7, 15 o 30 días con precio al instante.",
   },
   gemidos: {
-    title: "Precios en Gemidos.tv (Classic, Gold, Platinum, Diamond)",
+    title: "Gemidos.tv Chile: precios Classic, Gold, Platinum y más",
     description:
-      "Cotiza tu publicación en Gemidos.tv: Classic, Gold, Platinum, Diamond, Diamond VIP y Black Rose. Precios por días al instante.",
+      "Cotiza publicaciones en Gemidos.tv Chile: Classic, Gold, Platinum, Diamond, Diamond VIP y Black Rose.",
   },
 };
+
+/** Landings SEO indexables (además de cotizadores / guías / valores). */
+export const SEO_LANDINGS = [
+  {
+    path: "/publicaciones-escort-chile",
+    title: "Publicaciones escort Chile | Publiescort y avisos destacados",
+    description:
+      "Publicaciones escort y publiescort en todo Chile. Cotiza anuncios escort en Skokka, Locanto, Chimbis, Escorcitas, SimpleEscorts, Wenas y Gemidos. Agencia desde 2015.",
+    priority: 0.98,
+  },
+  {
+    path: "/anuncios-escort-chile",
+    title: "Anuncios escort Chile | Cotiza y publica en las mejores páginas",
+    description:
+      "Anuncios escort en Chile con precio al instante. Publicamos y destacamos tu aviso en Skokka, Locanto, Chimbis y más. Textos que venden y packs por presupuesto.",
+    priority: 0.97,
+  },
+  {
+    path: "/donde-publicar-escort-chile",
+    title: "Dónde publicar escort en Chile | Skokka, Locanto, Chimbis y más",
+    description:
+      "Guía para elegir dónde publicar escort en Chile: Skokka, Locanto, Chimbis, Escorcitas, SimpleEscorts, Wenas, Gemidos y el panorama del mercado (Alcoba, Comunidad Escort).",
+    priority: 0.96,
+  },
+] as const;
 
 function dedupeKeywords(lista: string[]): string[] {
   const visto = new Set<string>();
@@ -165,4 +178,28 @@ function dedupeKeywords(lista: string[]): string[] {
 export function getKeywords(slug?: string): string[] {
   if (!slug) return SITE_KEYWORDS;
   return dedupeKeywords([...SITE_KEYWORDS, ...(KEYWORDS[slug] ?? [])]);
+}
+
+/** JSON-LD Organization / Service para Chile. */
+export function organizationJsonLd() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: SITE_NAME,
+    alternateName: ["Publicaciones Escort", "Publiescort Chile", "Agencia de Publicaciones para Escort"],
+    url: SITE_URL,
+    description: SITE_DESCRIPTION,
+    areaServed: { "@type": "Country", name: "Chile" },
+    knowsAbout: [
+      "publicaciones escort",
+      "anuncios escort",
+      "Skokka",
+      "Locanto",
+      "Chimbis",
+      "Escorcitas",
+      "SimpleEscorts",
+      "Wenas",
+      "Gemidos",
+    ],
+  };
 }

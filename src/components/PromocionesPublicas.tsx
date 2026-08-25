@@ -129,21 +129,21 @@ export default function PromocionesPublicas({
               <span>5.000, 10.000, 15.000, 50.000, etc.</span>
             </li>
             <li>
-              <strong>2. Los días</strong>
+              <strong>2. ¿Cuántos días quieres publicar?</strong>
               <span>1, 3 o 7 días</span>
             </li>
             <li>
-              <strong>3. Debes elegir en cuál zona estás</strong>
-              <span>Santiago o comunas de Santiago, o regiones sur o norte</span>
+              <strong>3. ¿En cuál ciudad o región quieres publicar?</strong>
+              <span>Comuna de Santiago / Santiago de Chile o regiones del sur o norte</span>
             </li>
             <li>
-              <strong>4. Elige en qué páginas quieres publicar</strong>
-              <span>Mínimo 2 páginas (puedes marcar todas)</span>
+              <strong>4. Dime en cuál página quieres publicar</strong>
+              <span>Mínimo elegir 2 páginas para armar un pack</span>
             </li>
             <li>
-              <strong>5. Eliges una opción</strong>
+              <strong>5. Eliges la opción que más se acomode para ti</strong>
               <span>
-                Envías por WhatsApp o tómale captura y mándanos la foto
+                Envías por WhatsApp o tómale captura al pack que te gustó y mándanos la foto
               </span>
             </li>
           </ol>
@@ -192,7 +192,7 @@ export default function PromocionesPublicas({
 
       {step === "dias" && (
         <section className="promo-pub__panel">
-          <h2 className="promo-pub__q">¿Por cuántos días?</h2>
+          <h2 className="promo-pub__q">¿Cuántos días quieres publicar?</h2>
           <p className="promo-pub__hint">1, 3 o 7 días.</p>
           <div className="promo-pub__chips">
             {diasOpts.map((d) => (
@@ -228,7 +228,10 @@ export default function PromocionesPublicas({
 
       {step === "zona" && (
         <section className="promo-pub__panel">
-          <h2 className="promo-pub__q">Debes elegir en cuál zona estás</h2>
+          <h2 className="promo-pub__q">¿En cuál ciudad o región quieres publicar?</h2>
+          <p className="promo-pub__hint">
+            Comuna de Santiago / Santiago de Chile o regiones del sur o norte.
+          </p>
           <div className="promo-pub__opts">
             {ZONA_PROMO_OPTS.map((z) => (
               <button
@@ -260,9 +263,9 @@ export default function PromocionesPublicas({
 
       {step === "paginas" && (
         <section className="promo-pub__panel">
-          <h2 className="promo-pub__q">¿En qué páginas quieres publicar?</h2>
+          <h2 className="promo-pub__q">Dime en cuál página quieres publicar</h2>
           <p className="promo-pub__hint">
-            Elige al menos {MIN_SITIOS_PROMO} O Todas.
+            Mínimo elegir {MIN_SITIOS_PROMO} páginas para armar un pack.
           </p>
 
           {sitiosPosibles.length < MIN_SITIOS_PROMO ? (
@@ -324,6 +327,11 @@ export default function PromocionesPublicas({
 
       {step === "resultado" && dias != null && zona != null && (
         <section className="promo-pub__panel">
+          <h2 className="promo-pub__q">Eliges la opción que más se acomode para ti</h2>
+          <p className="promo-pub__hint promo-pub__hint--block">
+            Envías por WhatsApp o tómale captura al pack que te gustó y mándanos la foto.
+          </p>
+
           <div className="promo-pub__resumen">
             <span>{clpAdmin(presupuesto)}</span>
             <span>

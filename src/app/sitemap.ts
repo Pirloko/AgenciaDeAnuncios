@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 import { listarSlugs } from "@/lib/sitios";
 import { ANUNCIOS_SITIOS } from "@/lib/anuncios-seo";
 import { VALORES_SITIOS } from "@/lib/valores-seo";
-import { SITE_URL } from "@/lib/seo";
+import { SITE_URL, SEO_LANDINGS } from "@/lib/seo";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const slugs = await listarSlugs();
@@ -10,6 +10,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   return [
     { url: SITE_URL, lastModified: now, changeFrequency: "weekly", priority: 1 },
+    ...SEO_LANDINGS.map((l) => ({
+      url: `${SITE_URL}${l.path}`,
+      lastModified: now,
+      changeFrequency: "weekly" as const,
+      priority: l.priority,
+    })),
     {
       url: `${SITE_URL}/promociones`,
       lastModified: now,

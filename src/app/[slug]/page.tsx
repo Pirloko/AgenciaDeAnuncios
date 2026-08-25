@@ -31,7 +31,10 @@ import { SITE_NAME, SITE_URL, getKeywords, SEO_OVERRIDES } from "@/lib/seo";
 import Link from "next/link";
 import { esValoresSitio, rutaValores } from "@/lib/valores-seo";
 import {
-  aplicarPreciosAdminSkokka,
+  aplicarPromosSkokkaASitio,
+  cargarPromosSkokkaPublicas,
+} from "@/lib/promos-pagina-skokka";
+import {
   cargarPreciosPublicos,
   mapaPreciosPorSitio,
 } from "@/lib/precios-publicos";
@@ -87,8 +90,12 @@ export default async function SitioPage({
 
   const preciosRows = await cargarPreciosPublicos();
   const preciosAdmin = mapaPreciosPorSitio(preciosRows, slug);
+  const promosSkokka =
+    slug === "skokka" ? await cargarPromosSkokkaPublicas() : null;
   const sitio =
-    slug === "skokka" ? aplicarPreciosAdminSkokka(sitioBase, preciosRows) : sitioBase;
+    slug === "skokka" && promosSkokka
+      ? aplicarPromosSkokkaASitio(sitioBase, promosSkokka)
+      : sitioBase;
 
   // ---- Offers para JSON-LD ----
   const offers =
@@ -232,7 +239,7 @@ export default async function SitioPage({
       ) : slug === "gemidos" ? (
         <CotizadorGemidos sitio={sitio} preciosAdmin={hasAdmin ? preciosAdmin : null} />
       ) : (
-        <Cotizador sitio={sitio} />
+        <Cotizador sitio={sitio} promosConfig={promosSkokka} />
       )}
       <CatalogoSEO sitio={sitio} />
       <footer className="foot">

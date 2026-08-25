@@ -1,24 +1,36 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import type { Sitio, Modalidad } from "@/types/sitio";
+import type { Sitio } from "@/types/sitio";
 import { clp, precioUnitario, calcularTotal } from "@/lib/precios";
 import { franjaDiurnaPorIndice, resumenHorarios } from "@/lib/horarios";
 import { SKOKKA_EJEMPLOS } from "@/lib/skokka-ejemplos";
 import { EjemploAviso } from "@/components/EjemploAviso";
 import { enlaceWhatsApp } from "@/lib/whatsapp";
+import {
+  precioUnitarioPromoSkokka,
+  totalPromoSkokka,
+  type SkokkaPromosConfig,
+} from "@/lib/promos-pagina-skokka";
 
 type Step = "cuando" | "dias" | "subidas" | "nivel" | "resultado";
 
 // 📲 WhatsApp: +56 9 6355 0717 (ver src/lib/whatsapp.ts)
 
-export default function Cotizador({ sitio }: { sitio: Sitio }) {
+export default function Cotizador({
+  sitio,
+  promosConfig = null,
+}: {
+  sitio: Sitio;
+  /** Precios de Admin → Promociones Skokka (fuente única en público). */
+  promosConfig?: SkokkaPromosConfig | null;
+}) {
   const [step, setStep] = useState(0);
-  const [modalidad, setModalidad] = useState<Modalidad | null>(null);
   const [dias, setDias] = useState<number | null>(null);
   const [subidas, setSubidas] = useState<number | null>(null);
   const [nivel, setNivel] = useState<string | null>(null);
   const [horarios, setHorarios] = useState<number[]>([]);
+  const [incluyeMadrugada, setIncluyeMadrugada] = useState(false);
 
   const brandStyle = {
     "--brand": sitio.color,
@@ -26,12 +38,15 @@ export default function Cotizador({ sitio }: { sitio: Sitio }) {
     "--accent": sitio.accent,
   } as unknown as React.CSSProperties;
 
+  const tieneDiurno = horarios.length > 0;
+  const soloMadrugada = incluyeMadrugada && !tieneDiurno;
+
   const steps: Step[] = useMemo(
     () =>
-      modalidad === "madrugada"
+      soloMadrugada
         ? ["cuando", "dias", "nivel", "resultado"]
         : ["cuando", "dias", "subidas", "nivel", "resultado"],
-    [modalidad]
+    [soloMadrugada]
   );
   const cur = steps[step];
 
@@ -43,45 +58,114 @@ export default function Cotizador({ sitio }: { sitio: Sitio }) {
   }
   function reset() {
     setStep(0);
-    setModalidad(null);
     setDias(null);
     setSubidas(null);
     setNivel(null);
     setHorarios([]);
+    setIncluyeMadrugada(false);
   }
 
-  // avanza solo al elegir (como un test)
   function pickAdvance(fn: () => void) {
     fn();
     setTimeout(next, 180);
   }
 
-  const subidasEfectivas = modalidad === "madrugada" ? 6 : subidas;
-
-  function toggleHorario(i: number) {
-    setHorarios((h) => (h.includes(i) ? h.filter((x) => x !== i) : [...h, i]));
-  }
+  const subidasDiurnas = tieneDiurno ? subidas : null;
+  const subidasListas = soloMadrugada || (tieneDiurno && subidasDiurnas != null);
 
   const todosLosHorarios = sitio.horarios.map((_, i) => i);
   const horariosCompletos = horarios.length === sitio.horarios.length;
+  const todosLosHorariosMarcados = horariosCompletos && incluyeMadrugada;
+  const seleccionOk = tieneDiurno || incluyeMadrugada;
 
-  function toggleTodosHorarios() {
-    setHorarios(horariosCompletos ? [] : todosLosHorarios);
+  function precioBloque(
+    modalidad: "diurno" | "madrugada",
+    subidasN: number,
+    nivelId: string,
+    cantidadHorarios: number
+  ): number {
+    if (promosConfig && dias) {
+      const fromPromo =
+        cantidadHorarios <= 1 && modalidad === "diurno"
+          ? precioUnitarioPromoSkokka(promosConfig, modalidad, subidasN, dias, nivelId)
+          : totalPromoSkokka(
+              promosConfig,
+              modalidad,
+              subidasN,
+              dias,
+              nivelId,
+              cantidadHorarios
+            );
+      if (fromPromo != null) return fromPromo;
+    }
+    if (cantidadHorarios <= 1 && modalidad === "diurno") {
+      return precioUnitario(sitio, modalidad, subidasN, dias!, nivelId);
+    }
+    return calcularTotal(sitio, modalidad, subidasN, dias!, nivelId, cantidadHorarios);
+  }
+
+  /** Precio mostrado en el paso nivel (referencia según selección). */
+  function precioNivel(nivelId: string): { valor: number; etiqueta: string } {
+    if (!dias || !subidasListas) return { valor: 0, etiqueta: "" };
+
+    if (soloMadrugada) {
+      return {
+        valor: precioBloque("madrugada", 6, nivelId, 1),
+        etiqueta: "total",
+      };
+    }
+
+    if (tieneDiurno && !incluyeMadrugada) {
+      return {
+        valor: precioBloque("diurno", subidasDiurnas!, nivelId, 1),
+        etiqueta: "por horario",
+      };
+    }
+
+    // Día + madrugada: total del pack actual
+    const dia = precioBloque("diurno", subidasDiurnas!, nivelId, horarios.length);
+    const mad = precioBloque("madrugada", 6, nivelId, 1);
+    return { valor: dia + mad, etiqueta: "total pack" };
+  }
+
+  function totalAviso(nivelId: string): number {
+    let total = 0;
+    if (tieneDiurno && dias && subidasDiurnas) {
+      total += precioBloque("diurno", subidasDiurnas, nivelId, horarios.length);
+    }
+    if (incluyeMadrugada && dias) {
+      total += precioBloque("madrugada", 6, nivelId, 1);
+    }
+    return total;
   }
 
   // ---------- RESULTADO ----------
-  if (cur === "resultado" && modalidad && dias && subidasEfectivas && nivel) {
-    const total = calcularTotal(sitio, modalidad, subidasEfectivas, dias, nivel, horarios.length);
+  if (cur === "resultado" && dias && subidasListas && nivel && seleccionOk) {
+    const total = totalAviso(nivel);
     const nivelNombre = sitio.niveles.find((n) => n.id === nivel)?.nombre ?? nivel;
-    const cuando = modalidad === "diurno" ? "Durante el día (6:00–00:00)" : "Madrugada (00:00–6:00)";
-    const hTxt =
-      modalidad === "diurno"
-        ? resumenHorarios(horarios)
-        : "00:00 a 06:00 hrs (12 de la noche a 6 de la mañana)";
+
+    const partesCuando: string[] = [];
+    if (tieneDiurno) partesCuando.push("Durante el día (6:00–00:00)");
+    if (incluyeMadrugada) partesCuando.push("Madrugada (00:00–6:00)");
+    const cuando = partesCuando.join(" + ");
+
+    const partesHorario: string[] = [];
+    if (tieneDiurno) partesHorario.push(resumenHorarios(horarios));
+    if (incluyeMadrugada) {
+      partesHorario.push("00:00 a 06:00 hrs (12 de la noche a 6 de la mañana)");
+    }
+    const hTxt = partesHorario.join(" · ");
+
+    const partesSubidas: string[] = [];
+    if (tieneDiurno && subidasDiurnas) {
+      partesSubidas.push(`${subidasDiurnas} al día (franjas diurnas)`);
+    }
+    if (incluyeMadrugada) partesSubidas.push("6 en madrugada");
+    const subidasTxt = partesSubidas.join(" · ");
 
     const msg = encodeURIComponent(
       `¡Hola! Quiero un aviso destacado en ${sitio.nombre} (${sitio.dominio}):\n` +
-        `• ${cuando}\n• ${dias} día${dias > 1 ? "s" : ""}\n• ${subidasEfectivas} subidas\n` +
+        `• ${cuando}\n• ${dias} día${dias > 1 ? "s" : ""}\n• Subidas: ${subidasTxt}\n` +
         `• Nivel: ${nivelNombre}\n• Horarios: ${hTxt}\n• Total: ${clp(total)}`
     );
     const wa = enlaceWhatsApp(msg);
@@ -96,7 +180,7 @@ export default function Cotizador({ sitio }: { sitio: Sitio }) {
           <div className="summary">
             <Row k="Cuándo" v={cuando} />
             <Row k="Duración" v={`${dias} día${dias > 1 ? "s" : ""}`} />
-            <Row k="Subidas" v={`${subidasEfectivas} al día`} />
+            <Row k="Subidas" v={subidasTxt} />
             <Row k="Nivel" v={nivelNombre} />
             <Row k="Horarios" v={hTxt} />
           </div>
@@ -126,74 +210,87 @@ export default function Cotizador({ sitio }: { sitio: Sitio }) {
         {cur === "cuando" && (
           <>
             <h2 className="q">¿Cuándo quieres que se vea?</h2>
-            <p className="qsub">Toca la franja del día.</p>
-            <Opt
-              on={modalidad === "diurno"}
-              icon="☀️"
-              title="Durante el día"
-              desc="De 6:00 a 00:00 hrs"
-              onClick={() => {
-                setModalidad("diurno");
-              }}
-            />
-            {modalidad === "diurno" && (
-              <div className="horarios-inline">
-                <p className="qsub horarios-inline__hint">
-                  Toca una o más franjas. Mientras más definas, más se ve tu aviso.
-                </p>
+            <p className="qsub">
+              Toca las franjas que quieras. Puedes combinar día y madrugada.
+            </p>
+            <div className="horarios-inline">
+              <button
+                type="button"
+                className={"hall" + (todosLosHorariosMarcados ? " on" : "")}
+                onClick={() => {
+                  if (todosLosHorariosMarcados) {
+                    setHorarios([]);
+                    setIncluyeMadrugada(false);
+                  } else {
+                    setHorarios(todosLosHorarios);
+                    setIncluyeMadrugada(true);
+                  }
+                }}
+              >
+                {todosLosHorariosMarcados
+                  ? "✓ Todos los horarios"
+                  : "Todos los horarios"}
+              </button>
+              <div className="hgrid hgrid--full">
+                {sitio.horarios.map((_, i) => {
+                  const franja = franjaDiurnaPorIndice(i);
+                  const on = horarios.includes(i);
+                  return (
+                    <button
+                      key={i}
+                      type="button"
+                      className={"hbtn" + (on ? " on" : "")}
+                      onClick={() =>
+                        setHorarios((h) =>
+                          h.includes(i) ? h.filter((x) => x !== i) : [...h, i]
+                        )
+                      }
+                    >
+                      <span className="tick">{on ? "✓" : ""}</span>
+                      <span className="hbtn__body">
+                        <span className="hbtn__reloj">{franja.reloj}</span>
+                        <span className="hbtn__texto">{franja.texto}</span>
+                      </span>
+                    </button>
+                  );
+                })}
                 <button
                   type="button"
-                  className={"hall" + (horariosCompletos ? " on" : "")}
-                  onClick={toggleTodosHorarios}
+                  className={
+                    "hbtn hbtn--madrugada" + (incluyeMadrugada ? " on" : "")
+                  }
+                  onClick={() => setIncluyeMadrugada((v) => !v)}
                 >
-                  {horariosCompletos ? "✓ Todos los horarios" : "Todos los horarios"}
+                  <span className="tick">{incluyeMadrugada ? "✓" : ""}</span>
+                  <span className="hbtn__body">
+                    <span className="hbtn__badge">Madrugada</span>
+                    <span className="hbtn__reloj">00:00 a 06:00 hrs</span>
+                    <span className="hbtn__texto">
+                      12 de la noche a 6 de la mañana · bloque nocturno especial
+                    </span>
+                  </span>
                 </button>
-                <div className="hgrid hgrid--full">
-                  {sitio.horarios.map((_, i) => {
-                    const franja = franjaDiurnaPorIndice(i);
-                    return (
-                      <button
-                        key={i}
-                        className={"hbtn" + (horarios.includes(i) ? " on" : "")}
-                        onClick={() => toggleHorario(i)}
-                      >
-                        <span className="tick">{horarios.includes(i) ? "✓" : ""}</span>
-                        <span className="hbtn__body">
-                          <span className="hbtn__reloj">{franja.reloj}</span>
-                          <span className="hbtn__texto">{franja.texto}</span>
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-                <p className="runtot">
-                  {horarios.length
-                    ? `${horarios.length} horario${horarios.length > 1 ? "s" : ""} marcado${horarios.length > 1 ? "s" : ""}`
-                    : "Toca al menos un horario"}
-                </p>
               </div>
-            )}
-            <Opt
-              on={modalidad === "madrugada"}
-              icon="🌙"
-              title="En la madrugada"
-              desc="De 00:00 a 6:00 hrs"
-              onClick={() =>
-                pickAdvance(() => {
-                  setModalidad("madrugada");
-                  setHorarios([]);
-                })
-              }
-            />
+              <p className="runtot">
+                {!seleccionOk
+                  ? "Toca al menos una franja"
+                  : [
+                      tieneDiurno
+                        ? `${horarios.length} franja${horarios.length > 1 ? "s" : ""} del día`
+                        : null,
+                      incluyeMadrugada ? "madrugada" : null,
+                    ]
+                      .filter(Boolean)
+                      .join(" + ")}
+              </p>
+            </div>
             <div className="bar">
               <button className="back" onClick={back}>
                 Atrás
               </button>
-              {modalidad === "diurno" && (
-                <button className="cta" disabled={!horarios.length} onClick={next}>
-                  Continuar
-                </button>
-              )}
+              <button className="cta" disabled={!seleccionOk} onClick={next}>
+                Continuar
+              </button>
             </div>
           </>
         )}
@@ -227,30 +324,38 @@ export default function Cotizador({ sitio }: { sitio: Sitio }) {
             </h2>
             <p className="qsub">Cada «subida» lleva tu aviso de nuevo a los primeros lugares.</p>
             <p className="step-note">
-              Las subidas son <b>en cada horario</b> que definiste
+              Las subidas son <b>en cada franja del día</b> que definiste
               {horarios.length > 0 && (
                 <>
                   {" "}
                   ({horarios.length} franja{horarios.length > 1 ? "s" : ""})
                 </>
               )}
-              : con <b>3 subidas</b> sube 3 veces en cada horario seleccionado; con <b>6 subidas</b>, 6 veces en cada horario.
+              : con <b>3 subidas</b> sube 3 veces en cada horario; con <b>6 subidas</b>, 6 veces.
+              {incluyeMadrugada && (
+                <>
+                  {" "}
+                  La <b>madrugada</b> siempre incluye 6 subidas.
+                </>
+              )}
             </p>
-            {([[3, "3 subidas en cada horario"], [6, "6 subidas en cada horario"]] as [number, string][]).map(([n, ds]) => (
-              <Opt
-                key={n}
-                on={subidas === n}
-                icon={`↑${n}`}
-                title={`${n} subidas`}
-                desc={ds}
-                onClick={() => pickAdvance(() => setSubidas(n))}
-              />
-            ))}
+            {([[3, "3 subidas en cada horario"], [6, "6 subidas en cada horario"]] as [number, string][]).map(
+              ([n, ds]) => (
+                <Opt
+                  key={n}
+                  on={subidas === n}
+                  icon={`↑${n}`}
+                  title={`${n} subidas`}
+                  desc={ds}
+                  onClick={() => pickAdvance(() => setSubidas(n))}
+                />
+              )
+            )}
             <BackBar onBack={back} />
           </>
         )}
 
-        {cur === "nivel" && subidasEfectivas && dias && (
+        {cur === "nivel" && subidasListas && dias && (
           <>
             <h2 className="q">
               ¿Qué tan destacado
@@ -261,7 +366,7 @@ export default function Cotizador({ sitio }: { sitio: Sitio }) {
               Toca TOP, Súper Top o Top All in One. Así ves cómo quedará tu aviso.
             </p>
             {sitio.niveles.map((n) => {
-              const p = precioUnitario(sitio, modalidad!, subidasEfectivas, dias, n.id);
+              const { valor, etiqueta } = precioNivel(n.id);
               return (
                 <button
                   key={n.id}
@@ -273,8 +378,8 @@ export default function Cotizador({ sitio }: { sitio: Sitio }) {
                     <span className="ds">{n.beneficio}</span>
                   </span>
                   <span className="pr">
-                    {clp(p)}
-                    <small>{modalidad === "diurno" ? "por horario" : "total"}</small>
+                    {clp(valor)}
+                    <small>{etiqueta}</small>
                   </span>
                 </button>
               );
@@ -300,7 +405,6 @@ export default function Cotizador({ sitio }: { sitio: Sitio }) {
             </div>
           </>
         )}
-
       </div>
     </div>
   );

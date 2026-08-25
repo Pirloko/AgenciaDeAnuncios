@@ -23,8 +23,10 @@ import { WENAS_DIAS_ORDER, WENAS_PRECIOS, type WenasDias } from "@/lib/wenas";
 import { GEMIDOS_OFERTAS, GEMIDOS_PLAN_INFO } from "@/lib/gemidos";
 import { iterarOfertasLocanto, LOCANTO_DIAS } from "@/lib/locanto";
 import { iterarOfertasChimbis } from "@/lib/chimbis";
-import { FALLBACK } from "@/lib/sitios";
-import { SKOKKA_PLANES_WEB } from "@/lib/admin-costos";
+import {
+  costosSkokkaDesdePromos,
+  seedSkokkaPromosConfig,
+} from "@/lib/promos-pagina-skokka";
 
 /** Sobrante máximo deseable al ajustar una promoción al presupuesto. */
 export const SOBRANTE_OBJETIVO = 1500;
@@ -39,18 +41,18 @@ export type ZonaPromo = "santiago" | "regiones";
 export const ZONA_PROMO_OPTS: { id: ZonaPromo; label: string; hint: string }[] = [
   {
     id: "santiago",
-    label: "Santiago o comunas de Santiago",
+    label: "Comuna de Santiago / Santiago de Chile",
     hint: "Región Metropolitana",
   },
   {
     id: "regiones",
-    label: "Regiones sur o norte",
+    label: "Regiones del sur o norte",
     hint: "Ciudades fuera de Santiago / RM",
   },
 ];
 
 export const ZONA_PROMO_LABEL: Record<ZonaPromo, string> = {
-  santiago: "Santiago / comunas",
+  santiago: "Santiago / comuna",
   regiones: "Sur o norte",
 };
 
@@ -101,37 +103,18 @@ export function parsePresupuestoCLP(raw: string): number | null {
 function catalogoDesdeWebPublica(): LineaPromo[] {
   const out: LineaPromo[] = [];
 
-  // Skokka — precio por 1 horario (diurno) / precio plano (madrugada)
-  const skokka = FALLBACK.skokka;
-  if (skokka) {
-    const mapPlan: Record<string, string> = {
-      TOP: "TOP",
-      "SUPER TOP": "SUPERTOP",
-      "TOP ALL IN ONE": "FULL DESTACADO",
-    };
-    for (const [modalidad, tabla] of [
-      ["diurno", skokka.diurno],
-      ["madrugada", skokka.madrugada],
-    ] as const) {
-      for (const [key, precios] of Object.entries(tabla)) {
-        const [subidas, dias] = key.split("-").map(Number);
-        for (const [nivelWeb, precio] of Object.entries(precios)) {
-          const plan = mapPlan[nivelWeb] ?? nivelWeb;
-          if (!(SKOKKA_PLANES_WEB as readonly string[]).includes(plan)) continue;
-          if (typeof precio !== "number" || precio <= 0) continue;
-          out.push({
-            id: `web-skokka-${modalidad}-${plan}-${subidas}-${dias}`,
-            sitio: "skokka",
-            plan,
-            etiqueta: `${PLAN_LABEL[plan] ?? plan} · ${subidas} sub · ${dias}d · ${modalidad === "diurno" ? "día" : "madrugada"}`,
-            categoria: modalidad,
-            dias,
-            subidas,
-            precio,
-          });
-        }
-      }
-    }
+  // Skokka: mismos precios del panel Promociones Skokka (seed / fallback)
+  for (const c of costosSkokkaDesdePromos(seedSkokkaPromosConfig())) {
+    out.push({
+      id: c.id,
+      sitio: c.sitio,
+      plan: c.plan,
+      etiqueta: c.etiqueta,
+      categoria: c.categoria,
+      dias: c.dias,
+      subidas: c.subidas,
+      precio: c.precio_venta!,
+    });
   }
 
   // Chimbis

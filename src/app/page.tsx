@@ -1,13 +1,22 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
+import JsonLd from "@/components/JsonLd";
 import { listarSitios } from "@/lib/sitios";
-import { SITE_NAME, SITE_DESCRIPTION, SITE_URL, getKeywords } from "@/lib/seo";
+import {
+  SITE_NAME,
+  SITE_DESCRIPTION,
+  SITE_URL,
+  getKeywords,
+  organizationJsonLd,
+} from "@/lib/seo";
 
 export const revalidate = 3600;
 
 export const metadata: Metadata = {
-  title: `${SITE_NAME} — Avisos destacados en Chile`,
+  title: {
+    absolute: `${SITE_NAME} — Publicaciones y anuncios escort en Chile`,
+  },
   description: SITE_DESCRIPTION,
   keywords: getKeywords(),
   alternates: { canonical: "/" },
@@ -16,7 +25,7 @@ export const metadata: Metadata = {
     locale: "es_CL",
     url: SITE_URL,
     siteName: SITE_NAME,
-    title: `${SITE_NAME} — Avisos destacados en Chile`,
+    title: `${SITE_NAME} — Publicaciones y anuncios escort en Chile`,
     description: SITE_DESCRIPTION,
   },
 };
@@ -26,23 +35,24 @@ export default async function Home() {
 
   return (
     <main className="app app--fill">
+      <JsonLd data={organizationJsonLd()} />
       <div className="home">
         <div className="home-avatar">
           <Image
             src="/perfil-agencia.png"
-            alt="Agencia de Publicaciones para Escort"
+            alt="Publicaciones Escort Chile — agencia de anuncios destacados"
             width={128}
             height={128}
             className="home-avatar__img"
             priority
           />
         </div>
-        <div className="big">
-          Agencia de Publicaciones
+        <h1 className="big">
+          Publicaciones escort
           <br />
-          para Escort
-        </div>
-        <p className="home-since">Desde 2015 en el rubro</p>
+          en Chile
+        </h1>
+        <p className="home-since">Desde 2015 · publicacionesescort.cl</p>
         <p className="lead">
           ¿Sin título ni textos? Te creamos uno que <b>vende</b>. Difuminamos o tapamos rostro y
           cubrimos tatuajes si lo necesitas.
@@ -73,10 +83,7 @@ export default async function Home() {
                 <span className="go">→</span>
               </Link>
             ) : (
-              <div
-                key={s.slug}
-                className="scard off"
-              >
+              <div key={s.slug} className="scard off">
                 <span className="slogo" style={{ color: s.color }}>
                   {s.nombre}
                 </span>
@@ -86,9 +93,17 @@ export default async function Home() {
             )
           )}
         </div>
+
+        <nav className="home-seo-links" aria-label="Guías de publicaciones escort">
+          <Link href="/publicaciones-escort-chile">Publicaciones escort Chile</Link>
+          <Link href="/anuncios-escort-chile">Anuncios escort Chile</Link>
+          <Link href="/donde-publicar-escort-chile">Dónde publicar</Link>
+        </nav>
       </div>
 
-      <footer className="foot">{SITE_NAME} · Catálogo de avisos destacados en Chile</footer>
+      <footer className="foot">
+        {SITE_NAME} · Publiescort y avisos destacados en todo Chile
+      </footer>
     </main>
   );
 }

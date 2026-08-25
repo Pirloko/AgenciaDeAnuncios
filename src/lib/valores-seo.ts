@@ -21,7 +21,7 @@ export function rutaValores(sitioSlug: string): string {
 /** Texto introductorio por sitio en la página de valores. */
 export const VALORES_INTRO: Record<ValoresSitioSlug, string> = {
   skokka:
-    "En Skokka eliges cuántas veces sube tu aviso al día, por cuántos días, el nivel (TOP, Súper Top o Top All in One) y en qué franjas horarias quieres que se vea. De día pagas por cada franja que marques; la madrugada es un precio único.",
+    "En Skokka eliges el pack (subidas y días) y ves la imagen con todos los precios por horarios. De día marcas las franjas que quieras; la madrugada es un bloque aparte de 00:00 a 06:00.",
   chimbis:
     "En Chimbis el precio depende de la zona (Santiago/RM u otras ciudades), los días, cuántas subidas quieres y el plan. Toca cada zona para ver su tabla completa.",
   locanto:
