@@ -11,6 +11,8 @@ export const SITE_URL =
 export const SITE_DESCRIPTION =
   "Publicaciones escort y anuncios escort en Chile. Agencia desde 2015: cotiza avisos destacados en Skokka, Locanto, Chimbis, Escorcitas, SimpleEscorts, Wenas y Gemidos. Textos que venden, difuminado de rostro y packs por presupuesto.";
 
+export const SITE_LOGO = `${SITE_URL}/logo-agencia.png`;
+
 /** Keywords globales (home + base). La meta keywords es secundaria; el contenido manda. */
 export const SITE_KEYWORDS: string[] = [
   "publicaciones escort",
@@ -188,6 +190,8 @@ export function organizationJsonLd() {
     name: SITE_NAME,
     alternateName: ["Publicaciones Escort", "Publiescort Chile", "Agencia de Publicaciones para Escort"],
     url: SITE_URL,
+    logo: SITE_LOGO,
+    image: SITE_LOGO,
     description: SITE_DESCRIPTION,
     areaServed: { "@type": "Country", name: "Chile" },
     knowsAbout: [

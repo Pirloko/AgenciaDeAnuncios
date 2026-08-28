@@ -1,6 +1,12 @@
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
-import { SITE_NAME, SITE_URL, SITE_DESCRIPTION, SITE_KEYWORDS } from "@/lib/seo";
+import {
+  SITE_NAME,
+  SITE_URL,
+  SITE_DESCRIPTION,
+  SITE_KEYWORDS,
+  SITE_LOGO,
+} from "@/lib/seo";
 import "./globals.css";
 
 const poppins = Poppins({
@@ -20,6 +26,13 @@ export const metadata: Metadata = {
   keywords: SITE_KEYWORDS,
   applicationName: SITE_NAME,
   alternates: { canonical: "/" },
+  icons: {
+    icon: [
+      { url: "/favicon.png", sizes: "48x48", type: "image/png" },
+      { url: "/icon.png", sizes: "192x192", type: "image/png" },
+    ],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+  },
   openGraph: {
     type: "website",
     locale: "es_CL",
@@ -27,6 +40,7 @@ export const metadata: Metadata = {
     siteName: SITE_NAME,
     title: `${SITE_NAME} — Publicaciones y anuncios escort en Chile`,
     description: SITE_DESCRIPTION,
+    images: [{ url: SITE_LOGO, width: 1080, height: 1080, alt: SITE_NAME }],
   },
   twitter: {
     card: "summary_large_image",

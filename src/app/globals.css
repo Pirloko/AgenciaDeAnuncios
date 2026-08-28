@@ -161,7 +161,7 @@ a { color: inherit; }
 .home-avatar__img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   display: block;
 }
 .home .big { font-size: 28px; font-weight: 800; letter-spacing: -.6px; line-height: 1.15; margin: 0 0 6px; }

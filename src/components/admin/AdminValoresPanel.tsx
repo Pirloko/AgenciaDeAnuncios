@@ -174,7 +174,7 @@ export default function AdminValoresPanel({ sitios }: Props) {
           <div className="home-avatar">
             {/* img nativo: html2canvas no captura bien next/image */}
             <img
-              src="/perfil-agencia.png"
+              src="/logo-agencia.png"
               alt="Agencia de Publicaciones para Escort"
               className="home-avatar__img"
               width={128}

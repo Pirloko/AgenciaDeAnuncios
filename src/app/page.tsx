@@ -7,6 +7,7 @@ import {
   SITE_NAME,
   SITE_DESCRIPTION,
   SITE_URL,
+  SITE_LOGO,
   getKeywords,
   organizationJsonLd,
 } from "@/lib/seo";
@@ -27,6 +28,7 @@ export const metadata: Metadata = {
     siteName: SITE_NAME,
     title: `${SITE_NAME} — Publicaciones y anuncios escort en Chile`,
     description: SITE_DESCRIPTION,
+    images: [{ url: SITE_LOGO, width: 1080, height: 1080, alt: SITE_NAME }],
   },
 };
 
@@ -39,7 +41,7 @@ export default async function Home() {
       <div className="home">
         <div className="home-avatar">
           <Image
-            src="/perfil-agencia.png"
+            src="/logo-agencia.png"
             alt="Publicaciones Escort Chile — agencia de anuncios destacados"
             width={128}
             height={128}
