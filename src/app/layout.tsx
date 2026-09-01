@@ -7,6 +7,7 @@ import {
   SITE_KEYWORDS,
   SITE_LOGO,
 } from "@/lib/seo";
+import GoogleAnalytics from "@/components/GoogleAnalytics";
 import "./globals.css";
 
 const poppins = Poppins({
@@ -57,7 +58,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es-CL" className={poppins.variable}>
-      <body>{children}</body>
+      <body>
+        <GoogleAnalytics />
+        {children}
+      </body>
     </html>
   );
 }
