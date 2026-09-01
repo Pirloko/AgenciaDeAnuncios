@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
+import HomeBannerCarousel from "@/components/HomeBannerCarousel";
 import JsonLd from "@/components/JsonLd";
 import { listarSitios } from "@/lib/sitios";
 import {
@@ -38,6 +39,7 @@ export default async function Home() {
   return (
     <main className="app app--fill">
       <JsonLd data={organizationJsonLd()} />
+      <HomeBannerCarousel />
       <div className="home">
         <div className="home-avatar">
           <Image
