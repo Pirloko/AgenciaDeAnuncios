@@ -28,6 +28,8 @@ import {
   precioChimbisEfectivo,
 } from "@/lib/chimbis";
 import { SITE_NAME, SITE_URL, getKeywords, SEO_OVERRIDES } from "@/lib/seo";
+import { getPublicidadLanding, listPublicidadSlugs } from "@/lib/seo-regiones";
+import SeoPublicidadPage, { metadataPublicidad } from "@/components/SeoPublicidadPage";
 import Link from "next/link";
 import { esValoresSitio, rutaValores } from "@/lib/valores-seo";
 import {
@@ -41,9 +43,18 @@ import {
 
 export const revalidate = 60; // precios admin → público (también se revalida al guardar en admin)
 
+function publicidadRegionDesdeSlug(slug: string): string | null {
+  const prefix = "publicidad-escort-";
+  if (!slug.startsWith(prefix)) return null;
+  return slug.slice(prefix.length);
+}
+
 export async function generateStaticParams() {
   const slugs = await listarSlugs();
-  return slugs.map((slug) => ({ slug }));
+  const publicidad = listPublicidadSlugs().map((region) => ({
+    slug: `publicidad-escort-${region}`,
+  }));
+  return [...slugs.map((slug) => ({ slug })), ...publicidad];
 }
 
 export async function generateMetadata({
@@ -52,6 +63,13 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
+  const regionPublicidad = publicidadRegionDesdeSlug(slug);
+  if (regionPublicidad) {
+    const landing = getPublicidadLanding(regionPublicidad);
+    if (landing) return metadataPublicidad(landing);
+    return {};
+  }
+
   const sitio = await obtenerSitio(slug);
   if (!sitio) return {};
 
@@ -85,6 +103,13 @@ export default async function SitioPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
+  const regionPublicidad = publicidadRegionDesdeSlug(slug);
+  if (regionPublicidad) {
+    const landing = getPublicidadLanding(regionPublicidad);
+    if (landing) return <SeoPublicidadPage landing={landing} />;
+    notFound();
+  }
+
   const sitioBase = await obtenerSitio(slug);
   if (!sitioBase || !sitioBase.disponible) notFound();
 

@@ -201,7 +201,7 @@ a { color: inherit; }
   background: var(--brand);
   transform: scale(1.15);
 }
-.home { flex: 1; display: flex; flex-direction: column; justify-content: center; text-align: center; padding: 20px 0 40px; }
+.home { flex: 1; display: flex; flex-direction: column; justify-content: flex-start; text-align: center; padding: 20px 0 40px; }
 .home-avatar {
   width: 128px;
   height: 128px;
@@ -234,6 +234,66 @@ a { color: inherit; }
   color: var(--brand);
   text-decoration: underline;
   text-underline-offset: 3px;
+}
+.home-ciudades {
+  margin-top: 28px;
+  padding: 20px 0 0;
+  border-top: 1px solid var(--line);
+  text-align: left;
+}
+.home-ciudades__title {
+  font-size: 17px;
+  font-weight: 800;
+  margin: 0 0 8px;
+  text-align: center;
+  letter-spacing: -.3px;
+}
+.home-ciudades__lead {
+  font-size: 13px;
+  color: var(--muted);
+  margin: 0 0 14px;
+  text-align: center;
+  line-height: 1.45;
+}
+.home-ciudades__regiones {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.home-ciudades__region {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  text-decoration: none;
+  color: inherit;
+  background: #fafafc;
+}
+.home-ciudades__region-name {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--brand);
+}
+.home-ciudades__region-cities {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.35;
+}
+.home-ciudades__more {
+  margin: 14px 0 0;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 700;
+}
+.home-ciudades__more a {
+  color: var(--brand);
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 .home-since { margin: 0 0 14px; font-size: 13px; font-weight: 600; letter-spacing: .2px; color: var(--brand, #e5167b); text-transform: uppercase; }
 .home .lead { color: var(--muted); font-size: 15px; margin: 0 0 12px; padding: 0 6px; line-height: 1.5; }
@@ -557,6 +617,68 @@ a { color: inherit; }
 }
 .seo-landing__more a {
   color: var(--brand);
+  font-weight: 700;
+}
+.seo-landing__region-more {
+  margin: 12px 0 0;
+  font-size: 13px;
+  font-weight: 700;
+}
+.seo-landing__region-more a {
+  color: var(--brand);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.anuncios-intro--highlight {
+  background: var(--brand-soft);
+  border: 1px solid #f5c4dc;
+  border-radius: 14px;
+  padding: 12px 14px;
+}
+.seo-regiones__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.seo-regiones__card {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  text-decoration: none;
+  color: inherit;
+  background: #fff;
+}
+.seo-regiones__card strong {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--brand);
+}
+.seo-regiones__card span {
+  font-size: 12.5px;
+  color: var(--muted);
+  line-height: 1.35;
+}
+.seo-ciudades__tags {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.seo-ciudades__tag {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--brand-soft);
+  color: var(--brand-d);
+  font-size: 13px;
   font-weight: 700;
 }
 

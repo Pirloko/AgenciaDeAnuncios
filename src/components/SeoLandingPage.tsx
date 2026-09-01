@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import JsonLd from "@/components/JsonLd";
 import { SITE_NAME, SITE_URL, getKeywords, organizationJsonLd } from "@/lib/seo";
+import { PUBLICIDAD_LANDINGS } from "@/lib/seo-regiones";
 
 const SITIOS_LINKS = [
   { href: "/skokka", nombre: "Skokka", desc: "TOP, Súper Top y All in One por franjas" },
@@ -33,8 +34,8 @@ const COPY: Record<
       "Publicaciones escort y publiescort en todo Chile. Cotiza anuncios escort en Skokka, Locanto, Chimbis, Escorcitas, SimpleEscorts, Wenas y Gemidos. Agencia desde 2015.",
     h1: "Publicaciones escort en Chile",
     intro: [
-      "Somos una agencia de publicaciones escort (publiescort) para todo Chile. Cotizas el aviso, te armamos el texto que vende y publicamos o destacamos en las páginas que más llaman.",
-      "Trabajamos Skokka, Locanto, Chimbis, Escorcitas, SimpleEscorts, Wenas y Gemidos. Si tienes presupuesto definido, arma un pack en el asistente de promociones.",
+      "Somos una agencia de publicaciones escort y publicidad para escort (publiescort) en todo Chile. Cotizas el aviso, te armamos el texto que vende y publicamos o destacamos en las páginas que más llaman.",
+      "Trabajamos Skokka, Locanto, Chimbis, Escorcitas, SimpleEscorts, Wenas y Gemidos. Atendemos sur, centro-sur y regiones: Puerto Montt, Concepción, Temuco, Rancagua y más.",
     ],
     faqs: [
       {
@@ -58,7 +59,7 @@ const COPY: Record<
       "Anuncios escort en Chile con precio al instante. Publicamos y destacamos tu aviso en Skokka, Locanto, Chimbis y más. Textos que venden y packs por presupuesto.",
     h1: "Anuncios escort en Chile",
     intro: [
-      "Si buscas anuncios escort en Chile con precio al tiro, aquí cotizas página por página o armas una promoción según tu presupuesto.",
+      "Si buscas anuncios escort o publicidad escort en Chile con precio al tiro, aquí cotizas página por página o armas una promoción según tu presupuesto.",
       "Desde 2015 ayudamos a publicar y destacar avisos: Skokka, Locanto, Chimbis, Escorcitas, SimpleEscorts, Wenas y Gemidos. WhatsApp listo cuando elijas el pack.",
     ],
     faqs: [
@@ -185,6 +186,23 @@ export default function SeoLandingPage({ kind }: { kind: LandingKind }) {
         </div>
 
         <section className="anuncios-block">
+          <h2 className="anuncios-h2">Publicidad escort por región</h2>
+          <ul className="seo-regiones__list">
+            {PUBLICIDAD_LANDINGS.filter((l) => l.slug !== "chile").map((r) => (
+              <li key={r.slug}>
+                <Link href={r.path} className="seo-regiones__card">
+                  <strong>{r.regionLabel}</strong>
+                  <span>{r.cities.join(" · ")}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+          <p className="seo-landing__region-more">
+            <Link href="/publicidad-escort-chile">Guía completa de publicidad escort en Chile →</Link>
+          </p>
+        </section>
+
+        <section className="anuncios-block">
           <h2 className="anuncios-h2">Páginas donde publicamos</h2>
           <ul className="seo-landing__sitios">
             {SITIOS_LINKS.map((s) => (
@@ -230,6 +248,8 @@ export default function SeoLandingPage({ kind }: { kind: LandingKind }) {
         </p>
 
         <p className="seo-landing__more">
+          <Link href="/publicidad-escort-chile">Publicidad escort Chile</Link>
+          {" · "}
           <Link href="/publicaciones-escort-chile">Publicaciones escort Chile</Link>
           {" · "}
           <Link href="/anuncios-escort-chile">Anuncios escort Chile</Link>

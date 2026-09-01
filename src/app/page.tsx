@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
 import HomeBannerCarousel from "@/components/HomeBannerCarousel";
+import HomeCiudadesSeo from "@/components/HomeCiudadesSeo";
 import JsonLd from "@/components/JsonLd";
 import { listarSitios } from "@/lib/sitios";
 import {
@@ -17,7 +18,7 @@ export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: {
-    absolute: `${SITE_NAME} — Publicaciones y anuncios escort en Chile`,
+    absolute: `${SITE_NAME} — Publicidad escort y anuncios en Chile`,
   },
   description: SITE_DESCRIPTION,
   keywords: getKeywords(),
@@ -27,7 +28,7 @@ export const metadata: Metadata = {
     locale: "es_CL",
     url: SITE_URL,
     siteName: SITE_NAME,
-    title: `${SITE_NAME} — Publicaciones y anuncios escort en Chile`,
+    title: `${SITE_NAME} — Publicidad escort y anuncios en Chile`,
     description: SITE_DESCRIPTION,
     images: [{ url: SITE_LOGO, width: 1080, height: 1080, alt: SITE_NAME }],
   },
@@ -52,14 +53,15 @@ export default async function Home() {
           />
         </div>
         <h1 className="big">
-          Publicaciones escort
+          Publicidad escort
           <br />
           en Chile
         </h1>
         <p className="home-since">Desde 2015 · publicacionesescort.cl</p>
         <p className="lead">
-          ¿Sin título ni textos? Te creamos uno que <b>vende</b>. Difuminamos o tapamos rostro y
-          cubrimos tatuajes si lo necesitas.
+          Agencia de <b>publicidad para escort</b> y publicaciones destacadas. ¿Sin título ni textos?
+          Te creamos uno que <b>vende</b>. Difuminamos o tapamos rostro y cubrimos tatuajes si lo
+          necesitas.
         </p>
         <p className="home-cta">
           Toca el sitio, define tu aviso y te damos el precio al instante.
@@ -99,10 +101,13 @@ export default async function Home() {
         </div>
 
         <nav className="home-seo-links" aria-label="Guías de publicaciones escort">
+          <Link href="/publicidad-escort-chile">Publicidad escort Chile</Link>
           <Link href="/publicaciones-escort-chile">Publicaciones escort Chile</Link>
           <Link href="/anuncios-escort-chile">Anuncios escort Chile</Link>
           <Link href="/donde-publicar-escort-chile">Dónde publicar</Link>
         </nav>
+
+        <HomeCiudadesSeo />
       </div>
 
       <footer className="foot">

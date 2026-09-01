@@ -19,7 +19,7 @@ const poppins = Poppins({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: `${SITE_NAME} — Publicaciones y anuncios escort en Chile`,
+    default: `${SITE_NAME} — Publicidad escort y anuncios en Chile`,
     template: `%s | ${SITE_NAME}`,
   },
   description: SITE_DESCRIPTION,
@@ -38,13 +38,13 @@ export const metadata: Metadata = {
     locale: "es_CL",
     url: SITE_URL,
     siteName: SITE_NAME,
-    title: `${SITE_NAME} — Publicaciones y anuncios escort en Chile`,
+    title: `${SITE_NAME} — Publicidad escort y anuncios en Chile`,
     description: SITE_DESCRIPTION,
     images: [{ url: SITE_LOGO, width: 1080, height: 1080, alt: SITE_NAME }],
   },
   twitter: {
     card: "summary_large_image",
-    title: `${SITE_NAME} — Publicaciones y anuncios escort en Chile`,
+    title: `${SITE_NAME} — Publicidad escort y anuncios en Chile`,
     description: SITE_DESCRIPTION,
   },
   robots: { index: true, follow: true },

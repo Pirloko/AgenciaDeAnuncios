@@ -9,12 +9,15 @@ export const SITE_URL =
   "https://publicacionesescort.cl";
 
 export const SITE_DESCRIPTION =
-  "Publicaciones escort y anuncios escort en Chile. Agencia desde 2015: cotiza avisos destacados en Skokka, Locanto, Chimbis, Escorcitas, SimpleEscorts, Wenas y Gemidos. Textos que venden, difuminado de rostro y packs por presupuesto.";
+  "Publicidad escort y publicaciones escort en Chile. Agencia desde 2015: cotiza avisos destacados en Skokka, Locanto, Chimbis, Escorcitas, SimpleEscorts, Wenas y Gemidos. Sur, centro y regiones.";
 
 export const SITE_LOGO = `${SITE_URL}/logo-agencia.png`;
 
 /** Keywords globales (home + base). La meta keywords es secundaria; el contenido manda. */
 export const SITE_KEYWORDS: string[] = [
+  "publicidad escort",
+  "publicidad para escort",
+  "agencia publicidad escort chile",
   "publicaciones escort",
   "publiescort",
   "anuncios escort",
@@ -25,6 +28,10 @@ export const SITE_KEYWORDS: string[] = [
   "avisos destacados escort chile",
   "cotizar aviso escort",
   "publicar escort chile",
+  "publicar escort puerto montt",
+  "publicar escort concepcion",
+  "publicar escort temuco",
+  "publicidad escort sur chile",
   "skokka",
   "locanto",
   "chimbis",
@@ -103,63 +110,70 @@ export const SEO_OVERRIDES: Record<
   { title?: string; description?: string }
 > = {
   skokka: {
-    title: "Skokka Chile: precios de avisos destacados (TOP, Súper Top, All in One)",
+    title: "Publicar en Skokka Chile — cotiza avisos destacados | Agencia desde 2015",
     description:
-      "Cotiza publicaciones escort en Skokka Chile: TOP, Súper Top y Top All in One por horarios, subidas y días. Precio al instante y packs con madrugada.",
+      "Publicidad escort en Skokka Chile. Cotiza TOP, Súper Top y All in One por horarios, subidas y días. Precio al instante. Publicamos en todo Chile.",
   },
   chimbis: {
-    title: "Chimbis Chile: precios de avisos destacados (TOP, Destacado, Historias)",
+    title: "Publicar en Chimbis Chile — cotiza TOP y Destacado | Santiago y regiones",
     description:
-      "Cotiza anuncios escort en Chimbis Chile: Santiago/RM o regiones. Planes TOP, Destacado e Historias por días y subidas.",
+      "Publicidad para escort en Chimbis Chile. Cotiza anuncios en Santiago/RM o regiones: TOP, Destacado e Historias. Agencia de publicaciones desde 2015.",
   },
   locanto: {
-    title: "Locanto Chile: precios TOP y Galería (7 días)",
+    title: "Publicar en Locanto Chile — precios TOP y Galería (7 días)",
     description:
-      "Cotiza anuncios escort en Locanto Chile: TOP, Galería o ambos por 7 días, visibles 24 hrs.",
+      "Publicidad escort en Locanto Chile. Cotiza TOP, Galería o ambos por 7 días. Precio al instante con agencia desde 2015.",
   },
   simpleescort: {
-    title: "SimpleEscorts Chile: Super Turbo 5X — precios por horario",
+    title: "Publicar en SimpleEscorts Chile — Super Turbo 5X por horario",
     description:
-      "Cotiza Super Turbo en SimpleEscorts Chile: foto más grande, etiqueta y 5 subidas por horario. Precio al instante.",
+      "Publicidad para escort en SimpleEscorts Chile. Cotiza Super Turbo: más visibilidad y 5 subidas por horario. Precio al instante.",
   },
   escorcitas: {
-    title: "Escorcitas Chile: precios TOP, PREMIUM y GOLD",
+    title: "Publicar en Escorcitas Chile — cotiza TOP, PREMIUM y GOLD",
     description:
-      "Cotiza publicaciones escort en Escorcitas Chile: TOP, PREMIUM y GOLD por 1, 3 o 7 días.",
+      "Publicidad escort en Escorcitas.cl. Cotiza anuncios destacados por 1, 3 o 7 días. Agencia de publicaciones desde 2015 en todo Chile.",
   },
   wenas: {
-    title: "Wenas Chile: precios VIP (7, 15 y 30 días)",
+    title: "Publicar en Wenas Chile (wenas.cl) — planes VIP con precio al instante",
     description:
-      "Cotiza tu aviso VIP en Wenas Chile (wenas.cl): 7, 15 o 30 días con precio al instante.",
+      "Publicidad para escort en Wenas Chile. Cotiza aviso VIP 7, 15 o 30 días. Agencia desde 2015. Atendemos Santiago y regiones.",
   },
   gemidos: {
-    title: "Gemidos.tv Chile: precios Classic, Gold, Platinum y más",
+    title: "Publicar en Gemidos.tv Chile — Classic, Gold, Platinum y más",
     description:
-      "Cotiza publicaciones en Gemidos.tv Chile: Classic, Gold, Platinum, Diamond, Diamond VIP y Black Rose.",
+      "Publicidad escort en Gemidos.tv Chile. Cotiza Classic, Gold, Platinum, Diamond y Black Rose. Precio al instante.",
   },
 };
 
 /** Landings SEO indexables (además de cotizadores / guías / valores). */
 export const SEO_LANDINGS = [
   {
+    path: "/publicidad-escort-chile",
+    title: "Publicidad escort Chile | Agencia de publicaciones desde 2015",
+    description:
+      "Publicidad escort y publicidad para escort en todo Chile. Cotiza avisos en Skokka, Chimbis, Escorcitas y más. Sur, centro y regiones.",
+    priority: 0.99,
+  },
+  {
     path: "/publicaciones-escort-chile",
     title: "Publicaciones escort Chile | Publiescort y avisos destacados",
     description:
-      "Publicaciones escort y publiescort en todo Chile. Cotiza anuncios escort en Skokka, Locanto, Chimbis, Escorcitas, SimpleEscorts, Wenas y Gemidos. Agencia desde 2015.",
+      "Publicaciones escort y publiescort en todo Chile. Publicidad para escort en Skokka, Locanto, Chimbis, Escorcitas, SimpleEscorts, Wenas y Gemidos. Agencia desde 2015.",
     priority: 0.98,
   },
   {
     path: "/anuncios-escort-chile",
     title: "Anuncios escort Chile | Cotiza y publica en las mejores páginas",
     description:
-      "Anuncios escort en Chile con precio al instante. Publicamos y destacamos tu aviso en Skokka, Locanto, Chimbis y más. Textos que venden y packs por presupuesto.",
+      "Anuncios escort en Chile con precio al instante. Publicidad escort en Skokka, Locanto, Chimbis y más. Textos que venden y packs por presupuesto.",
     priority: 0.97,
   },
   {
     path: "/donde-publicar-escort-chile",
     title: "Dónde publicar escort en Chile | Skokka, Locanto, Chimbis y más",
     description:
-      "Guía para elegir dónde publicar escort en Chile: Skokka, Locanto, Chimbis, Escorcitas, SimpleEscorts, Wenas, Gemidos y el panorama del mercado (Alcoba, Comunidad Escort).",
+      "Guía para elegir dónde publicar escort en Chile: Skokka, Locanto, Chimbis, Escorcitas, SimpleEscorts, Wenas, Gemidos y el panorama del mercado.",
     priority: 0.96,
   },
 ] as const;
@@ -195,6 +209,8 @@ export function organizationJsonLd() {
     description: SITE_DESCRIPTION,
     areaServed: { "@type": "Country", name: "Chile" },
     knowsAbout: [
+      "publicidad escort",
+      "publicidad para escort",
       "publicaciones escort",
       "anuncios escort",
       "Skokka",
