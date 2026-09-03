@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import JsonLd from "@/components/JsonLd";
+import SiteFooter from "@/components/SiteFooter";
 import { SITE_NAME, SITE_URL, getKeywords, organizationJsonLd } from "@/lib/seo";
 import { PUBLICIDAD_LANDINGS } from "@/lib/seo-regiones";
 
@@ -258,9 +259,7 @@ export default function SeoLandingPage({ kind }: { kind: LandingKind }) {
         </p>
       </article>
 
-      <footer className="foot">
-        <Link href="/">Ver sitios para cotizar</Link>
-      </footer>
+      <SiteFooter note={<Link href="/">Ver sitios para cotizar</Link>} />
     </main>
   );
 }

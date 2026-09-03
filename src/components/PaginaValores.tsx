@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import JsonLd from "@/components/JsonLd";
+import SiteFooter from "@/components/SiteFooter";
 import { TablaValoresPorSitio } from "@/components/TablasValores";
 import { obtenerSitio } from "@/lib/sitios";
 import { SITE_NAME, SITE_URL, getKeywords } from "@/lib/seo";
@@ -124,9 +125,7 @@ export default async function PaginaValores({
         </p>
       </article>
 
-      <footer className="foot">
-        <Link href="/">Ver otros sitios</Link>
-      </footer>
+      <SiteFooter note={<Link href="/">Ver otros sitios</Link>} />
     </main>
   );
 }

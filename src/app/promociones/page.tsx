@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import PromocionesPublicas from "@/components/PromocionesPublicas";
+import SiteFooter from "@/components/SiteFooter";
 import { SITE_NAME, SITE_URL, getKeywords } from "@/lib/seo";
 import {
   cargarPreciosPublicos,
@@ -36,5 +37,12 @@ export default async function PromocionesPage() {
   const costosBase = preciosPublicosComoCostos(rows);
   const promosSkokka = await cargarPromosSkokkaPublicas();
   const costos = fusionarCostosConPromosSkokka(costosBase, promosSkokka);
-  return <PromocionesPublicas costos={costos} />;
+  return (
+    <>
+      <PromocionesPublicas costos={costos} />
+      <div className="app">
+        <SiteFooter />
+      </div>
+    </>
+  );
 }

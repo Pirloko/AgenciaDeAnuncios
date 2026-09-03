@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import HomeBannerCarousel from "@/components/HomeBannerCarousel";
 import HomeCiudadesSeo from "@/components/HomeCiudadesSeo";
 import JsonLd from "@/components/JsonLd";
+import SiteFooter from "@/components/SiteFooter";
 import { listarSitios } from "@/lib/sitios";
 import {
   SITE_NAME,
@@ -110,9 +111,7 @@ export default async function Home() {
         <HomeCiudadesSeo />
       </div>
 
-      <footer className="foot">
-        {SITE_NAME} · Publiescort y avisos destacados en todo Chile
-      </footer>
+      <SiteFooter />
     </main>
   );
 }

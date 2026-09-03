@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { EjemploAviso } from "@/components/EjemploAviso";
 import JsonLd from "@/components/JsonLd";
+import SiteFooter from "@/components/SiteFooter";
 import {
   ejemplosVisualesSitio,
   faqAnchorId,
@@ -150,9 +151,7 @@ export default async function PaginaAnunciosSEO({
         </p>
       </article>
 
-      <footer className="foot">
-        <Link href="/">Ver otros sitios</Link>
-      </footer>
+      <SiteFooter note={<Link href="/">Ver otros sitios</Link>} />
     </main>
   );
 }

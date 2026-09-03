@@ -30,6 +30,7 @@ import {
 import { SITE_NAME, SITE_URL, getKeywords, SEO_OVERRIDES } from "@/lib/seo";
 import { getPublicidadLanding, listPublicidadSlugs } from "@/lib/seo-regiones";
 import SeoPublicidadPage, { metadataPublicidad } from "@/components/SeoPublicidadPage";
+import SiteFooter from "@/components/SiteFooter";
 import Link from "next/link";
 import { esValoresSitio, rutaValores } from "@/lib/valores-seo";
 import {
@@ -267,16 +268,21 @@ export default async function SitioPage({
         <Cotizador sitio={sitio} promosConfig={promosSkokka} />
       )}
       <CatalogoSEO sitio={sitio} />
-      <footer className="foot">
-        {sitio.descripcion[0]} <br />
-        {esValoresSitio(slug) && (
+      <SiteFooter
+        note={
           <>
-            <Link href={rutaValores(slug)}>Ver tabla completa de valores</Link>
+            {sitio.descripcion[0]}
             <br />
+            {esValoresSitio(slug) && (
+              <>
+                <Link href={rutaValores(slug)}>Ver tabla completa de valores</Link>
+                <br />
+              </>
+            )}
+            <Link href="/">Ver otros sitios</Link>
           </>
-        )}
-        <Link href="/">Ver otros sitios</Link>
-      </footer>
+        }
+      />
     </main>
   );
 }

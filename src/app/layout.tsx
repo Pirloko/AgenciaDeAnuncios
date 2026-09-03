@@ -7,6 +7,7 @@ import {
   SITE_KEYWORDS,
   SITE_LOGO,
 } from "@/lib/seo";
+import AgeGate from "@/components/AgeGate";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
 import "./globals.css";
 
@@ -60,6 +61,7 @@ export default function RootLayout({
     <html lang="es-CL" className={poppins.variable}>
       <body>
         <GoogleAnalytics />
+        <AgeGate />
         {children}
       </body>
     </html>
