@@ -198,6 +198,39 @@ export const PUBLICIDAD_LANDINGS: PublicidadLanding[] = [
   },
 ];
 
+/** Página dedicada a la búsqueda exacta “publicidad para escort”. */
+export const PUBLICIDAD_PARA_ESCORT: PublicidadLanding = {
+  slug: "para-escort",
+  path: "/publicidad-para-escort",
+  title: "Publicidad para escort en Chile | Cotiza avisos destacados",
+  description:
+    "Publicidad para escort en todo Chile. Cotiza y destaca tu aviso en Skokka, Chimbis, Escorcitas, Locanto, Wenas y Gemidos. Precio al instante, desde 2015.",
+  h1: "Publicidad para escort en Chile",
+  regionLabel: "Todo Chile",
+  cities: [],
+  intro: [
+    "Si buscas publicidad para escort, aquí cotizas el aviso antes de publicarlo. Eliges el sitio, los días, el plan o el presupuesto y ves el precio al instante.",
+    "Somos un cotizador de avisos destacados para escorts en Chile. Trabajamos Skokka, Locanto, Chimbis, Escorcitas, SimpleEscorts, Wenas y Gemidos, en Santiago y en regiones.",
+  ],
+  destacado:
+    "La publicidad para escort que ofrecemos es el destacado de tu anuncio: textos que venden, opción de difuminar rostro o cubrir tatuajes, y el pack listo para pedir por WhatsApp.",
+  faqs: [
+    {
+      q: "¿Qué incluye la publicidad para escort?",
+      a: "Cotización clara, título y texto orientados a vender, y la publicación o el destacado en la página que elijas: Skokka, Chimbis, Escorcitas, Locanto, Wenas, Gemidos o SimpleEscorts.",
+    },
+    {
+      q: "¿La publicidad para escort sirve en todo Chile?",
+      a: "Sí. Cotizamos para Santiago y para regiones: sur y Los Lagos, Araucanía, Biobío, Maule, O'Higgins y Valparaíso.",
+    },
+    {
+      q: "¿Cómo pido la publicidad para escort?",
+      a: "Entras al cotizador del sitio o a Armar promoción, revisas el total y envías el pedido por WhatsApp. El precio en pantalla se confirma al coordinar la publicación.",
+    },
+  ],
+  priority: 0.99,
+};
+
 const bySlug = new Map(PUBLICIDAD_LANDINGS.map((l) => [l.slug, l]));
 
 export function getPublicidadLanding(slug: string): PublicidadLanding | undefined {

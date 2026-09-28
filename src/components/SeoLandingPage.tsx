@@ -187,7 +187,7 @@ export default function SeoLandingPage({ kind }: { kind: LandingKind }) {
         </div>
 
         <section className="anuncios-block">
-          <h2 className="anuncios-h2">Publicidad escort por región</h2>
+          <h2 className="anuncios-h2">Publicidad para escort por región</h2>
           <ul className="seo-regiones__list">
             {PUBLICIDAD_LANDINGS.filter((l) => l.slug !== "chile").map((r) => (
               <li key={r.slug}>
@@ -249,6 +249,8 @@ export default function SeoLandingPage({ kind }: { kind: LandingKind }) {
         </p>
 
         <p className="seo-landing__more">
+          <Link href="/publicidad-para-escort">Publicidad para escort</Link>
+          {" · "}
           <Link href="/publicidad-escort-chile">Publicidad escort Chile</Link>
           {" · "}
           <Link href="/publicaciones-escort-chile">Publicaciones escort Chile</Link>

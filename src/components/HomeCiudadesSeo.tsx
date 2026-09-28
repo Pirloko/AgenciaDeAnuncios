@@ -6,9 +6,9 @@ export default function HomeCiudadesSeo() {
 
   return (
     <section className="home-ciudades" aria-label="Publicidad escort por región en Chile">
-      <h2 className="home-ciudades__title">Publicidad escort en todo Chile</h2>
+      <h2 className="home-ciudades__title">Publicidad para escort en todo Chile</h2>
       <p className="home-ciudades__lead">
-        Agencia de <b>publicidad para escort</b> desde 2015. Atendemos sur, centro-sur y regiones:
+        Cotizamos <b>publicidad para escort</b> desde 2015. Atendemos sur, centro-sur y regiones:
       </p>
       <ul className="home-ciudades__regiones">
         {regiones.map((r) => (
@@ -21,7 +21,7 @@ export default function HomeCiudadesSeo() {
         ))}
       </ul>
       <p className="home-ciudades__more">
-        <Link href="/publicidad-escort-chile">Ver guía de publicidad escort en Chile →</Link>
+        <Link href="/publicidad-para-escort">Guía de publicidad para escort →</Link>
       </p>
     </section>
   );

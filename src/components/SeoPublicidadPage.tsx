@@ -153,9 +153,9 @@ export default function SeoPublicidadPage({ landing }: { landing: PublicidadLand
           </ul>
         </section>
 
-        {landing.slug === "chile" && (
+        {(landing.slug === "chile" || landing.slug === "para-escort") && (
           <section className="anuncios-block">
-            <h2 className="anuncios-h2">Publicidad escort por región</h2>
+            <h2 className="anuncios-h2">Publicidad para escort por región</h2>
             <ul className="seo-regiones__list">
               {otrasRegiones.map((r) => (
                 <li key={r.slug}>
@@ -188,6 +188,8 @@ export default function SeoPublicidadPage({ landing }: { landing: PublicidadLand
         </p>
 
         <p className="seo-landing__more">
+          <Link href="/publicidad-para-escort">Publicidad para escort</Link>
+          {" · "}
           <Link href="/publicidad-escort-chile">Publicidad escort Chile</Link>
           {" · "}
           <Link href="/publicaciones-escort-chile">Publicaciones escort</Link>

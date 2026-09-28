@@ -9,7 +9,7 @@ export const SITE_URL =
   "https://publicacionesescort.cl";
 
 export const SITE_DESCRIPTION =
-  "Publicidad escort y publicaciones escort en Chile. Agencia desde 2015: cotiza avisos destacados en Skokka, Locanto, Chimbis, Escorcitas, SimpleEscorts, Wenas y Gemidos. Sur, centro y regiones.";
+  "Publicidad para escort en Chile. Cotiza avisos destacados en Skokka, Locanto, Chimbis, Escorcitas, SimpleEscorts, Wenas y Gemidos. Agencia desde 2015, sur, centro y regiones.";
 
 export const SITE_LOGO = `${SITE_URL}/logo-agencia.png`;
 
@@ -148,6 +148,13 @@ export const SEO_OVERRIDES: Record<
 
 /** Landings SEO indexables (además de cotizadores / guías / valores). */
 export const SEO_LANDINGS = [
+  {
+    path: "/publicidad-para-escort",
+    title: "Publicidad para escort en Chile | Cotiza avisos destacados",
+    description:
+      "Publicidad para escort en todo Chile. Cotiza y destaca tu aviso en Skokka, Chimbis, Escorcitas, Locanto, Wenas y Gemidos. Precio al instante, desde 2015.",
+    priority: 0.99,
+  },
   {
     path: "/publicidad-escort-chile",
     title: "Publicidad escort Chile | Agencia de publicaciones desde 2015",

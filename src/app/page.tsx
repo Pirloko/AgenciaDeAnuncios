@@ -19,7 +19,7 @@ export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: {
-    absolute: `${SITE_NAME} — Publicidad escort y anuncios en Chile`,
+    absolute: `Publicidad para escort en Chile | ${SITE_NAME}`,
   },
   description: SITE_DESCRIPTION,
   keywords: getKeywords(),
@@ -29,9 +29,9 @@ export const metadata: Metadata = {
     locale: "es_CL",
     url: SITE_URL,
     siteName: SITE_NAME,
-    title: `${SITE_NAME} — Publicidad escort y anuncios en Chile`,
+    title: `Publicidad para escort en Chile | ${SITE_NAME}`,
     description: SITE_DESCRIPTION,
-    images: [{ url: SITE_LOGO, width: 1080, height: 1080, alt: SITE_NAME }],
+    images: [{ url: SITE_LOGO, width: 496, height: 332, alt: SITE_NAME }],
   },
 };
 
@@ -43,26 +43,28 @@ export default async function Home() {
       <JsonLd data={organizationJsonLd()} />
       <HomeBannerCarousel />
       <div className="home">
-        <div className="home-avatar">
+        <div className="home-logo">
           <Image
             src="/logo-agencia.png"
             alt="Publicaciones Escort Chile — agencia de anuncios destacados"
-            width={128}
-            height={128}
-            className="home-avatar__img"
+            width={496}
+            height={332}
+            className="home-logo__img"
+            sizes="(max-width: 520px) 92vw, 420px"
+            quality={95}
             priority
           />
         </div>
         <h1 className="big">
-          Publicidad escort
+          Publicidad para escort
           <br />
           en Chile
         </h1>
         <p className="home-since">Desde 2015 · publicacionesescort.cl</p>
         <p className="lead">
-          Agencia de <b>publicidad para escort</b> y publicaciones destacadas. ¿Sin título ni textos?
-          Te creamos uno que <b>vende</b>. Difuminamos o tapamos rostro y cubrimos tatuajes si lo
-          necesitas.
+          Cotizador de <b>publicidad para escort</b>: eliges el sitio, armas el aviso y ves el
+          precio al instante. ¿Sin título ni textos? Te creamos uno que <b>vende</b>. Difuminamos
+          o tapamos rostro y cubrimos tatuajes si lo necesitas.
         </p>
         <p className="home-cta">
           Toca el sitio, define tu aviso y te damos el precio al instante.
@@ -102,6 +104,7 @@ export default async function Home() {
         </div>
 
         <nav className="home-seo-links" aria-label="Guías de publicaciones escort">
+          <Link href="/publicidad-para-escort">Publicidad para escort</Link>
           <Link href="/publicidad-escort-chile">Publicidad escort Chile</Link>
           <Link href="/publicaciones-escort-chile">Publicaciones escort Chile</Link>
           <Link href="/anuncios-escort-chile">Anuncios escort Chile</Link>

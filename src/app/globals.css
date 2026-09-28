@@ -219,6 +219,17 @@ a { color: inherit; }
   object-fit: contain;
   display: block;
 }
+.home-logo {
+  width: 100%;
+  max-width: 420px;
+  margin: 4px auto 18px;
+  line-height: 0;
+}
+.home-logo__img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
 .home .big { font-size: 28px; font-weight: 800; letter-spacing: -.6px; line-height: 1.15; margin: 0 0 6px; }
 .home-seo-links {
   display: flex;
